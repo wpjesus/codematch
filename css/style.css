@@ -4,9 +4,9 @@
 ****************************/
 
 body{
-	font-size: 12px;
+	font-size: 15px;
 	line-height: 22px;
-	color: #666;
+	color: #222;
 	border-top: 3px solid #eee;
 	background:#343434 url("../img/back.png") repeat;  
 	padding-top: 37px;
@@ -17,16 +17,17 @@ body{
 h1,h2,h3,h4,h5,h6{
 	padding: 2px 0px;
 	margin: 2px 0px;
-	color: #777;
+	color: #222;
 }
 
 h2{
 	font-size: 25px;
 	line-height: 35px;
+	margin-bottom: 10px;
 }
 
 h3{
-	font-size: 18px;
+	font-size: 20px;
 	line-height: 23px;
 }
 
@@ -51,16 +52,18 @@ p{
 }
 
 a{
-	color: #026b9c;
+	color: #3d22b3;
 }
 
 a:hover{
-	color: #003f5c;
+	color: #3d22b3;
 	text-decoration: none;
 }
 
 a:hover,a:active,a:focus {
 	outline: 0;
+	text-decoration:none;
+	color: #3d22b3;
 }
 
 .bold{
@@ -447,7 +450,7 @@ text-decoration:none;
    color:#777;
    font-size:23px;
    font-weight:bold;
-   padding-top:8px;
+   padding:8px 0 0 5px;
 }
 
 .navbar-brand:hover{
@@ -474,8 +477,19 @@ text-decoration:none;
 	color:#eee;
 	font-weight: bold;
 }
-
-.navbar li a:hover{
+.navbar-brand-name a{
+	color: #eee;
+    font-family: "Trebuchet MS", "PT Sans","Trebuchet","Seravek",sans-serif;
+    font-weight: bold;
+	font-size: 16px !important;
+	}
+.navbar-brand-name{
+	padding-bottom: 16px;
+    padding-top: 16px;
+	line-height: 18px;
+	display: block:
+	position: relative;
+	float: left;
 }
 
 .navbar i{
@@ -1802,9 +1816,7 @@ footer .copy{
 	.sidebar{
 		width: 200px;
 	}
-	.mainbar{
-		margin-left: 200px;
-	}
+	
    
    header{
       padding-top:10px;

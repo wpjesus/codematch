@@ -3033,6 +3033,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 @media (min-width: 768px) {
   .navbar-header {
     float: left;
+	width:57px;
   }
 }
 .navbar-collapse {
@@ -3166,8 +3167,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   margin: 8px -15px;
 }
 .navbar-nav > li > a {
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding: 16px 10px;
   line-height: 18px;
 }
 @media (max-width: 767px) {
@@ -3279,7 +3279,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
     box-shadow: none;
   }
   .navbar-form.navbar-right:last-child {
-    margin-right: 30px;
+    margin-right: 0px;
   }
 }
 .navbar-nav > li > .dropdown-menu {

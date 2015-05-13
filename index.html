@@ -12,6 +12,7 @@
 
 
   <!-- Stylesheets -->
+  <!-- Stylesheets -->
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <!-- Font awesome icon -->
   <link rel="stylesheet" href="css/font-awesome.min.css">
@@ -64,15 +65,15 @@
 		  <a href="index.html" class="navbar-brand" ><img src="img/ietflogo-small-transparent.png" /></a>
 		</div>
       <ul class="nav navbar-nav">	
-	  <li class="dropdown">
-			<a href="index.html" role="button" > Code<b>Match</b></a>
-		</li>
-      	<li class="dropdown">
-			<a href="dashboard.html" role="button" > <i class="fa fa-home"></i> </a>
+	  <div class="navbar-brand-name" style="border-right: 1px dotted WindowFrame; padding: 16px 7px 0 10px; height: 50px;">
+			<a href="index.html" role="button" > <span style="font-weight: normal">Code</span>Match</a>
+		</div>
+      	<li class="dropdown" style="margin-left:12px;">
+			<a href="dashboard.html" role="button" > <i class="fa fa-home"></i> Dashboard</a>
 		</li>
 		
 		<li class="dropdown">
-			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="icon ion-arrow-shrink" ></i> CodeMatches </a>
+			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="icon ion-arrow-shrink" ></i> Code matches </a>
 			<ul class="dropdown-menu" role="menu">
 				<li>
 					<a href="code_matches.html" rel="nofollow">All CodeMatches</a>
@@ -84,7 +85,7 @@
 		</li>
 		
 		<li class="dropdown">
-			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-microphone" ></i> CodeRequests </a>
+			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-microphone" ></i> Code requests </a>
 			<ul class="dropdown-menu" role="menu">
 				<li>
 					<a href="code_requests.html" rel="nofollow">All CodeRequests</a>
@@ -99,7 +100,7 @@
 		</li>
 		
 		<li class="dropdown">
-			<a class="dropdown-toggle" data-toggle="dropdown" href="#">  <i class="fa fa-star" ></i>Coders Hall-of-Fame </a>
+			<a class="dropdown-toggle" data-toggle="dropdown" href="#">  <i class="fa fa-star" ></i>Hall of fame </a>
 		</li>
 	  </ul>
 
@@ -107,9 +108,7 @@
         <!-- Links -->
         <ul class="nav navbar-nav pull-right">
           <li class="dropdown pull-right">            
-            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-              <i class="fa fa-user"></i> Admin <b class="caret"></b>              
-            </a>
+              <i class="fa fa-square-o" style="font-size: 38px; color: #fff; padding: 8px 10px 0 0;"></i>
             
             <!-- Dropdown menu -->
             <ul class="dropdown-menu">
@@ -140,7 +139,7 @@
 
   	  	<!-- Main bar -->
   	<div class="mainbar" style="background:none; min-">
-     <div style="padding:50px">
+     <div style="padding:25px">
 		<!-- Widget title -->
 		<div>
 		  <h2>Hi! Welcome to IETF CodeMatch!</h2>
@@ -151,26 +150,34 @@
 		  <!-- Widget content -->
 		  <p>Here comes the short description of IETF CodeMatch, informing its goals, results so fac, etc. Here comes the short description of IETF CodeMatch, informing its goals, results so fac, etc. Here comes the short description of IETF CodeMatch, informing its goals, results so fac, etc. Here comes the short description of IETF CodeMatch, informing its goals, results so fac, etc. Here comes the short description of IETF CodeMatch, informing its goals, results so fac, etc.</p>
 		  
+		  <div style="margin: 29px 22px 0 0; float: left;">
+			<i class="icon ion-arrow-shrink" style="font-size: 30px;padding-top:5px"></i>
+		  </div>
+		  
 		  <div style="margin: 20px 0">
-			<i class="icon ion-arrow-shrink" style="font-size: 30px; float: left; padding-top:5px"></i>
-			<p style="padding-left: 44px">
-			<a href="#">CodeMatches</a><br />
+		    <p>
+			<h3 style="padding-left:5px;"><a href="#">Code matches</a></h3>
 			Who's Implementing what?</p>
 		  </div>
 		  
-		   <div>
+		   <div style="margin: 8px 26px 0 0; float: left;">
 			<i class="fa fa-microphone" style="font-size: 30px; float: left; padding-top:5px"></i>
-			<p style="padding-left: 44px">
-			<a href="#"> CodeRequests</a><br />
+		  </div>
+		  <div style="margin: 20px 0">
+		    <p>
+			<h3 style="padding-left:5px;"><a href="#"> Code requests</a></h3>
 			Which coding opportunities are offered by the IETF?</p>
 		  </div>
 		  
-		   <div style="margin: 20px 0 ">
-			<i class="fa fa-star" style="font-size: 30px; float: left; padding-top:5px"></i>
-			<p style="padding-left: 44px">
-			<a href="#"> Coders Hall-of-Fame</a><br />
+		   <div style="margin: 8px 18px 0 0; float: left;">
+			 <i class="fa fa-star" style="font-size: 30px; float: left; padding-top:5px"></i>
+		   </div>
+		   <div style="margin: 20px 0">
+			<p>
+			<h3 style="padding-left:5px;"><a href="#"> Hall of fame</a></h3>
 			The stars of IETF CodeMatch!</p>
 		  </div>
+		  
 		  </div>
 		  <div class="widget-foot" ></div>
 		</div>
