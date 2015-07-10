@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% load ietf_filters %}
+
+{% block title %}List of CodeMatch Projects{% endblock %}
+
+{% block bodyAttrs %}data-spy="scroll" data-target="#affix"{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-10">
+
+      <h1>List of Codematch Projects</h1>
+
+      <div class="alert alert-info">
+        <p>
+Multiple development efforts can occur around a single draft or RFC, enabling collaboration between development efforts and opportunities for organizing plugfest and hackaton events.  
+        </p>
+
+        <p>
+	  The IETF takes no position regarding the validity or scope of any
+	  intellectual property rights or other rights that might be claimed to
+	  pertain to the implementation or use of the technology described in any IETF documents or the extent to
+	  which any license under such rights might or might not be available; nor does it represent that it has made any independent effort to identify any such rights.
+        </p>
+      </div>
+
+      <p class="buttonlist">
+        <a class="btn btn-default" href="{% url "ietf.codematch.views.about" %}">About</a>
+        <a class="btn btn-default" href="{% url "ietf.codematch.views.new" %}">New CodeMatch Project</a>
+        <a class="btn btn-default" href="{% url "ietf.codematch.views.search" %}">Search</a>
+      </p>
+
+      <h2 class="anchor-target" id="projectcontainers">List of CodeMatch Projects</h2>
+
+	<table class="table table-condensed table-striped projectcontainer-table">
+	  <thead>
+	    <tr>
+	      <th>Title for Project</th>
+	      <th>Protocol</th>
+	      <th>Description</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    {% for projectcontainer in projectcontainers %}
+	      <tr>
+		<td>
+		<a href="{% url 'show' projectcontainer.id %}">{{ projectcontainer.Title }}</a>
+		</td>
+		<td>
+		    <div>{{ projectcontainer.Protocol }}</div>
+		</td>
+		<td>
+		    <div>{{ projectcontainer.Description }}</div>
+		</td>
+	      </tr>
+	    {% endfor %}
+	  </tbody>
+	</table>
+
+    </div>
+
+    <div class="col-md-2 hidden-print bs-docs-sidebar" id="affix">
+    </div>
+  </div>
+{% endblock %}
