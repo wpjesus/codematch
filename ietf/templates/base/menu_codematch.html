@@ -1,0 +1,85 @@
+{# Copyright The IETF Trust 2015, All Rights Reserved #}{% load origin %}{% origin %}
+{% load ietf_filters community_tags wg_menu streams_menu %}
+
+<div class="navbar navbar-fixed-top bs-docs-nav" role="banner">
+  
+      <!-- Navigation starts -->
+      <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      	
+      <div class="pull-left">         
+      	<!-- Menu button for smallar screens -->
+      <div class="navbar-header">
+		  <button class="navbar-toggle btn-navbar" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+			<span>Menu</span>
+		  </button>
+		  <!-- Site name for smallar screens -->
+		  <a href="index.html" class="navbar-brand" ><img src="/images/ietflogo-small-transparent.png" /></a>
+		</div>
+      <ul class="nav navbar-nav">	
+	  <li class="dropdown">
+			<a href="index.html" role="button" > Code<b>Match</b></a>
+		</li>
+      	<li class="dropdown">
+			<a href="dashboard.html" role="button" > <i class="fa fa-home"></i> </a>
+		</li>
+		
+		<li class="dropdown">
+			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="icon ion-arrow-shrink" ></i> CodeMatches </a>
+			<ul class="dropdown-menu" role="menu">
+				<li>
+					<a href="code_matches.html" rel="nofollow">All CodeMatches</a>
+				</li>
+				<li>
+					<a href="my_code_matches.html">My CodeMatches</a>
+				</li>
+			</ul>
+		</li>
+		
+		<li class="dropdown">
+			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-microphone" ></i> CodeRequests </a>
+			<ul class="dropdown-menu" role="menu">
+				<li>
+					<a href="code_requests.html" rel="nofollow">All CodeRequests</a>
+				</li>
+				<li>
+					<a href="my_code_requests.html">My CodeRequests</a>
+				</li>
+				<li>
+					<a rel="nofollow" href="code_requests_mentoring.html">CodeRequests I'm Mentoring</a>
+				</li>
+			</ul>
+		</li>
+		
+		<li class="dropdown">
+			<a class="dropdown-toggle" data-toggle="dropdown" href="#">  <i class="fa fa-star" ></i>Coders Hall-of-Fame </a>
+		</li>
+	  </ul>
+
+    </div>
+        <!-- Links -->
+        <ul class="nav navbar-nav pull-right">
+          <li class="dropdown pull-right">            
+            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+              <i class="fa fa-user"></i> Admin <b class="caret"></b>              
+            </a>
+            
+            <!-- Dropdown menu -->
+            <ul class="dropdown-menu">
+              <li><a href="#"><i class="fa fa-user"></i> Profile</a></li>
+              <li><a href="#"><i class="fa fa-cogs"></i> Settings</a></li>
+              <li><a href="login.html"><i class="fa fa-sign-out"></i> Logout</a></li>
+            </ul>
+          </li>
+          
+        </ul>
+        
+        <!-- Search form -->
+        <form class="navbar-form navbar-right" role="search">
+			<div class="form-group">
+				<input type="text" class="form-control" placeholder="Search">
+			</div>
+		</form>
+       
+      </nav>
+
+</div>

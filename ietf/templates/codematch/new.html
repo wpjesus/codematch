@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% load ietf_filters bootstrap3 widget_tweaks %}
+{% load future %}
+
+{% block title %} Create a new CodeMatch Project{% endblock %}
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+{% block pagehead %}
+  <link rel="stylesheet" href="/css/lib/select2.css">
+  <link rel="stylesheet" href="/css/lib/select2-bootstrap.css">
+{% endblock %}
+
+{% block content %}
+
+<h1>Create a New Codematch Project</h1>
+
+  {% bootstrap_messages %}
+
+<form action="/codematch/new/" method="post">
+
+    {{ formset.management_form }}
+    {% csrf_token %}
+    {% for form in formset %}
+	{% for field in form %}
+	  <p>  {{ field.name }} : {{ field }} <p>
+	{% endfor %}
+    {% endfor %}
+    <p>
+    <input type="submit" value="Submit" />
+</form>
+
+{% endblock %}
+

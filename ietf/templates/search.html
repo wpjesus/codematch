@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}CodeMatch Projects Search{% endblock %}
+
+{% block content %}
+  <h1>CodeMatch Search</h1>
+
+  {% include "codematch/search_form.html" %}
+
+  {% if meta.searching %}
+    {% include "codematch/search_result.html" %}
+  {% endif %}
+{% endblock content %}
