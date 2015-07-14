@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_codematch.html" %}
 
 {% load future %}
 
@@ -10,79 +10,80 @@
 {% endblock %}
 
 {% block content %}
+<div class="content">
   <div id="projectcontainer-details">
 
     <h1>Project Details for: <small>{{ projectcontainer.Title }}</small></h1>
 
-<p>
-    <h2>Protocol: <small>{{ projectcontainer.Protocol }}</small></h1>
-    <h2>Description: <small>{{ projectcontainer.Description }}</small></h1>
-<p>
+	<p>
+    	<h2>Protocol: <small>{{ projectcontainer.Protocol }}</small></h1>
+    	<h2>Description: <small>{{ projectcontainer.Description }}</small></h1>
+	<p>
 
-<tbody>
-<h2>Related Documents:</h2>
-<table class="table table-condensed table-striped documents-table">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Working Group</th>
-    </tr>
-  </thead>
-    {% for doc in docs %}  
-      <tr>
-        <td>
-            <div><a  href="https://datatracker.ietf.org/doc/{{ doc.name}}"> {{ doc.name }} </a></div>
-        </td>
-        <td>
-            <div>{{ doc.document.group }}</div>
-        </td>
-      </tr>
-    {% endfor %}
-</table>
-</tbody>
-           <form action="/codematch/{{pk}}/" method="post">
-           {{ docform }}
-           {% csrf_token %}
-           <input type="submit" value="Add related Document" />
-           </form>
-
-<tbody>
-<h2>Implementations:</h2>
-<table class="table table-condensed table-striped implementations-table">
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Additional Information</th>
-      <th>URL</th>
-    </tr>
-  </thead>
-    {% for coding in codings %}  
-      <tr>
-        <td>
-            <div>{{ coding.Title }}</div>
-        </td>
-        <td>
-            <div>{{ coding.Additional_Information }}</div>
-        </td>
-        <td>
-            <div><a  href="{{coding.Link_to_Implementation}}"> {{ coding.Link_to_Implementation }} </a></div>
-        </td>
-      </tr>
-    {% endfor %}
-</table>
-</tbody>
-
-           <form action="/codematch/{{pk}}/" method="post">
-           Title:{{ codeform.Title }}  Info:{{ codeform.Additional_Information}}
-           <p>Link To Implementation:{{ codeform.Link_to_Implementation}}
-           {% csrf_token %}
-           <input type="submit" value="Add Implementation" />
-           </form>
-
-<p>
-  <p class="buttonlist">
-    <a class="btn btn-default" href="{% url "ietf.codematch.views.showlist" %}">Back to CodeMatch list page</a>
-  </p>
-<p>
-
+	<tbody>
+	<h2>Related Documents:</h2>
+	<table class="table table-condensed table-striped documents-table">
+	  <thead>
+	    <tr>
+	      <th>Name</th>
+	      <th>Working Group</th>
+	    </tr>
+	  </thead>
+	    {% for doc in docs %}  
+	      <tr>
+	        <td>
+	            <div><a  href="https://datatracker.ietf.org/doc/{{ doc.name}}"> {{ doc.name }} </a></div>
+	        </td>
+	        <td>
+	            <div>{{ doc.document.group }}</div>
+	        </td>
+	      </tr>
+	    {% endfor %}
+	</table>
+	</tbody>
+	           <form action="/codematch/{{pk}}/" method="post">
+	           {{ docform }}
+	           {% csrf_token %}
+	           <input type="submit" value="Add related Document" />
+	           </form>
+	
+	<tbody>
+	<h2>Implementations:</h2>
+	<table class="table table-condensed table-striped implementations-table">
+	  <thead>
+	    <tr>
+	      <th>Title</th>
+	      <th>Additional Information</th>
+	      <th>URL</th>
+	    </tr>
+	  </thead>
+	    {% for coding in codings %}  
+	      <tr>
+	        <td>
+	            <div>{{ coding.Title }}</div>
+	        </td>
+	        <td>
+	            <div>{{ coding.Additional_Information }}</div>
+	        </td>
+	        <td>
+	            <div><a  href="{{coding.Link_to_Implementation}}"> {{ coding.Link_to_Implementation }} </a></div>
+	        </td>
+	      </tr>
+	    {% endfor %}
+	</table>
+	</tbody>
+	
+	           <form action="/codematch/{{pk}}/" method="post">
+	           Title:{{ codeform.Title }}  Info:{{ codeform.Additional_Information}}
+	           <p>Link To Implementation:{{ codeform.Link_to_Implementation}}
+	           {% csrf_token %}
+	           <input type="submit" value="Add Implementation" />
+	           </form>
+	
+	<p>
+	  <p class="buttonlist">
+	    <a class="btn btn-default" href="{% url "ietf.codematch.views.showlist" %}">Back to CodeMatch list page</a>
+	  </p>
+	<p>
+</div>
 {% endblock content %}

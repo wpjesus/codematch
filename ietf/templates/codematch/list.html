@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_codematch.html" %}
 
 {% load ietf_filters %}
 
@@ -7,6 +7,7 @@
 {% block bodyAttrs %}data-spy="scroll" data-target="#affix"{% endblock %}
 
 {% block content %}
+<div class="content">
   <div class="row">
     <div class="col-md-10">
 
@@ -63,4 +64,5 @@ Multiple development efforts can occur around a single draft or RFC, enabling co
     <div class="col-md-2 hidden-print bs-docs-sidebar" id="affix">
     </div>
   </div>
+</div>
 {% endblock %}

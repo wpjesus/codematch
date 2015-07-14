@@ -797,8 +797,6 @@ header .header-data .hdata em{
 	margin-left: 0px;
 	margin-right: 0px;
 	width: auto;
-	background:#eee url("../images/main-back.png") repeat;
-	border-left: 1px solid #ccc;
 	z-index: 50;
 	/*min-height: 800px;*/
 }
@@ -1847,4 +1845,9 @@ footer .copy{
   ul.nav li.dropdown:hover > ul.dropdown-menu {
     display: block;
   }
+}
+
+.content{
+	padding: 50px 0 20px 50px;
+	background:#eee url("../images/main-back.png") repeat;
 }
