@@ -1,8 +1,9 @@
-{% extends "base.html" %}
+{% extends "base_codematch.html" %}
 
 {% block title %}CodeMatch Projects Search{% endblock %}
 
 {% block content %}
+<div class="content">
   <h1>CodeMatch Search</h1>
 
   {% include "codematch/search_form.html" %}
@@ -10,4 +11,6 @@
   {% if meta.searching %}
     {% include "codematch/search_result.html" %}
   {% endif %}
+ <div class="content">
+ 	
 {% endblock content %}
