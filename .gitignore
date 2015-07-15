@@ -2,3 +2,4 @@
 ietf/settings*
 buildbot/
 .pydevproject
+*.pyc
