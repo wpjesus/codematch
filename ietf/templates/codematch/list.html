@@ -7,62 +7,80 @@
 {% block bodyAttrs %}data-spy="scroll" data-target="#affix"{% endblock %}
 
 {% block content %}
-<div class="content">
-  <div class="row">
-    <div class="col-md-10">
+<!-- Main content starts -->
 
-      <h1>List of Codematch Projects</h1>
-
-      <div class="alert alert-info">
-        <p>
-Multiple development efforts can occur around a single draft or RFC, enabling collaboration between development efforts and opportunities for organizing plugfest and hackaton events.  
-        </p>
-
-        <p>
-	  The IETF takes no position regarding the validity or scope of any
-	  intellectual property rights or other rights that might be claimed to
-	  pertain to the implementation or use of the technology described in any IETF documents or the extent to
-	  which any license under such rights might or might not be available; nor does it represent that it has made any independent effort to identify any such rights.
-        </p>
-      </div>
-
-      <p class="buttonlist">
-        <a class="btn btn-default" href="{% url "ietf.codematch.views.about" %}">About</a>
-        <a class="btn btn-default" href="{% url "ietf.codematch.views.new" %}">New CodeMatch Project</a>
-        <a class="btn btn-default" href="{% url "ietf.codematch.views.search" %}">Search</a>
-      </p>
-
-      <h2 class="anchor-target" id="projectcontainers">List of CodeMatch Projects</h2>
-
-	<table class="table table-condensed table-striped projectcontainer-table">
-	  <thead>
-	    <tr>
-	      <th>Title for Project</th>
-	      <th>Protocol</th>
-	      <th>Description</th>
-	    </tr>
-	  </thead>
-	  <tbody>
-	    {% for projectcontainer in projectcontainers %}
-	      <tr>
-		<td>
-		<a href="{% url 'show' projectcontainer.id %}">{{ projectcontainer.Title }}</a>
-		</td>
-		<td>
-		    <div>{{ projectcontainer.Protocol }}</div>
-		</td>
-		<td>
-		    <div>{{ projectcontainer.Description }}</div>
-		</td>
-	      </tr>
-	    {% endfor %}
-	  </tbody>
-	</table>
-
+<div class="content" style="padding:0">
+    
+    <!-- Main bar -->
+    <div class="mainbar">
+        
+        <!-- Page heading -->
+        <div class="page-head">
+            <h2 class="pull-left"><i class="icon ion-arrow-shrink" style="font-size: 20px;"></i> CodeMatches</h2>
+            
+            <!-- Breadcrumb -->
+            <div class="bread-crumb pull-right">
+                <a href="#"><i class="fa fa-home"></i> Home</a>
+                <!-- Divider -->
+                <span class="divider">/</span>
+                <a href="#" class="bread-current">CodeMatches</a>
+            </div>
+            
+            <div class="clearfix"></div>
+            
+        </div>
+        <!-- Page heading ends -->
+        
+        <!-- Matter -->
+        
+        <div class="matter">
+            <div class="container">
+                
+                <!-- Recent News -->
+                <div class="col-md-12">
+                    <div class="widget">
+                        <!-- Widget title -->
+                        <div class="widget-head">
+                            <div class="pull-left">
+                                <i class="fa fa-sort"></i> <span style="font-weight: lighter">Order by: </span> Title/Project | <a href="#">Coder</a> | <a href="#">Coding Request</a> | <a href="#">Protocol</a> | <a href="#">Area</a> | <a href="#">Working Group</a>
+                            </div>
+                            <div class="widget-icons pull-right">
+                                <a href="#" class="wminimize"><i class="fa fa-chevron-up"></i></a>
+                                <a href="#" class="wclose"><i class="fa fa-times"></i></a>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="widget-content referrer">
+                            <!-- Widget content -->
+                            <div class="padd">
+                                <ul class="latest-news">
+                                    {% for projectcontainer in projectcontainers %}
+                                    <li>
+                                        <!-- Title and date -->
+                                        <h6><a href="{% url 'show' projectcontainer.id %}">{{ projectcontainer.Title }}</a> <span>by</span> <a href="#">?</a></h6>
+                                        <p>{{ projectcontainer.Description }}</p>
+                                        <p>
+                                        CodeRequest: <a href="#">?</a> | Protocol: <a href="#">{{ projectcontainer.Protocol }}</a> | Area: <a href="#">?</a> | Working Group: <a href="#">?</a>
+                                        </p>
+                                    </li>
+                                    {% endfor %}
+                                </ul> 
+                            </div>
+                            <div class="widget-foot">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+        <!-- Matter ends -->
+        
     </div>
-
-    <div class="col-md-2 hidden-print bs-docs-sidebar" id="affix">
-    </div>
-  </div>
+    
+    <!-- Mainbar ends -->
+    <div class="clearfix"></div>
+    
 </div>
-{% endblock %}
+<!-- Content ends -->{% endblock %}
