@@ -67,6 +67,11 @@
                                 </ul> 
                             </div>
                             <div class="widget-foot">
+                                <p class="buttonlist">
+                                <a class="btn btn-default" href="{% url "ietf.codematch.views.about" %}">About</a>
+                                <a class="btn btn-default" href="{% url "ietf.codematch.views.new" %}">New CodeMatch Project</a>
+                                <a class="btn btn-default" href="{% url "ietf.codematch.views.search" %}">Search</a>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -83,4 +88,6 @@
     <div class="clearfix"></div>
     
 </div>
-<!-- Content ends -->{% endblock %}
+<!-- Content ends -->
+
+{% endblock %}
