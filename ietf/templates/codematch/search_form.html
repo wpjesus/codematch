@@ -1,11 +1,8 @@
 {% load ietf_filters widget_tweaks bootstrap3 %}
 
-<h1>Search Options</h1>
-
 <form class="codematch-search clearfix" role="form">
 
   <div class="col-md-6">
-    <h2>Document search</h2>
 
     <div class="form-group">
 
@@ -13,7 +10,7 @@
         {% render_field form.doctitle class="form-control" placeholder="Draft-..." %}
         <span class="input-group-btn">
           <button class="btn btn-primary" type="submit" name="submit" value="doctitle"><span class="fa fa-search"></span> Search IETF Documents</button>
-	</span>
+		</span>
       </div>
 <p>
 

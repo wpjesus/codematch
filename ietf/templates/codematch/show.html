@@ -11,79 +11,124 @@
 
 {% block content %}
 <div class="content">
-  <div id="projectcontainer-details">
-
-    <h1>Project Details for: <small>{{ projectcontainer.Title }}</small></h1>
-
-	<p>
-    	<h2>Protocol: <small>{{ projectcontainer.Protocol }}</small></h1>
-    	<h2>Description: <small>{{ projectcontainer.Description }}</small></h1>
-	<p>
-
-	<tbody>
-	<h2>Related Documents:</h2>
-	<table class="table table-condensed table-striped documents-table">
-	  <thead>
-	    <tr>
-	      <th>Name</th>
-	      <th>Working Group</th>
-	    </tr>
-	  </thead>
-	    {% for doc in docs %}  
-	      <tr>
-	        <td>
-	            <div><a  href="https://datatracker.ietf.org/doc/{{ doc.name}}"> {{ doc.name }} </a></div>
-	        </td>
-	        <td>
-	            <div>{{ doc.document.group }}</div>
-	        </td>
-	      </tr>
-	    {% endfor %}
-	</table>
-	</tbody>
-	           <form action="/codematch/{{pk}}/" method="post">
-	           {{ docform }}
-	           {% csrf_token %}
-	           <input type="submit" value="Add related Document" />
-	           </form>
 	
-	<tbody>
-	<h2>Implementations:</h2>
-	<table class="table table-condensed table-striped implementations-table">
-	  <thead>
-	    <tr>
-	      <th>Title</th>
-	      <th>Additional Information</th>
-	      <th>URL</th>
-	    </tr>
-	  </thead>
-	    {% for coding in codings %}  
-	      <tr>
-	        <td>
-	            <div>{{ coding.Title }}</div>
-	        </td>
-	        <td>
-	            <div>{{ coding.Additional_Information }}</div>
-	        </td>
-	        <td>
-	            <div><a  href="{{coding.Link_to_Implementation}}"> {{ coding.Link_to_Implementation }} </a></div>
-	        </td>
-	      </tr>
-	    {% endfor %}
-	</table>
-	</tbody>
-	
-	           <form action="/codematch/{{pk}}/" method="post">
-	           Title:{{ codeform.Title }}  Info:{{ codeform.Additional_Information}}
-	           <p>Link To Implementation:{{ codeform.Link_to_Implementation}}
-	           {% csrf_token %}
-	           <input type="submit" value="Add Implementation" />
-	           </form>
-	
-	<p>
-	  <p class="buttonlist">
-	    <a class="btn btn-default" href="{% url "ietf.codematch.views.showlist" %}">Back to CodeMatch list page</a>
-	  </p>
-	<p>
+	<div class="container">
+
+		<div class="col-md-12">
+
+              <!-- User widget -->
+              <div class="widget">
+                <div class="widget-head">
+                  <div class="pull-left">
+					<i class="fa fa-chevron-circle-right"></i>  {{ projectcontainer.Title }}
+				  </div>
+                  <div class="widget-icons pull-right">
+                    <a href="#" class="wminimize"><i class="fa fa-chevron-up"></i></a> 
+                    <a href="my_code_matches.html" class="wclose"><i class="fa fa-times"></i></a>
+                  </div>  
+                  <div class="clearfix"></div>
+                </div>
+                <div class="widget-content">
+                  <div class="padd">
+
+                    <div class="user">
+
+                      <div class="user-details" style="margin-left: 0px; margin-bottom:20px;">
+                      	<div style="margin-left: 15px">
+                      		
+                      		<div class="row">
+		                      <div class="col-md-4">
+		                        <strong>By:</strong> <a href="#">?</a><br />
+	                      		<strong>Mentor:</strong> <a href="#">?</a><br />
+	                      		<strong>CodeRequest:</strong> External<br />
+	                      		<strong>Protocol:</strong> <a href="#">{{ projectcontainer.Protocol }}</a><br />
+	                      		<strong>Area:</strong> <a href="#">?</a>
+		                      </div>
+		
+		                      <div class="col-md-4">
+
+		                        <!-- Social Media strip -->
+		                        <div id="media-strip">
+		                        <a><i class="fa fa-facebook-square"></i></a>
+		                        <a><i class="fa fa-twitter-square"></i></a>
+		                        <a><i class="fa fa-google-plus-square"></i></a>
+		                        </div>
+	                          </div>            
+
+		                    </div>
+
+                      		<br />
+                      		
+                      		<h4><strong>Description</strong></h4>
+		                    <p>{{ projectcontainer.Description }}</p>
+		                    
+		                    <br />  
+		                    
+		                    <h4><strong>Documents</strong></h4>
+		                     {% for doc in docs %}  
+						      {{ doc.document.group }}: <a  href="https://datatracker.ietf.org/doc/{{ doc.name}}"> {{ doc.name }} </a>
+						      <br />
+						    {% endfor %}
+						    <hr />
+		                    <form action="/codematch/{{pk}}/" method="post">
+					           {{ docform }}
+					           {% csrf_token %}
+					           <input type="submit" value="Add related Document" />
+				            </form>
+		            		<br />
+		            		<br />
+		            		
+		            		<h4><strong>Implementations</strong></h4>
+		            		<ul>
+			            		{% for coding in codings %}  
+		                 			<li><a  href="{{coding.Link_to_Implementation}}"> {{ coding.Title }}</a>: {{ coding.Additional_Information }}</li>
+			           			{% endfor %}
+		            		</ul>
+		            		<hr />
+		            		<form class="form-horizontal" action="/codematch/{{pk}}/" method="post">
+								<div class="form-group">
+									<label class="control-label col-xs-2">Title:</label>
+									<div class="col-xs-4">
+										{{ codeform.Title }}
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="control-label col-xs-2">Info:</label>
+									<div class="col-xs-4">
+										{{ codeform.Additional_Information}}
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="control-label col-xs-2">Link To Implementation:</label>
+									<div class="col-xs-4">
+										{{ codeform.Link_to_Implementation}}
+									</div>
+								</div>
+		
+								{% csrf_token %}
+								<div class="form-group">
+    								<div class="col-xs-offset-2">
+										<input type="submit" value="Add Implementation" />
+									</div>
+								</div>
+							</form>
+                        </div>
+
+                      </div>
+                      <div class="clearfix"></div>
+                    </div>
+                  </div>
+                  <div class="widget-foot">
+                    <div class="pull-right">
+						<a class="btn btn-default btn-sm" href="{% url "ietf.codematch.views.showlist" %}">Back</a>
+					</div>
+					<div class="clearfix"></div>
+                  </div>
+                </div>
+              </div>  
+
+            </div>
+		</div>
 </div>
+		<!-- -asdfasdfasdfasdfa -->
 {% endblock content %}

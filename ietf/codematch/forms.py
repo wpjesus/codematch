@@ -18,6 +18,13 @@ class ProjectContainerForm(ModelForm):
     class Meta:
         model = ProjectContainer
         fields = [ "Title" , "Protocol" , "Description"]
+        
+    def __init__(self, *args, **kwargs):
+        super(ProjectContainerForm, self).__init__(*args, **kwargs)
+        for field in self.Meta.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
 
 class CodingProjectForm(ModelForm):
     class Meta:

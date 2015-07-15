@@ -14,22 +14,31 @@
 
 {% block content %}
 <div class="content">
-<h1>Create a New Codematch Project</h1>
-
+<h1 class="col-xs-offset-1">Create a New Codematch Project</h1>
+<br />
   {% bootstrap_messages %}
 
-<form action="/codematch/new/" method="post">
+<form class="form-horizontal" action="/codematch/new/" method="post">
 
     {{ formset.management_form }}
     {% csrf_token %}
     {% for form in formset %}
 	{% for field in form %}
-	  <p>  {{ field.name }} : {{ field }} <p>
+	<div class="form-group">
+		<label class="control-label col-xs-1">{{ field.name }}</label>
+		<div class="col-xs-4">
+			{{ field }}
+		</div>
+	</div>
 	{% endfor %}
     {% endfor %}
-    <p>
-    <input type="submit" value="Submit" />
+    <div class="form-group">
+    	<div class="col-xs-offset-4">
+    		<input type="submit" class="btn btn-primary" value="Submit" />
+    	
+    		<a class="btn btn-default " href="{% url "ietf.codematch.views.showlist" %}">Back</a>
+    	</div>
+    </div>
 </form>
 </div>
 {% endblock %}
-
