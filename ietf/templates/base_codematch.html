@@ -84,14 +84,14 @@
 	        <a href="https://www.iana.org/" class="padded">IANA</a>
 	    </div>
 	  </div>
-
+ 
       <footer class="row">
 	  <div class="col-md-12">
 	    <div class="text-center">
 	      <p class="small text-muted">
 	        {% if version_num %}
-		  <a href="/release/about">About</a> |
-	          IETF Datatracker |
+		  <a href="{% url "ietf.codematch.views.about" %}">About</a> |
+	          IETF CodeMatch |
 	          <a href="/release/{{version_num}}/">Version {{ version_num }}</a>
 	          | {{revision_date}} |
 	        {% endif %}

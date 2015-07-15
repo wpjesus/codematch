@@ -1,11 +1,55 @@
 {% extends "base_codematch.html" %}
 
 {% block title %}About CodeMatch
-  <a class="btn btn-default pull-right" href="{% url "ietf.codematch.views.showlist" %}">Back</a>
+
 {% endblock %}
 {% block content %}
-<div class="content">
-  <h1>About CodeMatch</h1>
+<div class="content" style="padding:0">
+
+	<!-- Main bar -->
+    <div class="mainbar">
+    	
+        <!-- Page heading -->
+        <div class="page-head">
+            <h2 class="pull-left"><i class="icon ion-arrow-shrink" style="font-size: 20px;"></i> CodeMatches</h2>
+            
+            <!-- Breadcrumb -->
+            <div class="bread-crumb pull-right">
+                <a href="#"><i class="fa fa-home"></i> Home</a>
+                <!-- Divider -->
+                <span class="divider">/</span>
+                <a href="#" class="bread-current">CodeMatches</a>
+                <span class="divider">/</span>
+                <a href="#" class="bread-current">About</a>
+            </div>
+            <div class="clearfix"></div>
+            
+        </div> <!-- Page heading ends -->
+
+    </div> <!-- Main bar ends -->
+        
+        <!-- Matter -->
+        
+        <div class="matter">
+            <div class="container">
+                
+                <!-- Recent News -->
+                <div class="col-md-12">
+                    <div class="widget">
+                        <!-- Widget title -->
+                        <div class="widget-head">
+                            <div class="pull-left">
+                                About CodeMatch
+                            </div>
+                            <div class="widget-icons pull-right">
+                                <a href="#" class="wminimize"><i class="fa fa-chevron-up"></i></a>
+                                <a href="#" class="wclose"><i class="fa fa-times"></i></a>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="widget-content referrer">
+                            <!-- Widget content -->
+                            <div class="padd">
 
 <h3>What it is</h3> 
 
@@ -60,25 +104,36 @@ Consumers of Code Bases - Why you should get involved
 Please note that licenses are issued by the developer and are independent of CodeMatch and the IETF. We do encourage the use of open source friendly license terms such as MIT or BSD. License terms may be included in the actual code that would be stored in a code repository linked to the CodeMatch site.
 Implementations may have a statement of interoperability if plugfest testing was performed
 </P>
-About the Internet Engineering Task Force (IETF)
+<h3>About the Internet Engineering Task Force (IETF) - <a href="http://www.ietf.org">www.ietf.org</a> </h4>
 
-www.ietf.org
 <p> 
 Formed in 1986, the mission of the IETF is to make the Internet work better by producing high quality, relevant technical documents that influence the way people design, use, and manage the Internet. Since its inception, the engineers who have been involved in the IETF have written more than 8500 Requests for Comments (RFCs) that impact how the billions of users on the Internet use connect, communicate, collaborate, and innovate across all facets of life.
 </p>
-About the Internet Research Task Force (IRTF)
 
-www.irtf.org
+<h3>About the Internet Research Task Force (IRTF) - <a href="http://www.irtf.org">www.irtf.org</a> </h4> 
+
 <p>
 While the IETF focuses on shorter term issues such as engineering and standards development, the IRTF focuses on longer term research issues, such as Internet Congestion Control, Delay Tolerant Networking, and CryptoForum Research. Its mission is to promote research of importance to the evolution of the Internet by creating focused, long term research groups working on topics related to Internet protocols, applications, architecture, and technology.
  </p>
-IETF CodeMatch
 
-<H1>codematch.ietf.org</H1>
-
-
-  <a class="btn btn-default pull-right" href="{% url "ietf.codematch.views.showlist" %}">Back</a>
-
+<a class="btn btn-info" href="http://codematch.ietf.org">codematch.ietf.org</a>
 
 </div>
+</div>
+                            <div class="widget-foot">
+                                <p class="buttonlist">
+                                	<a class="btn btn-default " href="{% url "ietf.codematch.views.showlist" %}">Back</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>        <!-- Matter ends -->
+    
+    <!-- Mainbar ends -->
+    <div class="clearfix"></div>
+    
+</div> <!-- Content ends -->
+
 {% endblock %}
