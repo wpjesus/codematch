@@ -14,10 +14,10 @@
 
 			<!-- Breadcrumb -->
 			<div class="bread-crumb pull-right">
-				<a href="#"><i class="fa fa-home"></i> Home</a>
+				<a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a>
 				<!-- Divider -->
 				<span class="divider">/</span>
-				<a href="#" class="bread-current">CodeMatches</a>
+				<a href="{% url "ietf.codematch.matches.views.showlist" %}" class="bread-current">CodeMatches</a>
 				<span class="divider">/</span>
 				<a href="#" class="bread-current">Search</a>
 			</div>
@@ -49,16 +49,16 @@
 						<div class="widget-content referrer">
 							<!-- Widget content -->
 								<div class="padd">
-									{% include "codematch/search_form.html" %}
+									{% include "codematch/matches/search_form.html" %}
 
 									{% if meta.searching %}
-									{% include "codematch/search_result.html" %}
+									{% include "codematch/matches/search_result.html" %}
 									{% endif %}
 								</div>
 								<div class="widget-foot">
 									<p class="buttonlist">
 										
-											<a class="btn btn-default " href="{% url "ietf.codematch.views.showlist" %}">Back</a>
+											<a class="btn btn-default " href="{% url "ietf.codematch.matches.views.showlist" %}">Back</a>
 										
 									</p>
 								</div>

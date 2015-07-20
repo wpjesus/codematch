@@ -2,7 +2,7 @@
 
 {% load future %}
 
-{% block title %}Details for Project - {{ projectcontainer.Title }}{% endblock %}
+{% block title %}Details for Project - {{ projectcontainer.title }}{% endblock %}
 
 <p>
 	{% block pagehead %}
@@ -21,12 +21,12 @@
 
 				<!-- Breadcrumb -->
 				<div class="bread-crumb pull-right">
-					<a href="#"><i class="fa fa-home"></i> Home</a>
+					<a href="{% url "ietf.codematch.views.index" %}" ><i class="fa fa-home"></i> Home</a>
 					<!-- Divider -->
 					<span class="divider">/</span>
-					<a href="#" class="bread-current">CodeMatches</a>
+					<a href="{% url "ietf.codematch.matches.views.showlist" %}" class="bread-current">CodeMatches</a>
 					<span class="divider">/</span>
-					<a href="#" class="bread-current">{{ projectcontainer.Title }}</a>
+					<a href="#" class="bread-current">{{ projectcontainer.title }}</a>
 				</div>
 				<div class="clearfix"></div>
 
@@ -47,7 +47,7 @@
 					<div class="widget">
 						<div class="widget-head">
 							<div class="pull-left">
-								<i class="fa fa-chevron-circle-right"></i> {{ projectcontainer.Title }}
+								<i class="fa fa-chevron-circle-right"></i> {{ projectcontainer.title }}
 							</div>
 							<div class="widget-icons pull-right">
 								<a href="#" class="wminimize"><i class="fa fa-chevron-up"></i></a>
@@ -71,7 +71,7 @@
 													<br />
 													<strong>CodeRequest:</strong> External
 													<br />
-													<strong>Protocol:</strong><a href="#">{{ projectcontainer.Protocol }}</a>
+													<strong>Protocol:</strong><a href="#">{{ projectcontainer.protocol }}</a>
 													<br />
 													<strong>Area:</strong><a href="#">?</a>
 												</div>
@@ -92,7 +92,7 @@
 
 											<h4><strong>Description</strong></h4>
 											<p>
-												{{ projectcontainer.Description }}
+												{{ projectcontainer.description }}
 											</p>
 
 											<br />
@@ -115,7 +115,7 @@
 											<ul>
 												{% for coding in codings %}
 												<li>
-													<a  href="{{coding.Link_to_Implementation}}"> {{ coding.Title }}</a>: {{ coding.Additional_Information }}
+													<a  href="{{coding.link_to_implementation}}"> {{ coding.title }}</a>: {{ coding.additional_information }}
 												</li>
 												{% endfor %}
 											</ul>
@@ -124,19 +124,19 @@
 												<div class="form-group">
 													<label class="control-label col-xs-2">Title:</label>
 													<div class="col-xs-4">
-														{{ codeform.Title }}
+														{{ codeform.title }}
 													</div>
 												</div>
 												<div class="form-group">
 													<label class="control-label col-xs-2">Info:</label>
 													<div class="col-xs-4">
-														{{ codeform.Additional_Information}}
+														{{ codeform.additional_information}}
 													</div>
 												</div>
 												<div class="form-group">
 													<label class="control-label col-xs-2">Link To Implementation:</label>
 													<div class="col-xs-4">
-														{{ codeform.Link_to_Implementation}}
+														{{ codeform.link_to_implementation}}
 													</div>
 												</div>
 
@@ -155,7 +155,7 @@
 							</div>
 							<div class="widget-foot">
 								<div class="pull-right">
-									<a class="btn btn-default btn-sm" href="{% url "ietf.codematch.views.showlist" %}">Back</a>
+									<a class="btn btn-default btn-sm" href="{% url "ietf.codematch.matches.views.showlist" %}">Back</a>
 								</div>
 								<div class="clearfix"></div>
 							</div>

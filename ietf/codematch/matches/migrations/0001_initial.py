@@ -9,22 +9,10 @@ class Migration(migrations.Migration):
     dependencies = [
         ('doc', '0004_auto_20150403_1235'),
         ('person', '0004_auto_20150308_0440'),
+        ('requests', '0001_initial'),
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='CodeRequest',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('Estimated_LoF', models.CharField(max_length=80)),
-                ('Additional_information', models.CharField(max_length=255)),
-                ('time', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(to='person.Person')),
-            ],
-            options={
-            },
-            bases=(models.Model,),
-        ),
         migrations.CreateModel(
             name='CodingProject',
             fields=[
@@ -46,7 +34,8 @@ class Migration(migrations.Migration):
                 ('Creation_date', models.DateTimeField(auto_now_add=True)),
                 ('Protocol', models.CharField(max_length=255)),
                 ('Description', models.CharField(max_length=255)),
-                ('CodeRequest', models.ForeignKey(blank=True, to='codematch.CodeRequest', null=True)),
+                ('CodeRequest', models.ForeignKey(blank=True, to='requests.CodeRequest', null=True)),
+                ('Person', models.ForeignKey(blank=True, to='person.Person', null=True)),
                 ('docs', models.ManyToManyField(to='doc.DocAlias')),
             ],
             options={
@@ -56,7 +45,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='codingproject',
             name='ProjectContainer',
-            field=models.ForeignKey(blank=True, to='codematch.ProjectContainer', null=True),
+            field=models.ForeignKey(blank=True, to='matches.ProjectContainer', null=True),
             preserve_default=True,
         ),
         migrations.AddField(

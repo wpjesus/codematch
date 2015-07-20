@@ -20,7 +20,7 @@
             
             <!-- Breadcrumb -->
             <div class="bread-crumb pull-right">
-                <a href="#"><i class="fa fa-home"></i> Home</a>
+                <a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a>
                 <!-- Divider -->
                 <span class="divider">/</span>
                 <a href="#" class="bread-current">CodeMatches</a>
@@ -68,10 +68,10 @@
                                     {% for projectcontainer in projectcontainers %}
                                     <li>
                                         <!-- Title and date -->
-                                        <h6><a href="{% url 'show' projectcontainer.id %}">{{ projectcontainer.Title }}</a> <span>by</span> <a href="#">?</a></h6>
-                                        <p>{{ projectcontainer.Description }}</p>
+                                        <h6><a href="{% url 'show' projectcontainer.id %}">{{ projectcontainer.title }}</a> <span>by</span> <a href="#">?</a></h6>
+                                        <p>{{ projectcontainer.description }}</p>
                                         <p>
-                                        CodeRequest: <a href="#">?</a> | Protocol: <a href="#">{{ projectcontainer.Protocol }}</a> | Area: <a href="#">?</a> | Working Group: <a href="#">?</a>
+                                        CodeRequest: <a href="#">?</a> | Protocol: <a href="#">{{ projectcontainer.protocol }}</a> | Area: <a href="#">?</a> | Working Group: <a href="#">?</a>
                                         </p>
                                     </li>
                                     {% endfor %}
@@ -79,8 +79,8 @@
                             </div>
                             <div class="widget-foot">
                                 <p class="buttonlist">
-                                <a class="btn btn-default" href="{% url "ietf.codematch.views.new" %}">New CodeMatch Project</a>
-                                <a class="btn btn-default" href="{% url "ietf.codematch.views.search" %}">Search</a>
+                                <a class="btn btn-default" href="{% url "ietf.codematch.matches.views.new" %}">New CodeMatch Project</a>
+                                <a class="btn btn-default" href="{% url "ietf.codematch.matches.views.search" %}">Search</a>
                                 </p>
                             </div>
                         </div>

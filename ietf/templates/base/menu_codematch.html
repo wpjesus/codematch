@@ -13,24 +13,24 @@
 			<span>Menu</span>
 		  </button>
 		  <!-- Site name for smallar screens -->
-		  <a href="index.html" class="navbar-brand" ><img src="/images/ietflogo-small-transparent.png" /></a>
+		  <a href="#" class="navbar-brand" ><img src="/images/ietflogo-small-transparent.png" /></a>
 		</div>
       <ul class="nav navbar-nav">	
 	  <li class="dropdown">
-			<a href="index.html" role="button" > Code<b>Match</b></a>
+			<a href="{% url "ietf.codematch.views.index" %}" role="button" > Code<b>Match</b></a>
 		</li>
       	<li class="dropdown">
-			<a href="dashboard.html" role="button" > <i class="fa fa-home"></i> </a>
+			<a href="#" role="button" > <i class="fa fa-home"></i> </a>
 		</li>
 		
 		<li class="dropdown">
 			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="icon ion-arrow-shrink" ></i> CodeMatches </a>
 			<ul class="dropdown-menu" role="menu">
 				<li>
-					<a href="{% url "ietf.codematch.views.showlist" %}">All CodeMatches</a>
+					<a href="{% url "ietf.codematch.matches.views.showlist" %}">All CodeMatches</a>
 				</li>
 				<li>
-					<a href="my_code_matches.html">My CodeMatches</a>
+					<a href="#">My CodeMatches</a>
 				</li>
 			</ul>
 		</li>
@@ -39,13 +39,13 @@
 			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-microphone" ></i> CodeRequests </a>
 			<ul class="dropdown-menu" role="menu">
 				<li>
-					<a href="code_requests.html" rel="nofollow">All CodeRequests</a>
+					<a href="#" rel="nofollow">All CodeRequests</a>
 				</li>
 				<li>
-					<a href="my_code_requests.html">My CodeRequests</a>
+					<a href="#">My CodeRequests</a>
 				</li>
 				<li>
-					<a rel="nofollow" href="code_requests_mentoring.html">CodeRequests I'm Mentoring</a>
+					<a rel="nofollow" href="#">CodeRequests I'm Mentoring</a>
 				</li>
 			</ul>
 		</li>
@@ -67,7 +67,7 @@
             <ul class="dropdown-menu">
               <li><a href="#"><i class="fa fa-user"></i> Profile</a></li>
               <li><a href="#"><i class="fa fa-cogs"></i> Settings</a></li>
-              <li><a href="login.html"><i class="fa fa-sign-out"></i> Logout</a></li>
+              <li><a href="#"><i class="fa fa-sign-out"></i> Logout</a></li>
             </ul>
           </li>
           

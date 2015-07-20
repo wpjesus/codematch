@@ -1,6 +1,9 @@
 from django import forms
 from django.forms import ModelForm, CharField
-from ietf.codematch.models import CodeRequest, ProjectContainer, CodingProject
+
+from ietf.codematch.matches.models import ProjectContainer, CodingProject
+from ietf.codematch.requests.models import CodeRequest
+
 from ietf.doc.fields import SearchableDocAliasField
 from ietf.doc.models import DocAlias
 
@@ -12,13 +15,13 @@ class SearchForm(forms.Form):
     person = forms.CharField(label="First Name or Last Name", max_length=128,required=False)
 
 class DocNameForm(forms.Form):
-    name = forms.CharField(label="name", max_length=128,required=True)
+    name = forms.CharField(label="Name", max_length=128,required=True)
 
 class ProjectContainerForm(ModelForm):
     class Meta:
         model = ProjectContainer
-        fields = [ "Title" , "Protocol" , "Description"]
-        
+        fields = [ "title" , "protocol" , "description"]
+                
     def __init__(self, *args, **kwargs):
         super(ProjectContainerForm, self).__init__(*args, **kwargs)
         for field in self.Meta.fields:
@@ -28,5 +31,6 @@ class ProjectContainerForm(ModelForm):
 
 class CodingProjectForm(ModelForm):
     class Meta:
-         model = CodingProject
-         fields = [ "Title" , "Additional_Information" , "Link_to_Implementation" ]
+        model = CodingProject
+        fields = [ "title" , "additional_information" , "link_to_implementation" ]
+        

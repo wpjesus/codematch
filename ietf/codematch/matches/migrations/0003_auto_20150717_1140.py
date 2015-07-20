@@ -7,15 +7,14 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('person', '0004_auto_20150308_0440'),
-        ('codematch', '0003_remove_projectcontainer_person'),
+        ('matches', '0002_auto_20150717_0919'),
     ]
 
     operations = [
-        migrations.AddField(
+        migrations.AlterField(
             model_name='projectcontainer',
-            name='Person',
-            field=models.ForeignKey(blank=True, to='person.Person', null=True),
+            name='title',
+            field=models.CharField(max_length=80, verbose_name='Title'),
             preserve_default=True,
         ),
     ]
