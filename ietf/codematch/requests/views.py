@@ -53,7 +53,7 @@ def new(request):
           project                   = new_project.save(commit=False)
           project.code_request      = code_request
           project.save()
-          return HttpResponseRedirect('/codematch/requests/'+str(code_request.id))
+          return HttpResponseRedirect('/codematch/requests/'+str(project.id))
        else:
           print "Some form is not valid"
 
