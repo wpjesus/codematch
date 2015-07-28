@@ -19,12 +19,6 @@ from ietf.codematch.requests.models import CodeRequest
 
 import debug                            
 
-def about(request):
-    return render(request, "codematch/matches/about.html", {})
-
-def index(request):
-    return render(request, "codematch/matches/index.html", {})
-
 def showlist(request):
     """List all ProjectContaineres by Title"""
     project_containers = ProjectContainer.objects.order_by('creation_date')[:20]
@@ -32,14 +26,13 @@ def showlist(request):
             'projectcontainers' : project_containers
     })
 
-
-def show(request,pk):
+def show(request, pk, ck):
     """View individual Codematch Project and Add Document and Implementation"""
-    doc_form = DocNameForm()
-    coding_form = modelform_factory(CodingProject,form=CodingProjectForm)
+    doc_form          = DocNameForm()
+    #coding_form       = modelform_factory(CodingProject,form=CodingProjectForm)
     project_container = get_object_or_404(ProjectContainer, id=pk)
-    docs = project_container.docs.select_related()
-    codings = CodingProject.objects.filter(project_container = pk)
+    coding            = get_object_or_404(CodingProject, id=ck)
+    docs              = project_container.docs.select_related()
 
     if request.method == 'POST':
        doc_name=request.POST.get("name")
@@ -52,22 +45,17 @@ def show(request,pk):
           project_container.save()
           return HttpResponseRedirect('/codematch/matches/'+str(pk))
 
-       elif code_form.is_valid():
-          new_code=code_form.save(commit=False)
-          new_code.project_container=project_container #TODO
-          new_code.save()
-          return HttpResponseRedirect('/codematch/matches/'+str(pk))
-
        else:
           print "Invalid Entry"
 
     return render(request, "codematch/matches/show.html",  {
         'projectcontainer': project_container,
-        'docs' : docs,
-        'codings' : codings,
-        'docform' : doc_form,
-        'codeform' : coding_form,
-        'pk' : pk,
+        'coding'          : coding,
+        'docs'            : docs,
+        'docform'         : doc_form,
+        #'codeform' : coding_form,
+        'pk'              : project_container.id,
+        'ck'              : coding
     })
 
 
@@ -88,13 +76,13 @@ def search(request):
 
             # Search by ProjectContainer Title or description
             if search_type == "title":
-                project_containers =  ProjectContainer.objects.filter(Title__icontains=query) | ProjectContainer.objects.filter(Description__icontains=query) 
+                project_containers =  ProjectContainer.objects.filter(title__icontains=query) | ProjectContainer.objects.filter(description__icontains=query) 
 
             elif search_type == "protocol":
                 project_containers = ProjectContainer.objects.filter(protocol__icontains=query) 
 
-            elif search_type == "person":
-                project_containers = ProjectContainer.objects.filter(Person__name__icontains=query) 
+            elif search_type == "coder":
+                project_containers = CodingProject.objects.filter(coder__name__icontains=query) 
 
             # Document list with a Codematch project
             elif search_type == "doctitle":
@@ -117,17 +105,42 @@ def search(request):
         return render(request, "codematch/matches/search.html", {"form":form })
 
 
-def new(request):
-    """ New ProjectContainer Entry """
-    form = modelform_factory(ProjectContainer,form=ProjectContainerForm)
+def new(request, pk=""):
+    """ New CodeRequest Entry """
+    proj_form = modelform_factory(ProjectContainer,form=ProjectContainerForm)
+    code_form = modelform_factory(CodingProject,form=CodingProjectForm)
+    
+    project_container = None
+    if pk != "":
+        project_container = get_object_or_404(ProjectContainer, id=pk)
+    
     if request.method == 'POST':
-       project = ProjectContainerForm(request.POST)
-       if project.is_valid():
-          project.person = Person.objects.filter(user=request.user.id)
-          project_container = project.save()
-          return HttpResponseRedirect('/codematch/matches/'+str(projectcontainer.id))
+       
+       project = None
+       if project_container == None:
+           new_project = ProjectContainerForm(request.POST)
+           if new_project.is_valid():
+              project = new_project.save()
        else:
-          print "Form is not valid"
+           project = project_container
+       
+       new_coding  = CodingProjectForm(request.POST)
+       
+       if project != None and new_coding.is_valid():
+          # TODO: review this
+          #new_request.mentor = Person.objects.filter(user=request.user.id)
+          coding                    = new_coding.save()
+          project.codings.add(coding)
+          project.save()
+          return HttpResponseRedirect('/codematch/matches/'+str(project.id)+'/'+str(coding.id))
+       else:
+          print "Some form is not valid"
+          return HttpResponseRedirect('/codematch/matches/lala.html')
 
-    return render(request, 'codematch/matches/new.html', {'formset': form})
+    return render(request, 'codematch/matches/new.html', {
+        'projform'         : proj_form,
+        'codeform'         : code_form,
+        'projectcontainer' : project_container,
+        'pk'               : pk
+    })
 

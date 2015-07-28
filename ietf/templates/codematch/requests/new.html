@@ -58,28 +58,14 @@
                         </div>
                         <div class="widget-content referrer">
                             <!-- Widget content -->
-                            <form class="form-horizontal" action="/codematch/matches/new{{pk}}/" method="POST">
-                            	<div class="padd">
-                            	{% if projectcontainer != None %}
-								<div class="form-group">
-									<label class="control-label col-xs-2">Title:</label>
+                            <form class="form-horizontal" action="/codematch/requests/new/" method="POST">
+                            <div class="padd">
+                            	<div class="form-group">
+									<label class="control-label col-xs-2">Mentor:</label>
 									<div class="col-xs-4">
-										{{ projectcontainer.title }}
+										{{ reqform.mentor }}
 									</div>
 								</div>
-								<div class="form-group">
-									<label class="control-label col-xs-2">Protocol:</label>
-									<div class="col-xs-4">
-										{{ projectcontainer.protocol}}
-									</div>
-								</div>
-								<div class="form-group">
-									<label class="control-label col-xs-2">Description:</label>
-									<div class="col-xs-4">
-										{{ projectcontainer.description}}
-									</div>
-								</div>
-								{% else %}
 								<div class="form-group">
 									<label class="control-label col-xs-2">Title:</label>
 									<div class="col-xs-4">
@@ -98,43 +84,20 @@
 										{{ projform.description}}
 									</div>
 								</div>
-								{% endif %}
-								<div class="form-group">
-									<label class="control-label col-xs-2">Coder</label>
-									<div class="col-xs-4">
-										{{ codeform.coder }}
-									</div>
-								</div>
-								<div class="form-group">
-									<label class="control-label col-xs-2">Title:</label>
-									<div class="col-xs-4">
-										{{ codeform.title }}
-									</div>
-								</div>
-								<div class="form-group">
-									<label class="control-label col-xs-2">Info:</label>
-									<div class="col-xs-4">
-										{{ codeform.additional_information}}
-									</div>
-								</div>
-								<div class="form-group">
-									<label class="control-label col-xs-2">Link To Implementation:</label>
-									<div class="col-xs-4">
-										{{ codeform.link_to_implementation}}
-									</div>
-								</div>
-								{% csrf_token %}
+								
 						   		<div class="widget-foot">
                                 <p class="buttonlist">
                                 	{% csrf_token %}
                                 	<div class="col-xs-offset-1">
 								    	<input type="submit" class="btn btn-primary" value="Submit" />
-                                		<a class="btn btn-default " href="{% url "ietf.codematch.matches.views.showlist" %}">Back</a>
+                                		<a class="btn btn-default " href="{% url "ietf.codematch.requests.views.showlist" %}">Back</a>
                                 	</div>
                                 </p>
                             	</div>
-								</div>
+                            	
+                            </div>
 							</form>
+							
                         </div>
                     </div>
                 </div>

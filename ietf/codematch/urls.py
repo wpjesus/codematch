@@ -6,10 +6,11 @@ from ietf.codematch import views
 
 urlpatterns = patterns('',
     url(r'^$', views.index, name="index"),
+    url(r'^about/$', views.about , name="about"),
                        
     #Matches
     url(r'^matches/$', include('ietf.codematch.matches.urls')),
     
     #Requests
-    #url(r'^requests/$', include('ietf.codematch.requests.urls')),
+    url(r'^requests/$', include('ietf.codematch.requests.urls')),
 )

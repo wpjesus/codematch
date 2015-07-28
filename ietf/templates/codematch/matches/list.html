@@ -66,14 +66,16 @@
                             <div class="padd">
                                 <ul class="latest-news">
                                     {% for projectcontainer in projectcontainers %}
-                                    <li>
-                                        <!-- Title and date -->
-                                        <h6><a href="{% url 'show' projectcontainer.id %}">{{ projectcontainer.title }}</a> <span>by</span> <a href="#">?</a></h6>
-                                        <p>{{ projectcontainer.description }}</p>
-                                        <p>
-                                        CodeRequest: <a href="#">?</a> | Protocol: <a href="#">{{ projectcontainer.protocol }}</a> | Area: <a href="#">?</a> | Working Group: <a href="#">?</a>
-                                        </p>
-                                    </li>
+                                    	{% for coding in projectcontainer.codings.all %}
+                                    	<li>
+                                        	<!-- Title and date -->
+                                        	<h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder }}</a></h6>
+                                        	<p>{{ projectcontainer.description }}</p>
+                                        	<p>
+                                        	CodeRequest: <a href="#">{{ projectcontainer.code_request }}</a> | Protocol: <a href="#">{{ projectcontainer.protocol }}</a> | Area: <a href="#">?</a> | Working Group: <a href="#">?</a>
+                                        	</p>
+                                    	</li>
+                                    	{% endfor %}
                                     {% endfor %}
                                 </ul> 
                             </div>

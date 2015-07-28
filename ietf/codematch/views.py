@@ -4,3 +4,6 @@ import debug
 
 def index(request):
     return render(request, "codematch/index.html", {})
+
+def about(request):
+    return render(request, "codematch/about.html", {})

@@ -28,4 +28,4 @@ EOF
 ) &
 
 PYTHONWARNINGS="d" HTTPS=1 PYTHONPATH=. python manage.py runserver
-mysql.server stop; kill $pid
+kill $pid
