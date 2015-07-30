@@ -44,7 +44,7 @@ def show(request, pk, ck):
           project_container.save()
           return HttpResponseRedirect('/codematch/matches/'+str(pk))
       
-       else
+       else:
           print "Invalid doc" #reload page
 
     return render(request, "codematch/matches/show.html",  {
