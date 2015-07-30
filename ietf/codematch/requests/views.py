@@ -11,9 +11,8 @@ from django.http import Http404, HttpResponseRedirect
 
 from ietf.group.models import Group
 from ietf.person.models import Person
-from ietf.doc.models import DocAlias, Document
 
-from ietf.codematch.matches.forms import SearchForm, ProjectContainerForm, DocNameForm, CodingProjectForm
+from ietf.codematch.matches.forms import ProjectContainerForm
 from ietf.codematch.requests.forms import CodeRequestForm
 from ietf.codematch.matches.models import ProjectContainer, CodingProject
 from ietf.codematch.requests.models import CodeRequest
@@ -22,18 +21,56 @@ import debug
 
 def showlist(request):
     """List all CodeRequests by Title"""
+    
     project_containers = ProjectContainer.objects.exclude(code_request__isnull=True).order_by('creation_date')[:20]
     return render(request, "codematch/requests/list.html", {
             'projectcontainers' : project_containers
-    })
+    })                 
 
 def search(request):
-    return render(request, "codematch/requests/search.html", {})
+    search_type = request.GET.get("submit")
+    if search_type:
+        form               = SearchForm(request.GET)
+        project_containers = []
+        template           = "codematch/requests/list.html"
+    
+        # get query field
+        query = ''
+        if request.GET.get(search_type):
+            query = request.GET.get(search_type)
+
+        if query :
+
+            # Search by ProjectContainer Title or description
+            if search_type   == "title":
+                project_containers  =  ProjectContainer.objects.filter(title__icontains=query) | ProjectContainer.objects.filter(description__icontains=query) 
+
+            elif search_type == "protocol":
+                project_containers  =  ProjectContainer.objects.filter(protocol__icontains=query) 
+
+            elif search_type == "mentor":
+                # TODO: review this
+                #project_containers = CodingProject.objects.filter(code_request__mentor__name__icontains=query) 
+                project_containers  =  ProjectContainer.objects.filter(code_request__mentor__icontains=query)
+
+            else:
+                raise Http404("Unexpected search type in ProjectContainer query: %s" % search_type)
+
+            return render(request, template, {
+                "projectcontainers" : project_containers,
+                "form"              : form,
+            })
+
+        return HttpResponseRedirect(request.path)
+
+    else:
+        form = SearchForm()
+        return render(request, "codematch/requests/search.html", { "form" : form })
 
 def show(request,pk):
     """View individual Codematch Project and Add Document and Implementation"""
+    
     project_container = get_object_or_404(ProjectContainer, id=pk)
-
     return render(request, "codematch/requests/show.html",  {
         'projectcontainer': project_container,
     })
@@ -41,15 +78,20 @@ def show(request,pk):
 
 def new(request):
     """ New CodeRequest Entry """
+    
     proj_form = modelform_factory(ProjectContainer,form=ProjectContainerForm)
-    code_form = modelform_factory(CodeRequest,form=CodeRequestForm)
+    req_form  = modelform_factory(CodeRequest,form=CodeRequestForm)
+    
     if request.method == 'POST':
        new_project = ProjectContainerForm(request.POST)
        new_request = CodeRequestForm(request.POST)
+       
        if new_project.is_valid() and new_request.is_valid():
-          # TODO: review this
-          #new_request.mentor = Person.objects.filter(user=request.user.id)
           code_request              = new_request.save()
+          # TODO: review this
+          #code_request             = new_request.save(commit=False)
+          #code_request.mentor      = Person.objects.filter(user=request.user.id)
+          #code_request.save()
           project                   = new_project.save(commit=False)
           project.code_request      = code_request
           project.save()
@@ -59,6 +101,6 @@ def new(request):
 
     return render(request, 'codematch/requests/new.html', {
         'projform' : proj_form,
-        'reqform' : code_form,
+        'reqform'  : req_form,
     })
 

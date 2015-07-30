@@ -2,6 +2,8 @@
 
 {% load ietf_filters %}
 
+{% load url from future %}
+
 {% block title %}List of CodeRequests{% endblock %}
 
 {% block bodyAttrs %}data-spy="scroll" data-target="#affix"{% endblock %}
@@ -18,7 +20,6 @@
 	    <!-- Page heading -->
 	    <div class="page-head">
 	      <h2 class="pull-left"><i class="fa fa-microphone"></i> CodeRequests</h2>
-
         <!-- Breadcrumb -->
         <div class="bread-crumb pull-right">
           <a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a> 
@@ -54,7 +55,13 @@
               <div class="widget">
                 <div class="widget-head">
                   <div class="pull-left">
-					<i class="fa fa-sort"></i> <span style="font-weight: lighter">Order by: </span> <a href="#">Code Request</a> | Protocol | <a href="#">Area</a> | <a href="#">Release date</a> | <a href="#">Popularity</a> | <a href="#">Working Group</a>
+					<i class="fa fa-sort"></i> <span style="font-weight: lighter">Order by: </span> 
+					<a href="#">Code Request</a> |
+					<a href="#">Protocol </a> | 
+					<a href="#">Area</a> | 
+					<a href="#">Release date</a> | 
+					<a href="#">Popularity</a> | 
+					<a href="#">Working Group</a>
 				  </div>
                   <div class="widget-icons pull-right">
                     <a href="#" class="wminimize"><i class="fa fa-chevron-up"></i></a> 
@@ -103,7 +110,7 @@
  	    		</div>
  	          	<li class="dropdown dropdown-big">
 		       		 <!--<a href="#myModal" class="btn btn-info btn-xs" style="padding:1px 5px" data-toggle="modal"><i class="fa fa-check"></i> Associate my project</a>--> 
-		       		<a href="{% url 'ietf.codematch.matches.views.new' pk=projectcontainer.id %}" class="btn btn-info btn-xs" style="padding:1px 5px" ><i class="fa fa-check"></i> Associate my project</a>
+		       		<a href="{% url 'ietf.codematch.matches.views.new' projectcontainer.id %}" class="btn btn-info btn-xs" style="padding:1px 5px" ><i class="fa fa-check"></i> Associate my project</a>
 		       	</li>
  	    
  	    		<hr />

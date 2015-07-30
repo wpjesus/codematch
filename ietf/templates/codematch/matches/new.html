@@ -1,6 +1,7 @@
 {% extends "base_codematch.html" %}
 
 {% load ietf_filters bootstrap3 widget_tweaks %}
+
 {% load future %}
 
 {% block title %} Create a new CodeMatch Project{% endblock %}
@@ -58,24 +59,25 @@
                         </div>
                         <div class="widget-content referrer">
                             <!-- Widget content -->
-                            <form class="form-horizontal" action="/codematch/matches/new{{pk}}/" method="POST">
+                            <form class="form-horizontal" action="/codematch/matches/new/{{pk}}/" method="post">
+                            	{% csrf_token %}
                             	<div class="padd">
                             	{% if projectcontainer != None %}
 								<div class="form-group">
 									<label class="control-label col-xs-2">Title:</label>
-									<div class="col-xs-4">
+									<div class="col-xs-4" style="margin-top: 5px">
 										{{ projectcontainer.title }}
 									</div>
 								</div>
 								<div class="form-group">
 									<label class="control-label col-xs-2">Protocol:</label>
-									<div class="col-xs-4">
+									<div class="col-xs-4" style="margin-top: 5px">
 										{{ projectcontainer.protocol}}
 									</div>
 								</div>
 								<div class="form-group">
 									<label class="control-label col-xs-2">Description:</label>
-									<div class="col-xs-4">
+									<div class="col-xs-4" style="margin-top: 5px">
 										{{ projectcontainer.description}}
 									</div>
 								</div>
@@ -123,10 +125,8 @@
 										{{ codeform.link_to_implementation}}
 									</div>
 								</div>
-								{% csrf_token %}
 						   		<div class="widget-foot">
                                 <p class="buttonlist">
-                                	{% csrf_token %}
                                 	<div class="col-xs-offset-1">
 								    	<input type="submit" class="btn btn-primary" value="Submit" />
                                 		<a class="btn btn-default " href="{% url "ietf.codematch.matches.views.showlist" %}">Back</a>

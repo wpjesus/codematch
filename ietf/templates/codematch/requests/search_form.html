@@ -6,14 +6,6 @@
 
     <div class="form-group">
 
-      <div class="input-group">
-        {% render_field form.doctitle class="form-control" placeholder="Draft-..." %}
-        <span class="input-group-btn">
-          <button class="btn btn-primary" type="submit" name="submit" value="doctitle"><span class="fa fa-search"></span> Search IETF Documents</button>
-		</span>
-      </div>
-<p>
-
 <p>
       <div class="input-group">
         {% render_field form.protocol class="form-control" placeholder="Protocol..." %}
@@ -32,9 +24,9 @@
 
 <p>
       <div class="input-group">
-        {% render_field form.coder class="form-control" placeholder="Coder..." %}
+        {% render_field form.mentor class="form-control" placeholder="Mentor..." %}
         <span class="input-group-btn">
-          <button class="btn btn-primary" type="submit" name="submit" value="coder"><span class="fa fa-search"></span> Search Document Authors</button>
+          <button class="btn btn-primary" type="submit" name="submit" value="mentor"><span class="fa fa-search"></span> Search Document Mentors</button>
 	</span>
       </div>
 

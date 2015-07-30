@@ -15,17 +15,15 @@ class CodeRequest (models.Model):
 
     
     #mentor                 = models.ForeignKey(Person)
-
-    #TODO remove this
     mentor                  = models.CharField(max_length=80)
 
     #Estimated Level of Effort
     #TODO: CharField?????
-    estimated_lof          = models.CharField(max_length=80, blank=True)
+    estimated_lof           = models.CharField(max_length=80, blank=True)
     
     # The author can include additional text to describe his request
-    additional_information = models.CharField(max_length=255, blank=True)
-    creation_date          = models.DateTimeField(auto_now_add=True)
+    additional_information  = models.CharField(max_length=255, blank=True)
+    creation_date           = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
         return self.additional_information

@@ -66,8 +66,10 @@
 											<div class="row">
 												<div class="col-md-4">
 													<strong>By:</strong><a href="#">{{ coding.coder }}</a>
+													<!--<strong>By:</strong><a href="#">{{ coding.coder.name }}</a>-->
 													<br />
 													<strong>Mentor:</strong><a href="#">{{ projectcontainer.code_request.mentor }}</a>
+													<!--<strong>Mentor:</strong><a href="#">{{ projectcontainer.code_request.mentor.name }}</a>-->
 													<br />
 													<strong>CodeRequest:</strong> {{ projectcontainer.code_request.id }}
 													<br />
@@ -103,7 +105,7 @@
 											<br />
 											{% endfor %}
 											<hr />
-											<form action="/codematch/matches/{{pk}}/" method="post">
+											<form action="/codematch/matches/{{projectcontainer.id}}/" method="post">
 												{{ docform }}
 												{% csrf_token %}
 												<input type="submit" value="Add related Document" />

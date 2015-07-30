@@ -57,26 +57,29 @@
                   </div>  
                   <div class="clearfix"></div>
                 </div>
+                
                 <div class="widget-content">
                   <div class="padd">
-<!-- Modal -->
-<div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-<div class="modal-dialog">
-  <div class="modal-content">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h4 class="modal-title">Alert</h4>
-  </div>
-  <div class="modal-body">
-    <p>To request an offer, you must first log in to IETF CodeMatch</p>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
-    <button type="button" class="btn btn-primary" onclick="location.href = 'login.html';" >Log in</button>
-  </div>
-</div>
-</div>
-</div>
+                  	
+				<!-- Modal -->
+				<div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+					  <div class="modal-content">
+						  <div class="modal-header">
+						    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						    <h4 class="modal-title">Alert</h4>
+						  </div>
+						  <div class="modal-body">
+						    <p>To request an offer, you must first log in to IETF CodeMatch</p>
+						  </div>
+						  <div class="modal-footer">
+						    <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+						    <button type="button" class="btn btn-primary" onclick="location.href = 'login.html';" >Log in</button>
+						  </div>
+						</div>
+					</div>
+				</div>
+				
                     <div class="user">
 
                       <div class="user-details" style="margin-left: 0px; margin-bottom:20px;">
@@ -90,7 +93,7 @@
 		                      </div>
 		
 		                      <div class="col-md-4">
-		                        <a href="#myModal" class="btn btn-info btn-xs" style="padding:1px 5px" data-toggle="modal"><i class="fa fa-check"></i> Associate my project</a>
+		                        <a href="{% url 'ietf.codematch.matches.views.new' projectcontainer.id %}" class="btn btn-info btn-xs" style="padding:1px 5px"><i class="fa fa-check"></i> Associate my project</a>
 
 		                        <!-- Social Media strip -->
 		                        <div id="media-strip">
@@ -111,8 +114,9 @@
 		                    
 		                    <h4><strong>Resources</strong></h4>
 		                    Mentor: <a href="#">{{ projectcontainer.code_request.mentor }}</a><br />
+		                    <!--Mentor: <a href="#">{{ projectcontainer.code_request.mentor.name }}</a><br />-->
 		            		Mailing list: <a href="#">?</a> - <a href="#">?</a><br />
-		            		Twitter: <a href="#"</a>?<br />
+		            		Twitter: <a href="#">?</a><br />
 		            		Facebook: <a href="#">?</a>
 		            		
 		            		<br />
@@ -131,12 +135,12 @@
                     </div>
                     
                   </div>
-                  <div class="widget-foot">
-                    <div class="pull-right">
-						<button class="btn btn-default btn-sm" onclick="location.href = 'code_requests.html';">Back</button>
+					<div class="widget-foot">
+						<div class="pull-right">
+							<a class="btn btn-default btn-sm" href="{% url "ietf.codematch.requests.views.showlist" %}">Back</a>
+						</div>
+						<div class="clearfix"></div>
 					</div>
-					<div class="clearfix"></div>
-                  </div>
                 </div>
               </div>  
 
