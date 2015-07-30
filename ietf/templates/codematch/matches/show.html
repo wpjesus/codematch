@@ -105,7 +105,7 @@
 											<br />
 											{% endfor %}
 											<hr />
-											<form action="/codematch/matches/{{projectcontainer.id}}/" method="post">
+											<form action="/codematch/matches/{{projectcontainer.id}}/{{coding.id}}" method="post">
 												{{ docform }}
 												{% csrf_token %}
 												<input type="submit" value="Add related Document" />

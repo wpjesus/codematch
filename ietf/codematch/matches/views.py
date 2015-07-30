@@ -42,7 +42,7 @@ def show(request, pk, ck):
           doc = DocAlias.objects.get( name = doc_name )
           project_container.docs.add(doc)
           project_container.save()
-          return HttpResponseRedirect('/codematch/matches/'+str(pk))
+          return HttpResponseRedirect('/codematch/matches/'+str(pk)+'/'+str(ck))
       
        else:
           print "Invalid doc" #reload page
