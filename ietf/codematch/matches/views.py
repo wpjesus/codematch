@@ -9,6 +9,8 @@ from django.forms.models import modelform_factory, inlineformset_factory
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponseRedirect
 
+from django.contrib.auth.decorators import login_required
+
 from ietf.group.models import Group
 from ietf.person.models import Person
 from ietf.doc.models import DocAlias, Document
@@ -23,8 +25,10 @@ def showlist(request):
     """List all ProjectContaineres by Title"""
     
     project_containers = ProjectContainer.objects.order_by('creation_date')[:20]
+    codings            = CodingProject.objects.all()
     return render(request, "codematch/matches/list.html", {
-            'projectcontainers' : project_containers
+            'projectcontainers' : project_containers,
+            'codings'           : codings
     })
 
 def show(request, pk, ck):
@@ -62,7 +66,9 @@ def search(request):
         docs = None
         project_containers = []
         template = "codematch/matches/list.html"
-    
+        
+        codings = CodingProject.objects.all()
+        
         # get query field
         query = ''
         if request.GET.get(search_type):
@@ -78,9 +84,9 @@ def search(request):
                 project_containers = ProjectContainer.objects.filter(protocol__icontains=query) 
 
             elif search_type == "coder":
-                # TODO: review this
-                #project_containers = CodingProject.objects.filter(codings__coder__name__icontains=query) 
-                project_containers  = ProjectContainer.objects.filter(codings__coder__icontains=query).distinct()
+                # review this
+                project_containers = ProjectContainer.objects.filter(codings__coder__name__icontains=query).distinct()
+                codings            = CodingProject.objects.filter(coder__name__icontains=query)
 
             # Document list with a Codematch project
             elif search_type == "doctitle":
@@ -91,6 +97,7 @@ def search(request):
 
             return render(request, template, {
                 "projectcontainers" : project_containers,
+                "codings"           : codings,
                 "docs"              : docs,
                 "form"              : form,
             })
@@ -102,6 +109,7 @@ def search(request):
         return render(request, "codematch/matches/search.html", { "form" : form })
 
 
+@login_required(login_url='/codematch/accounts/login')
 def new(request, pk=""):
     """ New CodeMatch Entry """
     
@@ -125,11 +133,9 @@ def new(request, pk=""):
        new_coding  = CodingProjectForm(request.POST)
        
        if project != None and new_coding.is_valid():
-          coding                    = new_coding.save()
-          # TODO: review this
-          #coding                   = new_coding.save(commit=False)
-          #coding.coder             = Person.objects.filter(user=request.user.id)
-          #coding.save()
+          coding                   = new_coding.save(commit=False)
+          coding.coder             = Person.objects.get(user=request.user)
+          coding.save()
           project.codings.add(coding)
           project.save()
           return HttpResponseRedirect('/codematch/matches/'+str(project.id)+'/'+str(coding.id))

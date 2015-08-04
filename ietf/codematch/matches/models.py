@@ -20,9 +20,9 @@ class CodingProject (models.Model):
     link_to_implementation = models.URLField(blank=True)
     # Any other text that the coder would like to include as a description
     additional_information = models.CharField(max_length=255)
+    
     # The coder must have a user account in datatracker (as a person)
-    #coder                  = models.ForeignKey(Person, blank=True, null=True)
-    coder                  = models.CharField(max_length=80,null=True, blank=True)
+    coder                  = models.ForeignKey(Person, null=True, blank=True)
     
     # When the coding project was added
     creation_date          = models.DateTimeField(auto_now_add=True)
@@ -46,8 +46,6 @@ class ProjectContainer (models.Model):
     #(Note that this is a free text field )
     protocol               = models.CharField(max_length=255)
     description            = models.CharField(max_length=255)
-
-    #coder                  = models.ForeignKey(Person, blank=True, null=True)
     
     # Some elements will not have a CodeRequest
     code_request           = models.ForeignKey(CodeRequest, blank=True, null=True)

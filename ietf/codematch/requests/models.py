@@ -14,8 +14,7 @@ class CodeRequest (models.Model):
     """ requested by an author """
 
     
-    #mentor                 = models.ForeignKey(Person)
-    mentor                  = models.CharField(max_length=80)
+    mentor                  = models.ForeignKey(Person, null=True, blank=True)
 
     #Estimated Level of Effort
     #TODO: CharField?????

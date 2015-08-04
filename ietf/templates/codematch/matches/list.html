@@ -73,22 +73,24 @@
                                 <ul class="latest-news">
                                     {% for projectcontainer in projectcontainers %}
                                     	{% for coding in projectcontainer.codings.all %}
-                                    	<li>
-                                        	<!-- Title and date -->
-                                        	<h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder }}</a></h6>
-                                        	<!--<h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a></h6>-->
-                                        	<p>{{ projectcontainer.description }}</p>
-                                        	<p>
-                                        	{% if projectcontainer.code_request == None %}
-                                        	CodeRequest: 	 <a href="#">None</a>
-                                        	{% else %}
-                                        	CodeRequest: 	 <a href="{% url 'ietf.codematch.requests.views.show' projectcontainer.id %}">{{ projectcontainer.code_request.id }}</a>
-                                        	{% endif %} 
-                                        	| Protocol:  	 <a href="#">{{ projectcontainer.protocol }}</a> 
-                                        	| Area:    	 	 <a href="#">?</a> 
-                                        	| Working Group: <a href="#">?</a>
-                                        	</p>
-                                    	</li>
+                                    		{% if coding in codings %}
+		                               		<li>
+		                                    	<!-- Title and date -->
+		                                    	<h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a></h6>
+		                                    	<!--<h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a></h6>-->
+		                                    	<p>{{ projectcontainer.description }}</p>
+		                                    	<p>
+		                                    	{% if projectcontainer.code_request == None %}
+		                                    	CodeRequest: 	 <a href="#">None</a>
+		                                    	{% else %}
+		                                    	CodeRequest: 	 <a href="{% url 'ietf.codematch.requests.views.show' projectcontainer.id %}">{{ projectcontainer.code_request.id }}</a>
+		                                    	{% endif %} 
+		                                    	| Protocol:  	 <a href="#">{{ projectcontainer.protocol }}</a> 
+		                                    	| Area:    	 	 <a href="#">?</a> 
+		                                    	| Working Group: <a href="#">?</a>
+		                                    	</p>
+		                                	</li>
+		                                	{% endif %}
                                     	{% endfor %}
                                     {% endfor %}
                                 </ul> 

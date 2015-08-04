@@ -9,10 +9,12 @@ from django.forms.models import modelform_factory, inlineformset_factory
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponseRedirect
 
+from django.contrib.auth.decorators import login_required
+
 from ietf.group.models import Group
 from ietf.person.models import Person
 
-from ietf.codematch.matches.forms import ProjectContainerForm
+from ietf.codematch.matches.forms import SearchForm, ProjectContainerForm
 from ietf.codematch.requests.forms import CodeRequestForm
 from ietf.codematch.matches.models import ProjectContainer, CodingProject
 from ietf.codematch.requests.models import CodeRequest
@@ -25,7 +27,7 @@ def showlist(request):
     project_containers = ProjectContainer.objects.exclude(code_request__isnull=True).order_by('creation_date')[:20]
     return render(request, "codematch/requests/list.html", {
             'projectcontainers' : project_containers
-    })                 
+    })         
 
 def search(request):
     search_type = request.GET.get("submit")
@@ -49,9 +51,7 @@ def search(request):
                 project_containers  =  ProjectContainer.objects.filter(protocol__icontains=query) 
 
             elif search_type == "mentor":
-                # TODO: review this
-                #project_containers = CodingProject.objects.filter(code_request__mentor__name__icontains=query) 
-                project_containers  =  ProjectContainer.objects.filter(code_request__mentor__icontains=query)
+                project_containers = ProjectContainer.objects.filter(code_request__mentor__name__icontains=query) 
 
             else:
                 raise Http404("Unexpected search type in ProjectContainer query: %s" % search_type)
@@ -76,6 +76,7 @@ def show(request,pk):
     })
 
 
+@login_required(login_url='/codematch/accounts/login')
 def new(request):
     """ New CodeRequest Entry """
     
@@ -87,11 +88,9 @@ def new(request):
        new_request = CodeRequestForm(request.POST)
        
        if new_project.is_valid() and new_request.is_valid():
-          code_request              = new_request.save()
-          # TODO: review this
-          #code_request             = new_request.save(commit=False)
-          #code_request.mentor      = Person.objects.filter(user=request.user.id)
-          #code_request.save()
+          code_request              = new_request.save(commit=False)
+          code_request.mentor       = Person.objects.get(user=request.user)
+          code_request.save()
           project                   = new_project.save(commit=False)
           project.code_request      = code_request
           project.save()

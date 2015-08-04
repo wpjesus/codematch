@@ -26,6 +26,6 @@ class CodingProjectForm(ModelForm):
     class Meta:
         model  = CodingProject
         #fields = [ "title" , "additional_information" , "link_to_implementation" ]
-        fields = [ "coder", "title" , "additional_information" , "link_to_implementation" ]
+        fields = [ "title" , "additional_information" , "link_to_implementation" ]
         
         

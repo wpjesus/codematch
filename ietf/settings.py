@@ -232,6 +232,7 @@ INSTALLED_APPS = (
     'ietf.codematch',
     'ietf.codematch.matches',
     'ietf.codematch.requests',
+    'ietf.codematch.accounts',
     # IETF Secretariat apps
     'ietf.secr.announcement',
     'ietf.secr.areas',

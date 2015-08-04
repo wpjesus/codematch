@@ -7,7 +7,10 @@ from ietf.codematch import views
 urlpatterns = patterns('',
     url(r'^$', views.index, name="index"),
     url(r'^about/$', views.about , name="about"),
-                       
+    
+    #Accounts
+    url(r'^accounts/$', include('ietf.codematch.accounts.urls')),
+                
     #Matches
     url(r'^matches/$', include('ietf.codematch.matches.urls')),
     

@@ -15,10 +15,10 @@ class Migration(migrations.Migration):
             name='CodeRequest',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('Estimated_LoF', models.CharField(max_length=80)),
-                ('Additional_information', models.CharField(max_length=255)),
-                ('time', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(to='person.Person')),
+                ('estimated_lof', models.CharField(max_length=80, blank=True)),
+                ('additional_information', models.CharField(max_length=255, blank=True)),
+                ('creation_date', models.DateTimeField(auto_now_add=True)),
+                ('mentor', models.ForeignKey(blank=True, to='person.Person', null=True)),
             ],
             options={
             },
