@@ -19,6 +19,8 @@ from ietf.codematch.requests.forms import CodeRequestForm
 from ietf.codematch.matches.models import ProjectContainer, CodingProject
 from ietf.codematch.requests.models import CodeRequest
 
+from ietf.codematch.utils import (get_prefix)
+
 import debug                            
 
 def showlist(request):
@@ -76,7 +78,7 @@ def show(request,pk):
     })
 
 
-@login_required(login_url='/codematch/accounts/login')
+@login_required(login_url=get_prefix() + '/codematch/accounts/login')
 def new(request):
     """ New CodeRequest Entry """
     
@@ -94,7 +96,7 @@ def new(request):
           project                   = new_project.save(commit=False)
           project.code_request      = code_request
           project.save()
-          return HttpResponseRedirect('/codematch/requests/'+str(project.id))
+          return HttpResponseRedirect( get_prefix() + '/codematch/requests/'+str(project.id))
        else:
           print "Some form is not valid"
 

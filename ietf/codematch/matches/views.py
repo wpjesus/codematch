@@ -19,6 +19,8 @@ from ietf.codematch.matches.forms import SearchForm, ProjectContainerForm, DocNa
 from ietf.codematch.matches.models import ProjectContainer, CodingProject
 from ietf.codematch.requests.models import CodeRequest
 
+from ietf.codematch.utils import (get_prefix)
+
 import debug                            
 
 def showlist(request):
@@ -46,7 +48,7 @@ def show(request, pk, ck):
           doc = DocAlias.objects.get( name = doc_name )
           project_container.docs.add(doc)
           project_container.save()
-          return HttpResponseRedirect('/codematch/matches/'+str(pk)+'/'+str(ck))
+          return HttpResponseRedirect(get_prefix() + '/codematch/matches/'+str(pk)+'/'+str(ck))
       
        else:
           print "Invalid doc" #reload page
@@ -109,7 +111,7 @@ def search(request):
         return render(request, "codematch/matches/search.html", { "form" : form })
 
 
-@login_required(login_url='/codematch/accounts/login')
+@login_required(login_url=get_prefix() + '/codematch/accounts/login')
 def new(request, pk=""):
     """ New CodeMatch Entry """
     
@@ -138,7 +140,7 @@ def new(request, pk=""):
           coding.save()
           project.codings.add(coding)
           project.save()
-          return HttpResponseRedirect('/codematch/matches/'+str(project.id)+'/'+str(coding.id))
+          return HttpResponseRedirect( get_prefix() + '/codematch/matches/'+str(project.id)+'/'+str(coding.id))
       
        else:
           print "Some form is not valid"

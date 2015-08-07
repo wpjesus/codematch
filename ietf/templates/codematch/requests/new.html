@@ -57,7 +57,7 @@
                         </div>
                         <div class="widget-content referrer">
                             <!-- Widget content -->
-                            <form class="form-horizontal" action="/codematch/requests/new/" method="post">
+                            <form class="form-horizontal" action="{% url 'ietf.codematch.requests.views.new' %}" method="post">
                            	{% csrf_token %}
                             <div class="padd">
 								<div class="form-group">

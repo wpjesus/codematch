@@ -16,7 +16,7 @@
 		  <a href="#" class="navbar-brand" ><img src="/images/ietflogo-small-transparent.png" /></a>
 		</div>
       <ul class="nav navbar-nav">	
-	  <li class="dropdown">
+	  	<li class="dropdown">
 			<a href="{% url "ietf.codematch.views.index" %}" role="button" > Code<b>Match</b></a>
 		</li>
       	<li class="dropdown">
@@ -70,7 +70,7 @@
             <ul class="dropdown-menu">
               <li><a href="#"><i class="fa fa-user"></i> Profile</a></li>
               <li><a href="#"><i class="fa fa-cogs"></i> Settings</a></li>
-              <li><a rel="nofollow" href="/codematch/accounts/logout/" >Logout</a></li>
+              <li><a rel="nofollow" href="{% url 'django.contrib.auth.views.logout' %}" >Logout</a></li>
             </ul>
           </li>
           
@@ -85,7 +85,7 @@
             
             <!-- Dropdown menu -->
             <ul class="dropdown-menu">
-              <li><a rel="nofollow" href="/codematch/accounts/login{% if "/codematch/accounts/logout/" not in request.get_full_path %}/?next={{request.get_full_path|urlencode}}{% endif %}">Sign in</a></li>
+              <li><a rel="nofollow" href="{% url 'django.contrib.auth.views.login' %}?next={{request.get_full_path|urlencode}}">Sign in</a></li>
             </ul>
           </li>
           

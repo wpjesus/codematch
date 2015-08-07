@@ -32,7 +32,7 @@
                 <span class="divider">/</span>
                 <a href="#" class="bread-current">New</a>
             </div>
-            
+             
             <div class="clearfix"></div>
             
         </div>
@@ -59,7 +59,7 @@
                         </div>
                         <div class="widget-content referrer">
                             <!-- Widget content -->
-                            <form class="form-horizontal" action="/codematch/matches/new/{{pk}}/" method="post">
+                            <form class="form-horizontal" action="{% url 'ietf.codematch.matches.views.new' pk %}" method="post">
                             	{% csrf_token %}
                             	<div class="padd">
                             	{% if projectcontainer != None %}
