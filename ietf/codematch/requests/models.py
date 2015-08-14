@@ -21,7 +21,7 @@ class CodeRequest (models.Model):
     estimated_lof           = models.CharField(max_length=80, blank=True)
     
     # The author can include additional text to describe his request
-    additional_information  = models.CharField(max_length=255, blank=True)
+    additional_information  = models.CharField(max_length=255, null=True, blank=True)
     creation_date           = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):

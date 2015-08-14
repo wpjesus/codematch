@@ -2,7 +2,7 @@
 
 {% load future %}
 
-{% block title %}Details for Project - {{ projectcontainer.title }}{% endblock %}
+{% block title %}Details for Project - {{ coding.title }}{% endblock %}
 
 <p>
 	{% block pagehead %}
@@ -24,9 +24,9 @@
 					<a href="{% url "ietf.codematch.views.index" %}" ><i class="fa fa-home"></i> Home</a>
 					<!-- Divider -->
 					<span class="divider">/</span>
-					<a href="{% url "ietf.codematch.matches.views.showlist" %}" class="bread-current">CodeMatches</a>
+					<a href="{% url "ietf.codematch.matches.views.show_list" %}" class="bread-current">CodeMatches</a>
 					<span class="divider">/</span>
-					<a href="#" class="bread-current">{{ projectcontainer.title }}</a>
+					<a href="#" class="bread-current">{{ coding.title }}</a>
 				</div>
 				<div class="clearfix"></div>
 
@@ -47,11 +47,7 @@
 					<div class="widget">
 						<div class="widget-head">
 							<div class="pull-left">
-								<i class="fa fa-chevron-circle-right"></i> {{ projectcontainer.title }}
-							</div>
-							<div class="widget-icons pull-right">
-								<a href="#" class="wminimize"><i class="fa fa-chevron-up"></i></a>
-								<a href="my_code_matches.html" class="wclose"><i class="fa fa-times"></i></a>
+								<i class="fa fa-chevron-circle-right"></i> {{ coding.title }}
 							</div>
 							<div class="clearfix"></div>
 						</div>
@@ -71,7 +67,7 @@
 													<strong>Mentor:</strong><a href="#">{{ projectcontainer.code_request.mentor.name }}</a>
 													<!--<strong>Mentor:</strong><a href="#">{{ projectcontainer.code_request.mentor.name }}</a>-->
 													<br />
-													<strong>CodeRequest:</strong> {{ projectcontainer.code_request.id }}
+													<strong>CodeRequest:</strong> {{ projectcontainer.title }}
 													<br />
 													<strong>Protocol:</strong><a href="#">{{ projectcontainer.protocol }}</a>
 													<br />
@@ -94,32 +90,24 @@
 
 											<h4><strong>Description</strong></h4>
 											<p>
-												{{ projectcontainer.description }}
+												{{ coding.additional_information }}
 											</p>
 
 											<br />
-
-											<h4><strong>Documents</strong></h4>
-											{% for doc in docs %}
-											{{ doc.document.group }}: <a  href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
+										
+											{% if user.is_authenticated and mymatch %}
+											<h4><strong>Implementations</strong></h4>
+											{% for implementation in implementations %}
+												<a href="{{ implementation.link }}">{{ implementation.link }}</a>
 											<br />
 											{% endfor %}
 											<hr />
 											<form action="/codematch/matches/{{projectcontainer.id}}/{{coding.id}}" method="post">
-												{{ docform }}
+												{{ linkform }}
 												{% csrf_token %}
-												<input type="submit" value="Add related Document" />
+												<input type="submit" value="Add implementation" />
 											</form>
-											<br />
-											<br />
-
-											<h4><strong>Implementation</strong></h4>
-											<ul>
-												<li>
-													<a  href="{{coding.link_to_implementation}}"> {{ coding.title }}</a>: {{ coding.additional_information }}
-												</li>
-											</ul>
-											<hr />
+											{% endif %}
 										</div>
 
 									</div>
@@ -128,7 +116,7 @@
 							</div>
 							<div class="widget-foot">
 								<div class="pull-right">
-									<a class="btn btn-default btn-sm" href="{% url "ietf.codematch.matches.views.showlist" %}">Back</a>
+									<a class="btn btn-default btn-sm" href="{% url "ietf.codematch.matches.views.show_list" %}">Back</a>
 								</div>
 								<div class="clearfix"></div>
 							</div>

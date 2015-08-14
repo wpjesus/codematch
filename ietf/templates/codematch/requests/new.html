@@ -26,7 +26,7 @@
 	          <a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a> 
 	          <!-- Divider -->
 	          <span class="divider">/</span> 
-	          <a href="{% url "ietf.codematch.requests.views.showlist" %}" class="bread-current">Code Requests</a>
+	          <a href="{% url "ietf.codematch.requests.views.show_list" %}" class="bread-current">Code Requests</a>
 	          <span class="divider">/</span>
 	          <a href="#" class="bread-current">New</a>
 	        </div>
@@ -47,11 +47,7 @@
                         <!-- Widget title -->
                         <div class="widget-head">
                             <div class="pull-left">
-                                Creating a new CodeMatch Project
-                            </div>
-                            <div class="widget-icons pull-right">
-                                <a href="#" class="wminimize"><i class="fa fa-chevron-up"></i></a>
-                                <a href="#" class="wclose"><i class="fa fa-times"></i></a>
+                                Creating a new CodeRequest
                             </div>
                             <div class="clearfix"></div>
                         </div>
@@ -69,7 +65,7 @@
 								<div class="form-group">
 									<label class="control-label col-xs-2">Protocol:</label>
 									<div class="col-xs-4">
-										{{ projform.protocol}}
+										{{ projform.protocol }}
 									</div>
 								</div>
 								<div class="form-group">
@@ -78,12 +74,30 @@
 										{{ projform.description }}
 									</div>
 								</div>
+								<div class="form-group">
+									<label class="control-label col-xs-2">Mentor:</label>
+									<div class="col-xs-4">
+										{{ reqform.mentor }}
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="control-label col-xs-2">Estimated level of effort:</label>
+									<div class="col-xs-4">
+										{{ reqform.estimated_lof }}
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="control-label col-xs-2">Additional information:</label>
+									<div class="col-xs-4">
+										{{ reqform.additional_information }}
+									</div>
+								</div>
 								
 						   		<div class="widget-foot">
                                 <p class="buttonlist">
-                                	<div class="col-xs-offset-1">
+                                	<div class="col-xs-offset-1" style="margin-left: 0px">
 								    	<input type="submit" class="btn btn-primary" value="Submit" />
-                                		<a class="btn btn-default " href="{% url "ietf.codematch.requests.views.showlist" %}">Back</a>
+                                		<a class="btn btn-default " href="{% url "ietf.codematch.requests.views.show_list" %}">Back</a>
                                 	</div>
                                 </p>
                             	</div>

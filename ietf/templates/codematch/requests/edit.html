@@ -1,10 +1,9 @@
 {% extends "base_codematch.html" %}
 
 {% load ietf_filters bootstrap3 widget_tweaks %}
-
 {% load future %}
 
-{% block title %} Create a new CodeMatch Project{% endblock %}
+{% block title %} Create a new CodeRequest {% endblock %}
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
@@ -18,21 +17,20 @@
     
     <!-- Main bar -->
     <div class="mainbar">
-        
-        <!-- Page heading -->
-        <div class="page-head">
-            <h2 class="pull-left"><i class="icon ion-arrow-shrink" style="font-size: 20px;"></i> CodeMatches</h2>
+                    
+	    <!-- Page heading -->
+	    <div class="page-head">
+		      <h2 class="pull-left"><i class="fa fa-microphone"></i> CodeRequests</h2>
+	        <!-- Breadcrumb -->
+	        <div class="bread-crumb pull-right">
+	          <a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a> 
+	          <!-- Divider -->
+	          <span class="divider">/</span> 
+	          <a href="{% url "ietf.codematch.requests.views.show_list" %}" class="bread-current">Code Requests</a>
+	          <span class="divider">/</span>
+	          <a href="#" class="bread-current">New</a>
+	        </div>
             
-            <!-- Breadcrumb -->
-            <div class="bread-crumb pull-right">
-                <a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a>
-                <!-- Divider -->
-                <span class="divider">/</span>
-                <a href="{% url "ietf.codematch.matches.views.show_list" %}" class="bread-current">CodeMatches</a>
-                <span class="divider">/</span>
-                <a href="#" class="bread-current">New</a>
-            </div>
-             
             <div class="clearfix"></div>
             
         </div>
@@ -49,37 +47,17 @@
                         <!-- Widget title -->
                         <div class="widget-head">
                             <div class="pull-left">
-                                Creating a new CodeMatch Project
+                                Edit CodeRequest
                             </div>
                             <div class="clearfix"></div>
                         </div>
                         <div class="widget-content referrer">
                             <!-- Widget content -->
-                            <form class="form-horizontal" action="{% url 'ietf.codematch.matches.views.new' pk %}" method="post">
-                            	{% csrf_token %}
-                            	<div class="padd">
-                            	{% if projectcontainer != None %}
+                            <form class="form-horizontal" action="{% url 'ietf.codematch.requests.views.edit' projectcontainer.id %}" method="post">
+                           	{% csrf_token %}
+                            <div class="padd">
 								<div class="form-group">
 									<label class="control-label col-xs-2">Title:</label>
-									<div class="col-xs-4" style="margin-top: 5px">
-										{{ projectcontainer.title }}
-									</div>
-								</div>
-								<div class="form-group">
-									<label class="control-label col-xs-2">Protocol:</label>
-									<div class="col-xs-4" style="margin-top: 5px">
-										{{ projectcontainer.protocol}}
-									</div>
-								</div>
-								<div class="form-group">
-									<label class="control-label col-xs-2">Description:</label>
-									<div class="col-xs-4" style="margin-top: 5px">
-										{{ projectcontainer.description}}
-									</div>
-								</div>
-								{% else %}
-								<div class="form-group">
-									<label class="control-label col-xs-2">Project title:</label>
 									<div class="col-xs-4">
 										{{ projform.title }}
 									</div>
@@ -87,7 +65,7 @@
 								<div class="form-group">
 									<label class="control-label col-xs-2">Protocol:</label>
 									<div class="col-xs-4">
-										{{ projform.protocol}}
+										{{ projform.protocol }}
 									</div>
 								</div>
 								<div class="form-group">
@@ -96,29 +74,37 @@
 										{{ projform.description }}
 									</div>
 								</div>
-								{% endif %}
 								<div class="form-group">
-									<label class="control-label col-xs-2">Coding title:</label>
+									<label class="control-label col-xs-2">Mentor:</label>
 									<div class="col-xs-4">
-										{{ codeform.title }} }}
+										{{ reqform.mentor }}
 									</div>
 								</div>
 								<div class="form-group">
-									<label class="control-label col-xs-2">Coding info:</label>
+									<label class="control-label col-xs-2">Estimated level of effort:</label>
 									<div class="col-xs-4">
-										{{ codeform.additional_information}}
+										{{ reqform.estimated_lof }}
 									</div>
 								</div>
+								<div class="form-group">
+									<label class="control-label col-xs-2">Additional information:</label>
+									<div class="col-xs-4">
+										{{ reqform.additional_information }}
+									</div>
+								</div>
+								
 						   		<div class="widget-foot">
                                 <p class="buttonlist">
                                 	<div class="col-xs-offset-1" style="margin-left: 0px">
-								    	<input type="submit" class="btn btn-primary" value="Submit" />
-                                		<a class="btn btn-default " href="{% url "ietf.codematch.matches.views.show_list" %}">Back</a>
+								    	<input type="submit" class="btn btn-primary" value="Update" />
+                                		<a class="btn btn-default " href="{% url "ietf.codematch.requests.views.show_my_list" %}">Back</a>
                                 	</div>
                                 </p>
                             	</div>
-								</div>
+                            	
+                            </div>
 							</form>
+							
                         </div>
                     </div>
                 </div>

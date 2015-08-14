@@ -27,11 +27,13 @@
 			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="icon ion-arrow-shrink" ></i> CodeMatches </a>
 			<ul class="dropdown-menu" role="menu">
 				<li>
-					<a href="{% url "ietf.codematch.matches.views.showlist" %}">All CodeMatches</a>
+					<a href="{% url "ietf.codematch.matches.views.show_list" %}">All CodeMatches</a>
 				</li>
+				{% if mycodings %}
 				<li>
 					<a href="#">My CodeMatches</a>
 				</li>
+				{% endif %}
 			</ul>
 		</li>
 		
@@ -39,14 +41,18 @@
 			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-microphone" ></i> CodeRequests </a>
 			<ul class="dropdown-menu" role="menu">
 				<li>
-					<a href="{% url "ietf.codematch.requests.views.showlist" %}">All CodeRequests</a>
+					<a href="{% url "ietf.codematch.requests.views.show_list" %}">All CodeRequests</a>
 				</li>
+				{% if projectsowner %}
 				<li>
-					<a href="#">My CodeRequests</a>
+					<a href="{% url "ietf.codematch.requests.views.show_my_list" %}">My CodeRequests</a>
 				</li>
+				{% endif %}
+				{% if projectsmentoring %}
 				<li>
-					<a rel="nofollow" href="#">CodeRequests I'm Mentoring</a>
+					<a href="{% url "ietf.codematch.requests.views.show_mentoring_list" %}">CodeRequests I'm Mentoring</a>
 				</li>
+				{% endif %}
 			</ul>
 		</li>
 		
@@ -63,7 +69,7 @@
         <ul class="nav navbar-nav pull-right">
           <li class="dropdown pull-right">            
             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-              <i class="fa fa-user"></i> {{ user }} <b class="caret"></b>              
+              <i class="fa fa-user"></i> {{ username }} <b class="caret"></b>              
             </a>
             
             <!-- Dropdown menu -->

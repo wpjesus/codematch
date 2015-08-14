@@ -19,7 +19,7 @@
       
 	    <!-- Page heading -->
 	    <div class="page-head">
-	      <h2 class="pull-left"><i class="fa fa-microphone"></i> CodeRequests</h2>
+	      <h2 class="pull-left"><i class="fa fa-microphone"></i> CodeRequests I'm Mentoring</h2>
         <!-- Breadcrumb -->
         <div class="bread-crumb pull-right">
           <a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a> 
@@ -66,9 +66,10 @@
                   <div class="clearfix"></div>
                 </div>
                 <div class="widget-content">
-                  <div class="padd">
+                  
 
-		{% for projectcontainer in projectcontainers %}
+			{% for projectcontainer in projectcontainers %}
+			<div class="padd">
                <div class="user">
                    <div class="user-details" style="margin-left: 0px; margin-bottom:20px;">
                    	<h4><i class="fa fa-chevron-circle-right"> <a href="{% url 'show' projectcontainer.id %}">{{ projectcontainer.title }}</a> </i> {{ projectcontainer.code_request.creation_date|date:"d M Y" }} </h4>
@@ -77,7 +78,7 @@
 		            </div>
                    	{% for coding in projectcontainer.codings.all %}
                       	<div style="margin: 0 0 20px 15px">
-                      		<h5><i class="fa fa-minus"></i> <a href="{% url 'ietf.codematch.matches.views.show' projectcontainer.id coding.id %}">{{ coding.title }}</a></h5>
+                      		<h5><i class="fa fa-minus"></i> <a href="{% url 'ietf.codematch.matches.views.show' projectcontainer.id coding.id %}">{{ coding.title }}</a> {{ coding.creation_date }}</h5>
                       		<div style="margin-left:15px">
 		                        <p>{{ coding.additional_information }}</p>
 		            		</div>
@@ -85,21 +86,10 @@
                     {% endfor %}
 				   </div>
  	    		</div>
- 	    		{% if user.is_authenticated %}
- 	          	<div>
-		       		 <!--<a href="#myModal" class="btn btn-info btn-xs" style="padding:1px 5px" data-toggle="modal"><i class="fa fa-check"></i> Associate my project</a>--> 
-		       		<a href="{% url 'ietf.codematch.matches.views.new' projectcontainer.id %}" class="btn btn-info btn-xs" ><i class="fa fa-check"></i>Associate my project</a>
-		       	</div>
-		       	{% endif %}
- 	   
-		{% endfor %}
-		
-              </div>  
+ 	    	</div>  
+			{% endfor %}
               <div class="widget-foot">
                  <p class="buttonlist">
-                 	{% if user.is_authenticated %}
-                 		<a class="btn btn-default" href="{% url "ietf.codematch.requests.views.new" %}">New Code Request</a>
-                 	{% endif %}
                  	{% if projectcontainers %}
                  		<a class="btn btn-default" href="{% url "ietf.codematch.requests.views.search" %}">Search</a>
                  	{% endif %}

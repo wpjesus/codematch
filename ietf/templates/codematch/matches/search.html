@@ -17,7 +17,7 @@
 				<a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a>
 				<!-- Divider -->
 				<span class="divider">/</span>
-				<a href="{% url "ietf.codematch.matches.views.showlist" %}" class="bread-current">CodeMatches</a>
+				<a href="{% url "ietf.codematch.matches.views.show_list" %}" class="bread-current">CodeMatches</a>
 				<span class="divider">/</span>
 				<a href="#" class="bread-current">Search</a>
 			</div>
@@ -40,10 +40,6 @@
 							<div class="pull-left">
 								Search
 							</div>
-							<div class="widget-icons pull-right">
-								<a href="#" class="wminimize"><i class="fa fa-chevron-up"></i></a>
-								<a href="#" class="wclose"><i class="fa fa-times"></i></a>
-							</div>
 							<div class="clearfix"></div>
 						</div>
 						<div class="widget-content referrer">
@@ -58,7 +54,7 @@
 								<div class="widget-foot">
 									<p class="buttonlist">
 										
-											<a class="btn btn-default " href="{% url "ietf.codematch.matches.views.showlist" %}">Back</a>
+											<a class="btn btn-default " href="{% url "ietf.codematch.matches.views.show_list" %}">Back</a>
 										
 									</p>
 								</div>

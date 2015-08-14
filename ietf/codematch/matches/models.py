@@ -9,6 +9,21 @@ from ietf.doc.models import DocAlias
 
 from ietf.codematch.requests.models import CodeRequest
 
+class Implementation(models.Model):
+    """  """
+    
+    link                   = models.URLField(blank=True)
+    
+    def __unicode__(self):
+        return self.link
+class ProjectTag(models.Model):
+    """ """
+    
+    name                   = models.CharField(max_length=80)
+
+    def __unicode__(self):
+        return self.name
+
 class CodingProject (models.Model):
     """ an element in ProjectContainer can have several Coding Projects"""
     """  implementing the proposal in different ways, or in different """
@@ -17,7 +32,8 @@ class CodingProject (models.Model):
     # This is the name that the student choose for his coding project
     title                  = models.CharField(max_length=80)
     # URL to github or other repository:
-    link_to_implementation = models.URLField(blank=True)
+    #link_to_implementation = models.URLField(blank=True)
+    links                  = models.ManyToManyField(Implementation, blank=True)
     # Any other text that the coder would like to include as a description
     additional_information = models.CharField(max_length=255)
     
@@ -30,6 +46,8 @@ class CodingProject (models.Model):
     # TODO: this field is integer?
     reputation             = models.IntegerField(null=True, blank=True)
     
+    tags                   = models.ManyToManyField(ProjectTag, blank=True, null=True)
+    
      # Each Project belongs to an entry in Project Container
     #project_container      = models.ForeignKey(ProjectContainer, blank=True, null=True)
 
@@ -39,19 +57,23 @@ class CodingProject (models.Model):
 class ProjectContainer (models.Model):
     """ The ProjectContainer associates the Documents to the projects  """
 
+    owner                  = models.ForeignKey(Person, null=True, blank=True)
+
     title                  = models.CharField(max_length=80)
     creation_date          = models.DateTimeField(auto_now_add=True)
 
     # Protocol that was implemented (if any):
     #(Note that this is a free text field )
     protocol               = models.CharField(max_length=255)
-    description            = models.CharField(max_length=255)
+    description            = models.TextField()
     
     # Some elements will not have a CodeRequest
     code_request           = models.ForeignKey(CodeRequest, blank=True, null=True)
     docs                   = models.ManyToManyField(DocAlias)
     
     codings                = models.ManyToManyField(CodingProject)
+    
+    tags                   = models.ManyToManyField(ProjectTag, blank=True, null=True)
 
     def __unicode__(self):              # __unicode__ on Python 2
         return self.title

@@ -6,4 +6,4 @@ from ietf.codematch.requests.models import CodeRequest
 class CodeRequestForm(ModelForm):
     class Meta:
         model = CodeRequest
-        fields = [ "estimated_lof" , "additional_information"]
+        fields = [ "mentor", "estimated_lof" , "additional_information"]

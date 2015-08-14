@@ -13,51 +13,60 @@ from django.contrib.auth.decorators import login_required
 
 from ietf.group.models import Group
 from ietf.person.models import Person
-from ietf.doc.models import DocAlias, Document
 
-from ietf.codematch.matches.forms import SearchForm, ProjectContainerForm, DocNameForm, CodingProjectForm
-from ietf.codematch.matches.models import ProjectContainer, CodingProject
+from ietf.codematch.matches.forms import SearchForm, ProjectContainerForm, CodingProjectForm, LinkImplementationForm
+from ietf.codematch.matches.models import ProjectContainer, CodingProject, Implementation
 from ietf.codematch.requests.models import CodeRequest
 
-from ietf.codematch.utils import (get_prefix)
+from ietf.codematch.utils import (get_prefix, render_page)
 
 import debug                            
 
-def showlist(request):
+@login_required(login_url=get_prefix() + '/codematch/accounts/login')
+def show_list(request):
     """List all ProjectContaineres by Title"""
     
     project_containers = ProjectContainer.objects.order_by('creation_date')[:20]
     codings            = CodingProject.objects.all()
-    return render(request, "codematch/matches/list.html", {
+    return render_page(request, "codematch/matches/list.html", {
             'projectcontainers' : project_containers,
             'codings'           : codings
     })
 
+@login_required(login_url=get_prefix() + '/codematch/accounts/login')
 def show(request, pk, ck):
     """View individual Codematch Project and Add Document and Implementation"""
     
     project_container = get_object_or_404(ProjectContainer, id=pk)
     coding            = get_object_or_404(CodingProject,    id=ck)
-    docs              = project_container.docs.select_related()
-    doc_form          = DocNameForm()
+    links             = coding.links.all()
+    link_form         = LinkImplementationForm()
+
+    my_request = False
+    
+    if request.user.is_authenticated():
+        user = Person.objects.get( user = request.user )
+        my_match = coding.coder == user
 
     if request.method == 'POST':
-       doc_name=request.POST.get("name")
-
-       if doc_name:
-          doc = DocAlias.objects.get( name = doc_name )
-          project_container.docs.add(doc)
-          project_container.save()
+       link_to_implementation = LinkImplementationForm(request.POST)
+      
+       if link_to_implementation.is_valid():
+          link = link_to_implementation.save()
+          
+          coding.links.add(link)
+          coding.save()
           return HttpResponseRedirect(get_prefix() + '/codematch/matches/'+str(pk)+'/'+str(ck))
       
        else:
           print "Invalid doc" #reload page
 
-    return render(request, "codematch/matches/show.html",  {
+    return render_page(request, "codematch/matches/show.html",  {
         'projectcontainer': project_container,
         'coding'          : coding,
-        'docs'            : docs,
-        'docform'         : doc_form
+        'linkform'        : link_form,
+        'implementations' : links, #review this name,
+        'mymatch'         : my_match
     })
 
 
@@ -89,7 +98,6 @@ def search(request):
                 # review this
                 project_containers = ProjectContainer.objects.filter(codings__coder__name__icontains=query).distinct()
                 codings            = CodingProject.objects.filter(coder__name__icontains=query)
-
             # Document list with a Codematch project
             elif search_type == "doctitle":
                 project_containers = ProjectContainer.objects.filter(docs__name__icontains=query)
@@ -108,8 +116,7 @@ def search(request):
 
     else:
         form = SearchForm()
-        return render(request, "codematch/matches/search.html", { "form" : form })
-
+        return render_page(request, "codematch/matches/search.html", { "form" : form })
 
 @login_required(login_url=get_prefix() + '/codematch/accounts/login')
 def new(request, pk=""):
@@ -145,7 +152,7 @@ def new(request, pk=""):
        else:
           print "Some form is not valid"
 
-    return render(request, 'codematch/matches/new.html', {
+    return render_page(request, 'codematch/matches/new.html', {
         'projform'         : proj_form,
         'codeform'         : code_form,
         'projectcontainer' : project_container,

@@ -24,10 +24,10 @@
 
         <!-- Breadcrumb -->
         <div class="bread-crumb pull-right">
-          <a href="index.html"><i class="fa fa-home"></i> Home</a> 
+          <a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a> 
           <!-- Divider -->
           <span class="divider">/</span> 
-          <a href="#" class="bread-current">Coding Requests</a>
+          <a href="{% url "ietf.codematch.requests.views.show_list" %}" class="bread-current">Coding Requests</a>
           <!-- Divider -->
           <span class="divider">/</span> 
           <a href="#" class="bread-current">{{ projectcontainer.title }}</a>
@@ -51,34 +51,12 @@
                   <div class="pull-left">
 					<i class="fa fa-chevron-circle-right"></i>  {{ projectcontainer.title }}
 				  </div>
-                  <div class="widget-icons pull-right">
-                    <a href="#" class="wminimize"><i class="fa fa-chevron-up"></i></a> 
-                    <a href="#" class="wclose"><i class="fa fa-times"></i></a>
-                  </div>  
                   <div class="clearfix"></div>
                 </div>
                 
                 <div class="widget-content">
                   <div class="padd">
-                  	
-				<!-- Modal -->
-				<div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-					<div class="modal-dialog">
-					  <div class="modal-content">
-						  <div class="modal-header">
-						    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-						    <h4 class="modal-title">Alert</h4>
-						  </div>
-						  <div class="modal-body">
-						    <p>To request an offer, you must first log in to IETF CodeMatch</p>
-						  </div>
-						  <div class="modal-footer">
-						    <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
-						    <button type="button" class="btn btn-primary" onclick="location.href = 'login.html';" >Log in</button>
-						  </div>
-						</div>
-					</div>
-				</div>
+                  
 				
                     <div class="user">
 
@@ -93,8 +71,9 @@
 		                      </div>
 		
 		                      <div class="col-md-4">
+		                      	{% if user.is_authenticated %}
 		                        <a href="{% url 'ietf.codematch.matches.views.new' projectcontainer.id %}" class="btn btn-info btn-xs" style="padding:1px 5px"><i class="fa fa-check"></i> Associate my project</a>
-
+								{% endif %}
 		                        <!-- Social Media strip -->
 		                        <div id="media-strip">
 		                        <a><i class="fa fa-facebook-square"></i></a>
@@ -108,9 +87,25 @@
                       		<br />
                       		
                       		<h4><strong>Description</strong></h4>
-		                    <p>{{ projectcontainer.description }}</p>
+		                    <p>{{ projectcontainer.description|linebreaks }}</p>
 		                    
-		                    <br />  
+		                    <br />
+		                    
+		                    {% if user.is_authenticated and myrequest %}
+	            				<h4><strong>Documents</strong></h4>
+								{% for doc in docs %}
+								{{ doc.document.group }}: <a  href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
+								<br />
+								{% endfor %}
+								<br />
+								<form action="{% url 'ietf.codematch.requests.views.show' projectcontainer.id %}" method="post">
+									{{ docform }}
+									{% csrf_token %}
+									<input type="submit" value="Add related Document" />
+								</form>
+								<br />
+								<br />  
+							{% endif %}
 		                    
 		                    <h4><strong>Resources</strong></h4>
 		                    Mentor: <a href="#">{{ projectcontainer.code_request.mentor.name }}</a><br />
@@ -122,12 +117,14 @@
 		            		<br />
 		            		<br />
 		            		
-		            		<h4><strong>CodeMatches</strong></h4>
-		            		<ul>
-		            			{% for coding in projectcontainer.codings.all  %}
-		            			<li><a href="{% url 'ietf.codematch.matches.views.show' projectcontainer.id coding.id %}">{{ coding.title }}</a></li>
-		            			{% endfor %}
-		            		</ul>
+		            		{% if projectcontainer.codings.all %}
+			            		<h4><strong>CodeMatches</strong></h4>
+			            		<ul>
+			            			{% for coding in projectcontainer.codings.all  %}
+			            			<li><a href="{% url 'ietf.codematch.matches.views.show' projectcontainer.id coding.id %}">{{ coding.title }}</a></li>
+			            			{% endfor %}
+			            		</ul>
+		            		{% endif %}
                         </div>
 
                       </div>
@@ -137,7 +134,7 @@
                   </div>
 					<div class="widget-foot">
 						<div class="pull-right">
-							<a class="btn btn-default btn-sm" href="{% url "ietf.codematch.requests.views.showlist" %}">Back</a>
+							<a class="btn btn-default btn-sm" href="{% url "ietf.codematch.requests.views.show_list" %}">Back</a>
 						</div>
 						<div class="clearfix"></div>
 					</div>

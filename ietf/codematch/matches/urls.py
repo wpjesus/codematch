@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse_lazy
 from ietf.codematch.matches import views
 
 urlpatterns = patterns('ietf.codematch.matches.views',
-    url(r'^showlist/$', views.showlist, name="showlist"),
+    url(r'^show_list/$', views.show_list, name="show_list"),
     url(r'^new/$', views.new , name="new"),
     url(r'^new/(?P<pk>.*)/$', views.new , name="new"),
     url(r'^search/$', views.search, name="search"),
