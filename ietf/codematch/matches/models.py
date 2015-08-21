@@ -16,6 +16,7 @@ class Implementation(models.Model):
     
     def __unicode__(self):
         return self.link
+    
 class ProjectTag(models.Model):
     """ """
     

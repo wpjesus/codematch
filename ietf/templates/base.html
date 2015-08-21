@@ -1,6 +1,7 @@
 <!DOCTYPE html> {% load ietf_filters %}
 {# Copyright The IETF Trust 2015, All Rights Reserved #}
 {% load origin %}{% origin %}
+{% load staticfiles %}
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -8,19 +9,19 @@
     <title>{% block title %}No title{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="/fonts/PTMono/stylesheet.css" rel='stylesheet' type='text/css'>
-    <link href="/fonts/PTSans/stylesheet.css" rel='stylesheet' type='text/css'>
-    <link href="/fonts/PTSerif/stylesheet.css" rel='stylesheet' type='text/css'>
+    <link href="{% static "fonts/PTMono/stylesheet.css"%}" rel='stylesheet' type='text/css'>
+    <link href="{% static "fonts/PTSans/stylesheet.css"%}" rel='stylesheet' type='text/css'>
+    <link href="{% static "fonts/PTSerif/stylesheet.css"%}" rel='stylesheet' type='text/css'>
     {% comment %}
     <!-- Halloween
     <link href='https://fonts.googleapis.com/css?family=IM+Fell+English+SC|IM+Fell+DW+Pica:400,400italic|Nova+Mono|IM+Fell+English:400,400italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
     -->
     {% endcomment %}
 
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/ietf.css">
+    <link rel="stylesheet" href="{% static "css/bootstrap.min.css"%}">
+    <link rel="stylesheet" href="{% static "css/bootstrap-theme.min.css"%}">
+    <link rel="stylesheet" href="{% static "css/font-awesome.min.css"%}">
+    <link rel="stylesheet" href="{% static "css/ietf.css"%}">
     <style>
      {% block morecss %}{% endblock %}
     </style>
@@ -32,11 +33,11 @@
     {% block pagehead %}{% endblock %}
 
     {% if server_mode and server_mode == "production" %}
-    <link rel="shortcut icon" href="/images/ietf-icon-blue3.png">
+    <link rel="shortcut icon" href="{% static "images/ietf-icon-blue3.png"%}">
     {% else %}
-    <link rel="shortcut icon" href="/images/ietf-icon-red3.png">
+    <link rel="shortcut icon" href="{% static "images/ietf-icon-red3.png"%}">
     {% endif %}
-    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" href="{% static "images/apple-touch-icon.png"%}">
   </head>
 
   <body {% block bodyAttrs %}{%endblock%} data-group-menu-data-url="{% url "group_menu_data" %}">
@@ -51,7 +52,7 @@
 	      <span class="icon-bar"></span>
 	    </button>
 	    <a class="navbar-brand" href="/">
-	       <img alt="IETF Logo" src="/images/ietflogo-small-transparent.png">
+	       <img alt="IETF Logo" src="{% static "images/ietflogo-small-transparent.png"%}">
 	       {% if not user.is_authenticated %}
 		  {% if server_mode and server_mode == "production" %}
 		  Datatracker
@@ -162,9 +163,9 @@
       {% endcomment %}
       <script>$(".visible-nojs").removeClass("visible-nojs");</script>
       <script>$(".hidden-nojs").removeClass("hidden-nojs");</script>
-      <script src="/js/lib/jquery.cookie.min.js"></script>
-      <script src="/js/lib/bootstrap.min.js"></script>
-      <script src="/js/ietf.js"></script>
+      <script src="{% static "js/lib/jquery.cookie.min.js"></script>
+      <script src="{% static "js/lib/bootstrap.min.js"></script>
+      <script src="{% static "js/ietf.js"></script>
       {% block js %}{% endblock %}
       {% include "debug.html" %}
   </body>

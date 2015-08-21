@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render
 
-from ietf.codematch.utils import (get_prefix, render_page)
+from ietf.codematch.utils import (render_page)
 
 import debug
 

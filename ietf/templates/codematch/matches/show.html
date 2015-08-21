@@ -67,7 +67,7 @@
 													<strong>Mentor:</strong><a href="#">{{ projectcontainer.code_request.mentor.name }}</a>
 													<!--<strong>Mentor:</strong><a href="#">{{ projectcontainer.code_request.mentor.name }}</a>-->
 													<br />
-													<strong>CodeRequest:</strong> {{ projectcontainer.title }}
+													<strong>CodeRequest:</strong><a href="{% url "ietf.codematch.requests.views.show" projectcontainer.id %}"> {{ projectcontainer.title }}</a>
 													<br />
 													<strong>Protocol:</strong><a href="#">{{ projectcontainer.protocol }}</a>
 													<br />

@@ -13,9 +13,6 @@ class SearchForm(forms.Form):
     doctitle    = forms.CharField(label="Words in document title", max_length=128,required=False)
     coder       = forms.CharField(label="First Name or Last Name", max_length=128,required=False)
     mentor      = forms.CharField(label="First Name or Last name", max_length=128,required=False)
-
-class DocNameForm(forms.Form):
-    name = forms.CharField(label="Name", max_length=128, required=True)
     
 class LinkImplementationForm(ModelForm):
     class Meta:

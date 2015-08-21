@@ -66,9 +66,10 @@
                   <div class="clearfix"></div>
                 </div>
                 <div class="widget-content">
-                  <div class="padd">
+                  
 
 		{% for projectcontainer in projectcontainers %}
+          <div class="padd">
                <div class="user">
                    <div class="user-details" style="margin-left: 0px; margin-bottom:20px;">
                    	<h4><i class="fa fa-chevron-circle-right"> <a href="{% url 'show' projectcontainer.id %}">{{ projectcontainer.title }}</a> </i> {{ projectcontainer.code_request.creation_date|date:"d M Y" }} </h4>
@@ -91,13 +92,12 @@
 		       		<a href="{% url 'ietf.codematch.matches.views.new' projectcontainer.id %}" class="btn btn-info btn-xs" ><i class="fa fa-check"></i>Associate my project</a>
 		       	</div>
 		       	{% endif %}
- 	   
+ 	       </div>  
 		{% endfor %}
-		
-              </div>  
+	
               <div class="widget-foot">
                  <p class="buttonlist">
-                 	{% if user.is_authenticated %}
+                 	{% if user.is_authenticated and canaddrequest %}
                  		<a class="btn btn-default" href="{% url "ietf.codematch.requests.views.new" %}">New Code Request</a>
                  	{% endif %}
                  	{% if projectcontainers %}

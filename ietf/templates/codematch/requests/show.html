@@ -66,8 +66,21 @@
                       		<div class="row">
 		                      <div class="col-md-4">
 		                        <strong>Protocol:</strong> <a href="#">{{ projectcontainer.protocol }}</a><br />
-	                      		<strong>Area:</strong> <a href="#">?</a><br />
-	                      		<strong>Working Group:</strong> <a href="#">?</a>
+	                      		<strong>Area:</strong> 
+	                      		{% for area in areas %}
+		            				{% if not forloop.first %}
+		            				-
+		            				{% endif %}
+		            				<a href="#">{{ area }}</a>
+	            				{% endfor %}
+	                      		<a href="#">{{ area }}</a><br />
+	                      		<strong>Working Group:</strong>
+	                      		{% for group in workinggroups %}
+		            				{% if not forloop.first %}
+		            				-
+		            				{% endif %}
+		            				<a href="#">{{ group }}</a>
+	            				{% endfor %}
 		                      </div>
 		
 		                      <div class="col-md-4">
@@ -104,18 +117,33 @@
 									<input type="submit" value="Add related Document" />
 								</form>
 								<br />
-								<br />  
 							{% endif %}
 		                    
 		                    <h4><strong>Resources</strong></h4>
 		                    Mentor: <a href="#">{{ projectcontainer.code_request.mentor.name }}</a><br />
-		                    <!--Mentor: <a href="#">{{ projectcontainer.code_request.mentor.name }}</a><br />-->
-		            		Mailing list: <a href="#">?</a> - <a href="#">?</a><br />
-		            		Twitter: <a href="#">?</a><br />
-		            		Facebook: <a href="#">?</a>
+		            		Mailing list: <a href="#">None</a><br /> <!-- <a href="#">None</a><br />-->
+		            		Twitter: <a href="#">None</a><br />
+		            		Facebook: <a href="#">None</a><br />
+		            		Tags: 
+	            			{% for tag in tags %}
+	            				{% if not forloop.first %}
+	            				-
+	            				{% endif %}
+	            				<a href="#">{{ tag }}</a>
+	            			{% endfor %}
 		            		
 		            		<br />
 		            		<br />
+		            		
+		            		{% if user.is_authenticated and myrequest %}
+	            				<h4><strong>Tags</strong></h4>
+								<form action="{% url 'ietf.codematch.requests.views.show' projectcontainer.id %}" method="post">
+									{{ tagform }}
+									{% csrf_token %}
+									<input type="submit" value="Add new Tag" />
+								</form>
+								<br />
+							{% endif %}		            		
 		            		
 		            		{% if projectcontainer.codings.all %}
 			            		<h4><strong>CodeMatches</strong></h4>

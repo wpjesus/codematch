@@ -19,7 +19,7 @@
       
 	    <!-- Page heading -->
 	    <div class="page-head">
-	      <h2 class="pull-left"><i class="fa fa-microphone"></i> CodeRequests I've Created</h2>
+	      <h2 class="pull-left"><i class="fa fa-microphone"></i> CodeRequests</h2>
         <!-- Breadcrumb -->
         <div class="bread-crumb pull-right">
           <a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a> 
@@ -37,8 +37,7 @@
 
 	    <div class="matter">
         <div class="container">
-        	
-        	 <div class="alert alert-info">
+        	<div class="alert alert-info">
 			    <p>
 				Multiple development efforts can occur around a single draft or RFC, enabling collaboration between development efforts and opportunities for organizing plugfest and hackaton events.  
 			    </p>
@@ -58,7 +57,7 @@
                   <div class="pull-left">
 					<i class="fa fa-sort"></i> <span style="font-weight: lighter">Order by: </span> 
 					<a href="#">Code Request</a> |
-					<a href="#">Protocol</a> | 
+					<a href="#">Protocol </a> | 
 					<a href="#">Area</a> | 
 					<a href="#">Release date</a> | 
 					<a href="#">Popularity</a> | 
@@ -69,46 +68,38 @@
                 <div class="widget-content">
                   
 
-			{% for projectcontainer in projectcontainers %}
-			<div class="padd">
-	               <h4>
-		               <div class="fa fa-chevron-circle-right" >
-		               	<a href="{% url 'show' projectcontainer.id %}">{{ projectcontainer.title }}</a> </i> {{ projectcontainer.code_request.creation_date|date:"d M Y" }}
-		               		<a class="label label-info" href="{% url 'ietf.codematch.requests.views.edit' projectcontainer.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a> 
+		  {% for projectcontainer in projectcontainers %}
+          <div class="padd">
+                   	<h4><i class="fa fa-chevron-circle-right"> <a href="{% url 'show' projectcontainer.id %}">{{ projectcontainer.title }}</a> </i> {{ projectcontainer.code_request.creation_date|date:"d M Y" }}
+                   			<a class="label label-info" href="{% url 'ietf.codematch.requests.views.edit' projectcontainer.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a> 
 		               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
-	               	</h4>
-	               	<div style="margin-left:15px">
+		            </h4>
+                   	<div style="margin-left:15px">
 		                        <p>{{ projectcontainer.description|linebreaks }}</p>
 		            </div>
-		            <div style="margin-left:15px">
-			            <p>CodeMatches:
-			            {% if projectcontainer.codings.all %}
-			               	{% for coding in projectcontainer.codings.all %}
-			              		{% if not forloop.first %}
-			              		|
-			              		{% endif %}
-								<a href="{% url 'ietf.codematch.matches.views.show' projectcontainer.id coding.id %}">{{ coding.title }}</a> 
-			                {% endfor %}
-			            {% else %}
-			            <a>None</a>
-			            {% endif %}
-		                </p>
-	                </div>
-				   </div>
-			</div>  
-			{% endfor %}
-                   
-              <div class="widget-foot">
-                 <p class="buttonlist">
-                 	{% if user.is_authenticated and canaddrequest %}
-                 		<a class="btn btn-default" href="{% url "ietf.codematch.requests.views.new" %}">New Code Request</a>
-                 	{% endif %}
-                 	{% if projectcontainers %}
-                 		<a class="btn btn-default" href="{% url "ietf.codematch.requests.views.search" %}">Search</a>
-                 	{% endif %}
-                 </p>
-              </div>
-            </div>
+                   	{% for coding in projectcontainer.codings.all %}
+                      	<div style="margin: 0 0 20px 15px">
+                      		<h5><i class="fa fa-minus"></i> <a href="{% url 'ietf.codematch.matches.views.show' projectcontainer.id coding.id %}">{{ coding.title }}</a></h5>
+                      		<div style="margin-left:15px">
+		                        <p>{{ coding.additional_information }}</p>
+		            		</div>
+                        </div>
+                    {% endfor %}
+ 	       </div>  
+		   {% endfor %}
+	
+          <div class="widget-foot">
+             <p class="buttonlist">
+             	{% if user.is_authenticated and canaddrequest %}
+             		<a class="btn btn-default" href="{% url "ietf.codematch.requests.views.new" %}">New Code Request</a>
+             	{% endif %}
+             	{% if projectcontainers %}
+             		<a class="btn btn-default" href="{% url "ietf.codematch.requests.views.search" %}">Search</a>
+             	{% endif %}
+             </p>
+          </div>
+          
+        </div>
 
 		</div>
  	    </div>

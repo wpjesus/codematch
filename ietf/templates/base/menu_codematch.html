@@ -1,5 +1,6 @@
 {# Copyright The IETF Trust 2015, All Rights Reserved #}{% load origin %}{% origin %}
 {% load ietf_filters community_tags wg_menu streams_menu %}
+{% load staticfiles %}
 
 <div class="navbar navbar-fixed-top bs-docs-nav" role="banner">
   
@@ -13,7 +14,7 @@
 			<span>Menu</span>
 		  </button>
 		  <!-- Site name for smallar screens -->
-		  <a href="#" class="navbar-brand" ><img src="/images/ietflogo-small-transparent.png" /></a>
+		  <a href="#" class="navbar-brand" ><img src="{% static "images/ietflogo-small-transparent.png" %}" /></a>
 		</div>
       <ul class="nav navbar-nav">	
 	  	<li class="dropdown">
@@ -29,7 +30,7 @@
 				<li>
 					<a href="{% url "ietf.codematch.matches.views.show_list" %}">All CodeMatches</a>
 				</li>
-				{% if mycodings %}
+				{% if mycodings or canaddcoding %}
 				<li>
 					<a href="#">My CodeMatches</a>
 				</li>
@@ -43,12 +44,12 @@
 				<li>
 					<a href="{% url "ietf.codematch.requests.views.show_list" %}">All CodeRequests</a>
 				</li>
-				{% if projectsowner %}
+				{% if projectsowner or canaddrequest %}
 				<li>
-					<a href="{% url "ietf.codematch.requests.views.show_my_list" %}">My CodeRequests</a>
+					<a href="{% url "ietf.codematch.requests.views.show_my_list" %}">CodeRequests I've Created</a>
 				</li>
 				{% endif %}
-				{% if projectsmentoring %}
+				{% if projectsmentoring or ismentor %}
 				<li>
 					<a href="{% url "ietf.codematch.requests.views.show_mentoring_list" %}">CodeRequests I'm Mentoring</a>
 				</li>
@@ -69,13 +70,13 @@
         <ul class="nav navbar-nav pull-right">
           <li class="dropdown pull-right">            
             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-              <i class="fa fa-user"></i> {{ username }} <b class="caret"></b>              
+              <i class="fa fa-user"></i><b class="caret"></b>              
             </a>
             
             <!-- Dropdown menu -->
             <ul class="dropdown-menu">
-              <li><a href="#"><i class="fa fa-user"></i> Profile</a></li>
-              <li><a href="#"><i class="fa fa-cogs"></i> Settings</a></li>
+              <li><a href="#"><i class="fa fa-user"></i> {{ username }} </a></li>
+              <!--<li><a href="#"><i class="fa fa-cogs"></i> Settings</a></li>-->
               <li><a rel="nofollow" href="{% url 'django.contrib.auth.views.logout' %}" >Logout</a></li>
             </ul>
           </li>

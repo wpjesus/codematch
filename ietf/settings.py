@@ -229,10 +229,6 @@ INSTALLED_APPS = (
     'ietf.submit',
     'ietf.sync',
     'ietf.utils',
-    'ietf.codematch',
-    'ietf.codematch.matches',
-    'ietf.codematch.requests',
-    'ietf.codematch.accounts',
     # IETF Secretariat apps
     'ietf.secr.announcement',
     'ietf.secr.areas',
@@ -542,6 +538,7 @@ from settings_local import *            # pyflakes:ignore
 
 # Add DEV_APPS to INSTALLED_APPS
 INSTALLED_APPS += DEV_APPS
+INSTALLED_APPS += CODEMATCH_APPS
 
 # We provide a secret key only for test and development modes.  It's
 # absolutely vital that django fails to start in production mode unless a

@@ -6,11 +6,8 @@ from ietf.codematch.requests.models import CodeRequest
 
 import debug
 
-def get_prefix():
-    return ""
-
 def is_user_allowed(user, permission):
-    return False
+    return True
 
 def get_menu_arguments(request, dict):
     if request.user.is_authenticated():
@@ -21,8 +18,10 @@ def get_menu_arguments(request, dict):
         dict["mycodings"] = my_codings
         dict["projectsowner"] = projects_my_own
         dict["projectsmentoring"] = projects_my_mentoring
-        # rever como fazer isto melhor
+        # TODO: review this, add here others permissions
         dict["canaddrequest"] = is_user_allowed(user, "canaddrequest")
+        dict["canaddcoding"]  = is_user_allowed(user, "canaddcoding")
+        dict["ismentor"]      = is_user_allowed(user, "ismentor")
         
         alias = Alias.objects.filter( person = user )
         

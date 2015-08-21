@@ -18,11 +18,13 @@ from ietf.codematch.matches.forms import SearchForm, ProjectContainerForm, Codin
 from ietf.codematch.matches.models import ProjectContainer, CodingProject, Implementation
 from ietf.codematch.requests.models import CodeRequest
 
-from ietf.codematch.utils import (get_prefix, render_page)
+from ietf.codematch.utils import (render_page)
+
+from django.conf import settings
 
 import debug                            
 
-@login_required(login_url=get_prefix() + '/codematch/accounts/login')
+@login_required(login_url = settings.CODEMATCH_PREFIX + '/codematch/accounts/login')
 def show_list(request):
     """List all ProjectContaineres by Title"""
     
@@ -33,7 +35,7 @@ def show_list(request):
             'codings'           : codings
     })
 
-@login_required(login_url=get_prefix() + '/codematch/accounts/login')
+@login_required(login_url = settings.CODEMATCH_PREFIX + '/codematch/accounts/login')
 def show(request, pk, ck):
     """View individual Codematch Project and Add Document and Implementation"""
     
@@ -56,7 +58,7 @@ def show(request, pk, ck):
           
           coding.links.add(link)
           coding.save()
-          return HttpResponseRedirect(get_prefix() + '/codematch/matches/'+str(pk)+'/'+str(ck))
+          return HttpResponseRedirect( settings.CODEMATCH_PREFIX + '/codematch/matches/'+str(pk)+'/'+str(ck))
       
        else:
           print "Invalid doc" #reload page
@@ -118,7 +120,7 @@ def search(request):
         form = SearchForm()
         return render_page(request, "codematch/matches/search.html", { "form" : form })
 
-@login_required(login_url=get_prefix() + '/codematch/accounts/login')
+@login_required(login_url = settings.CODEMATCH_PREFIX + '/codematch/accounts/login')
 def new(request, pk=""):
     """ New CodeMatch Entry """
     
@@ -147,7 +149,7 @@ def new(request, pk=""):
           coding.save()
           project.codings.add(coding)
           project.save()
-          return HttpResponseRedirect( get_prefix() + '/codematch/matches/'+str(project.id)+'/'+str(coding.id))
+          return HttpResponseRedirect( settings.CODEMATCH_PREFIX + '/codematch/matches/'+str(project.id)+'/'+str(coding.id))
       
        else:
           print "Some form is not valid"

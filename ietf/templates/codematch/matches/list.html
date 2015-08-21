@@ -74,7 +74,7 @@
 		                                    	<!-- Title and date -->
 		                                    	<h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a></h6>
 		                                    	<!--<h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a></h6>-->
-		                                    	<p>{{ projectcontainer.description }}</p>
+		                                    	<p>{{ projectcontainer.description|linebreaks }}</p>
 		                                    	<p>
 		                                    	{% if projectcontainer.code_request == None %}
 		                                    	CodeRequest: 	 <a href="#">None</a>
