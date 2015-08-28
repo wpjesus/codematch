@@ -9,7 +9,7 @@ urlpatterns = patterns('ietf.codematch.requests.views',
     url(r'^show_mentoring_list/$', views.show_mentoring_list, name="show_mentoring_list"),
     url(r'^show_my_list/$', views.show_my_list, name="show_my_list"),
     url(r'^new/$', views.new , name="new"),
-    url(r'^edit/(?P<pk>[0-9]+)$', views.edit, name="edit"),
+    url(r'^update/(?P<pk>[0-9]+)$', views.update, name="update"),
     url(r'^search/$', views.search, name="search"),
     url(r'^(?P<pk>[0-9]+)/$', views.show, name='show'),
 )

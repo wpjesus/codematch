@@ -93,10 +93,52 @@
 									</div>
 								</div>
 								
+								<br />
+																
+								<div>
+									{% if user.is_authenticated and myrequest %}
+									<form action="{% url 'ietf.codematch.requests.views.new' %}" method="post">
+										{{ docform }}
+										{% csrf_token %}
+										<input type="submit" value="Add related Document" />
+										<br />
+										<label>Tag:</label>
+										{{ tagform.name }}
+										{% csrf_token %}
+										<input type="submit" value="Add new Tag" />
+									</form>
+									<br />
+									{% endif %}
+								</div>	
+								
+								<br />
+								
+								<div>
+									{% if user.is_authenticated and docs and myrequest %}
+			            				<h4><strong>Documents</strong></h4>
+										{% for doc in docs %}
+											{{ doc.document.group }}: <a  href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
+											<br />
+										{% endfor %}
+										<br />
+									{% endif %}
+								</div>
+								
+								<div>
+									{% if user.is_authenticated and tags and myrequest %}
+		            					<h4><strong>Tags</strong></h4> 
+		            					{% for tag in tags %}
+		            						<a>{{ tag }}</a>
+		            						<br />
+		            					{% endfor %}
+		            					<br />
+		            				{% endif %}
+	            				<div>
+	            				
 						   		<div class="widget-foot">
                                 <p class="buttonlist">
                                 	<div class="col-xs-offset-1" style="margin-left: 0px">
-								    	<input type="submit" class="btn btn-primary" value="Submit" />
+								    	<input type="submit" name="save" class="btn btn-primary" value="Submit" />
                                 		<a class="btn btn-default " href="{% url "ietf.codematch.requests.views.show_list" %}">Back</a>
                                 	</div>
                                 </p>

@@ -98,26 +98,20 @@
 		                    </div>
 
                       		<br />
-                      		
+							
+							{% if projectcontainer.docs.all %}
+								<h4><strong>Documents</strong></h4>
+								{% for doc in projectcontainer.docs.all %}
+									{{ doc.document.group }}: <a  href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
+									<br />
+								{% endfor %}        
+								<br />
+							{% endif %}
+							                     		
                       		<h4><strong>Description</strong></h4>
 		                    <p>{{ projectcontainer.description|linebreaks }}</p>
 		                    
 		                    <br />
-		                    
-		                    {% if user.is_authenticated and myrequest %}
-	            				<h4><strong>Documents</strong></h4>
-								{% for doc in docs %}
-								{{ doc.document.group }}: <a  href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
-								<br />
-								{% endfor %}
-								<br />
-								<form action="{% url 'ietf.codematch.requests.views.show' projectcontainer.id %}" method="post">
-									{{ docform }}
-									{% csrf_token %}
-									<input type="submit" value="Add related Document" />
-								</form>
-								<br />
-							{% endif %}
 		                    
 		                    <h4><strong>Resources</strong></h4>
 		                    Mentor: <a href="#">{{ projectcontainer.code_request.mentor.name }}</a><br />
@@ -133,17 +127,7 @@
 	            			{% endfor %}
 		            		
 		            		<br />
-		            		<br />
-		            		
-		            		{% if user.is_authenticated and myrequest %}
-	            				<h4><strong>Tags</strong></h4>
-								<form action="{% url 'ietf.codematch.requests.views.show' projectcontainer.id %}" method="post">
-									{{ tagform }}
-									{% csrf_token %}
-									<input type="submit" value="Add new Tag" />
-								</form>
-								<br />
-							{% endif %}		            		
+		            		<br />           		
 		            		
 		            		{% if projectcontainer.codings.all %}
 			            		<h4><strong>CodeMatches</strong></h4>

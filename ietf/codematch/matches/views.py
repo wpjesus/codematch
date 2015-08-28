@@ -1,5 +1,5 @@
 import datetime
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 
 from django import forms
 from django.forms import CharField
@@ -18,15 +18,14 @@ from ietf.codematch.matches.forms import SearchForm, ProjectContainerForm, Codin
 from ietf.codematch.matches.models import ProjectContainer, CodingProject, Implementation
 from ietf.codematch.requests.models import CodeRequest
 
-from ietf.codematch.utils import (render_page)
+from ietf.codematch.helpers.utils import (render_page, is_user_allowed)
 
 from django.conf import settings
 
 import debug                            
 
-@login_required(login_url = settings.CODEMATCH_PREFIX + '/codematch/accounts/login')
 def show_list(request):
-    """List all ProjectContaineres by Title"""
+    """ List all ProjectContaineres by Title """
     
     project_containers = ProjectContainer.objects.order_by('creation_date')[:20]
     codings            = CodingProject.objects.all()
@@ -35,9 +34,8 @@ def show_list(request):
             'codings'           : codings
     })
 
-@login_required(login_url = settings.CODEMATCH_PREFIX + '/codematch/accounts/login')
 def show(request, pk, ck):
-    """View individual Codematch Project and Add Document and Implementation"""
+    """ Show individual Codematch Project and Add Implementation """
     
     project_container = get_object_or_404(ProjectContainer, id=pk)
     coding            = get_object_or_404(CodingProject,    id=ck)
@@ -47,12 +45,13 @@ def show(request, pk, ck):
     my_request = False
     
     if request.user.is_authenticated():
-        user = Person.objects.get( user = request.user )
-        my_match = coding.coder == user
+        user        = Person.objects.get( user = request.user )
+        is_my_match = coding.coder == user
 
     if request.method == 'POST':
        link_to_implementation = LinkImplementationForm(request.POST)
       
+	   #Adding new implementation (Review this attribute name)
        if link_to_implementation.is_valid():
           link = link_to_implementation.save()
           
@@ -67,19 +66,20 @@ def show(request, pk, ck):
         'projectcontainer': project_container,
         'coding'          : coding,
         'linkform'        : link_form,
-        'implementations' : links, #review this name,
-        'mymatch'         : my_match
+        'implementations' : links, #review this name
+        'mymatch'         : is_my_match
     })
 
 
 def search(request):
+    """ Shows the list of projects, filtering by some query (title, protocol, coder or doctitle) """
+    
     search_type = request.GET.get("submit")
     if search_type:
         form = SearchForm(request.GET)
         docs = None
         project_containers = []
         template = "codematch/matches/list.html"
-        
         codings = CodingProject.objects.all()
         
         # get query field
@@ -100,14 +100,14 @@ def search(request):
                 # review this
                 project_containers = ProjectContainer.objects.filter(codings__coder__name__icontains=query).distinct()
                 codings            = CodingProject.objects.filter(coder__name__icontains=query)
-            # Document list with a Codematch project
+            # Document list with a Codematch project (MOVE IT TO CODEREQUESTS)
             elif search_type == "doctitle":
                 project_containers = ProjectContainer.objects.filter(docs__name__icontains=query)
 
             else:
                 raise Http404("Unexpected search type in ProjectContainer query: %s" % search_type)
 
-            return render(request, template, {
+            return render_page(request, template, {
                 "projectcontainers" : project_containers,
                 "codings"           : codings,
                 "docs"              : docs,

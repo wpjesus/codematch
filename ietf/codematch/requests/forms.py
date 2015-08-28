@@ -5,8 +5,8 @@ from ietf.codematch.requests.models import CodeRequest
 from ietf.codematch.matches.models import ProjectTag
 
 class DocNameForm(forms.Form):
-    doc = forms.CharField(label="Name", max_length=128, required=True)
-    
+    doc = forms.CharField(label="Document", max_length=128, required=True)
+
 class TagForm(ModelForm):
     class Meta:
         model = ProjectTag
