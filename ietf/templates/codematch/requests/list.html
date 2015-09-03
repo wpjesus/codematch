@@ -37,17 +37,6 @@
 
 	    <div class="matter">
         <div class="container">
-        	<div class="alert alert-info">
-			    <p>
-				Multiple development efforts can occur around a single draft or RFC, enabling collaboration between development efforts and opportunities for organizing plugfest and hackaton events.  
-			    </p>
-				<p>
-			    The IETF takes no position regarding the validity or scope of any
-				intellectual property rights or other rights that might be claimed to
-				pertain to the implementation or use of the technology described in any IETF documents or the extent to
-				which any license under such rights might or might not be available; nor does it represent that it has made any independent effort to identify any such rights.
-		    	</p>
-		    </div>
 
 		<div class="col-md-12">
 
@@ -67,38 +56,43 @@
                 </div>
                 <div class="widget-content">
                   
-
-		{% for projectcontainer in projectcontainers %}
-          <div class="padd">
-               <div class="user">
-                   <div class="user-details" style="margin-left: 0px; margin-bottom:20px;">
-                   <h4><i class="fa fa-chevron-circle-right"> <a href="{% url 'show' projectcontainer.id %}">{{ projectcontainer.title }}</a> </i> {{ projectcontainer.code_request.creation_date|date:"d M Y" }}
-               			{% if user.is_authenticated and projectcontainer.owner == owner %}
-                   			<a class="label label-info" href="{% url 'ietf.codematch.requests.views.update' projectcontainer.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a> 
-		               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
-	               		{% endif %}
-		            </h4>
-                   	<div style="margin-left:15px">
-		                        <p>{{ projectcontainer.description|linebreaks }}</p>
-		            </div>
-                   	{% for coding in projectcontainer.codings.all %}
-                      	<div style="margin: 0 0 20px 15px">
-                      		<h5><i class="fa fa-minus"></i> <a href="{% url 'ietf.codematch.matches.views.show' projectcontainer.id coding.id %}">{{ coding.title }}</a></h5>
-                      		<div style="margin-left:15px">
-		                        <p>{{ coding.additional_information }}</p>
-		            		</div>
-                        </div>
-                    {% endfor %}
-				   </div>
- 	    		</div>
- 	    		{% if user.is_authenticated %}
- 	          	<div>
-		       		 <!--<a href="#myModal" class="btn btn-info btn-xs" style="padding:1px 5px" data-toggle="modal"><i class="fa fa-check"></i> Associate my project</a>--> 
-		       		<a href="{% url 'ietf.codematch.matches.views.new' projectcontainer.id %}" class="btn btn-info btn-xs" ><i class="fa fa-check"></i>Associate my project</a>
-		       	</div>
-		       	{% endif %}
- 	       </div>  
-		{% endfor %}
+		
+		{% if projectcontainers %}
+			{% for projectcontainer in projectcontainers %}
+	          <div class="padd">
+	               <div class="user">
+	                   <div class="user-details" style="margin-left: 0px; margin-bottom:20px;">
+	                   <h4><i class="fa fa-chevron-circle-right"> <a href="{% url 'show' projectcontainer.id %}">{{ projectcontainer.title }}</a> </i> {{ projectcontainer.code_request.creation_date|date:"d M Y" }}
+	                      	{% if user.is_authenticated %}
+	                   			{% if projectcontainer.owner == owner %}
+		                   			<a class="label label-info" href="{% url 'ietf.codematch.requests.views.update' projectcontainer.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a> 
+				               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
+			               		{% endif %}
+		               			<a href="{% url 'ietf.codematch.matches.views.new' projectcontainer.id %}" class="label label-info" ><i class="fa fa-check"></i>Associate my project</a>
+							{% endif %}
+			            </h4>
+	                   	<div style="margin-left:15px">
+	                        <p>{{ projectcontainer.description|linebreaks }}</p>
+			            </div>
+	                   	{% for coding in projectcontainer.codings.all %}
+	                      	<div style="margin: 0 0 20px 15px">
+	                      		<h5><i class="fa fa-minus"></i> <a href="{% url 'ietf.codematch.matches.views.show' projectcontainer.id coding.id %}">{{ coding.title }}</a></h5>
+	                      		<div style="margin-left:15px">
+			                        <p>{{ coding.additional_information }}</p>
+			            		</div>
+	                        </div>
+	                    {% endfor %}
+					   </div>
+	 	    		</div>
+	 	       </div>  
+			{% endfor %}
+		{% else %}
+			<div class="alert alert-info" style="margin: 5px;">
+			    <p align="center">
+				No data to display  
+			    </p>
+		    </div>
+		{% endif %}
 	
               <div class="widget-foot">
                  <p class="buttonlist">

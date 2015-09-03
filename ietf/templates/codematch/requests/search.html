@@ -52,9 +52,7 @@
 								</div>
 								<div class="widget-foot">
 									<p class="buttonlist">
-										
-										<a class="btn btn-default " href="{% url "ietf.codematch.requests.views.show_list" %}">Back</a>
-										
+										<a class="btn btn-default " href="{{request.META.HTTP_REFERER}}">Back</a>
 									</p>
 								</div>
 						</div>

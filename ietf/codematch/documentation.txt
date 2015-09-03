@@ -1,0 +1,103 @@
+#### TODO LIST ###
+- Melhorar performance (principalmente new e edit CodeRequest)
+- Migrar vers„o est·vel para Master
+- Migrar implementaÁıes para dentro do formul·rio de new Match (tq CodeRequest)
+- Colocar constantes para melhorar legibilidade (para v·riaveis de sess„o e para strings de templates)
+- Definir padr„o para permissıes
+- Atualizar feature list
+- Pensar em unir o template de update e new
+- Estudar outras aplicaÁıes do DataTracker para padronizar cÛdigo
+- Pensar em separar as funÁıes dentro de POST dos mÈtodos
+- Criar uma nova base de dados para hospedar o Master
+- Criar tag no github para manter versıes master
+- Criar Script de migraÁ„o de base se necess·rio
+- Adicionar settings_local.py no github
+- Fazer esquema para permitir novos cadastros de usu·rios
+- Atualizar interface para mockups v5
+- Ver bug do login (logar, deslogar e logar novamente sem percorrer p·ginas)
+
+### DONE LIST ###
+- Adicionar documentos e tags dentro do formul·rio de novo coderequest
+- Mesma tela para All CodeRequests, Code requests i've created and CodeRequest i'm mentoring
+- Coment·rio e centralizaÁ„o da funÁ„o new e update
+- Todas as preferÍncias relacionadas ao CodeMatch postas em settings_local
+- Codematch muito lento (!) (Melhorar, ainda tem um erro estranho acontencendo no servidor)
+- Separar tags por virgula (/)
+- Back voltar sensível ao contexto (/)
+- Update e Archive no show (/)
+- Colocar Associate my project antes de Edit (/)
+- Colocar mensagem quando não existem itens na lista (/)
+- Retirar a mensagem superior aos CodeRequests (/)
+- Permitir remoção de documentos e tags (/)
+
+### QUESTION LIST ###
+- Existem diversos testes sendo feitos nos templates, deveriam ser passados para o cÛdigo?
+
+### DOCUMENTATION ###
+Estrutura composta no momento de 4 pastas alÈm da raÌz (Accounts, Helpers, Matches e Requests).
+- Accounts È onde devem ser colocadas as funÁıes referente ao Login e Logout entre outras preferÍncias de conta
+- Helpers È onde devem ser postas as funÁıes que s„o utilizadas por todas as outras aplicaÁıes
+- Matches È a aplicaÁ„o que cuida dos Codings
+- Requests È a aplicaÁ„o que dos ProjectContainers e CodeRequests
+- A raÌz n„o deve ter grandes funcionalidades alÈm de ativar as outras aplicaÁıes, È apenas uma porta de entrada
+* Obs: A mesma estrutura È usada para o cÛdigo e para os templates
+
+Como È utilizado esquema de permissıes, algumas permissıes devem ser sempre adicionadas para toda p·gina que for ser renderizada, por isso foi centralizado em Helpers/Utils.py um mÈtodo que adiciona v·riaveis de contexto ao dicion·rio. … preciso que sempre seja chamado o mÈtodo render_page quando se quiser renderizar uma p·gina, N√O USAR o mÈtodo render pois algumas coisas poder„o ficar inconsistentes.
+
+TambÈm em Helpers/Utils.py est· o mÈtodo is_user_allowed que deve cuidar das permissıes do usu·rio atual.
+
+Todas as preferÍncias que forem apenas do Codematch devem estar centradas em settings_local, acredito que o arquivo settings.py deva ser mexido o menos possÌvel para facilitar uma futura integraÁ„o com DataTracker.
+
+MÈtodos que precisam que o usu·rio esteja logado devem possuir o decorator login_required desta forma:
+- @login_required(login_url = settings.CODEMATCH_PREFIX + '/codematch/accounts/login')', onde o prefixo CODEMATCH_PREFIX deve vir da pasta settings_local. 
+… possÌvel assim que tenhamos diversas aplicaÁıes rodando no mesmo servidor apache, sendo separadas apenas pelo prefixo 'codematch-dev' ou 'codematch-master' por exemplo.
+
+Ao referenciar algum arquivo da pasta static È preciso colocar a tag 'static' tal qual est· em base_codematch.html ou base.html e lembrar de importar a definiÁ„o {% load staticfiles %}.
+Medida tambÈm para que se possa rodar diversas aplicaÁıes no mesmo servidor Apache.
+
+Usu·rio v·lidos est„o na tabela person_person (SELECT * FROM person_person) do Datatracker e a senha È sempre 'password'.
+
+Para o usu·rio ver CodeRequest i've created ou CodeRequest i'm mentoring na barra superior ele deve ter a permiss„o para tal ou j· ter criado/supervisionado algum CodeRequest antes.
+
+### TIPS PARA INSTALA«√O ###
+Instalar Django con 
+        sudo pip install Django
+Instalar Homebrew:
+        ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+Instalar mysql y stunnel con brew install mysql
+        brew install mysql
+                brew install stunnel
+
+Para baixar o repositÛrio do datatracker:
+	'svn checkout http://svn.tools.ietf.org/svn/tools/ietfdb/tags/6.0.4'
+
+(1) Instrucciones para instalar Datatracker en:
+        http://trac.tools.ietf.org/tools/ietfdb/wiki/SprintCoderSetup
+
+Para crear la base de datos
+        http://trac.tools.ietf.org/tools/ietfdb/wiki/SprintDatabase
+
+Para crear el user & pass del root en el mysql:
+        Crear el archivo: /Users/chris/Desktop/ietf/6.0.2/sqlpass 
+        y poner adentro:
+        SET PASSWORD FOR 'root'@'localhost' = PASSWORD('ietf');
+
+        mysqld_safe --init-file=/Users/chris/Desktop/ietf/6.0.2/sqlpass &
+
+crear stunnel.pem (en el directorio que lo pida: Ej. /usr/local/etc/stunnel/stunnel.pem )
+        openssl req -new -x509 -days 365 -nodes  -out stunnel.pem -keyout stunnel.pem
+
+Agregar en ~/.bash_profile
+        export LC_ALL=en_US.UTF-8
+        export LANG=en_US.UTF-8
+
+Instalar libmagic
+        sudo pip install libmagic
+
+Uno de los include se queja por falta de __init__py
+        sudo touch /System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/mpl_toolkits/__init__.py
+
+Crear el shell script the arranque para mysql & stunnel (las instrucciones est·n en(1)
+
+Crear el superuser de django
+        python ietf/manage.py createsuperuser

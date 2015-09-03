@@ -97,7 +97,7 @@
 										
 											{% if user.is_authenticated and mymatch %}
 											<h4><strong>Implementations</strong></h4>
-											{% for implementation in implementations %}
+											{% for implementation in coding.links.all %}
 												<a href="{{ implementation.link }}">{{ implementation.link }}</a>
 											<br />
 											{% endfor %}
@@ -116,7 +116,11 @@
 							</div>
 							<div class="widget-foot">
 								<div class="pull-right">
-									<a class="btn btn-default btn-sm" href="{% url "ietf.codematch.matches.views.show_list" %}">Back</a>
+									{% if request.META.HTTP_REFERER %}
+										<a class="btn btn-default " href="{{request.META.HTTP_REFERER}}">Cancel</a>
+									{% else %}
+										<a class="btn btn-default" href="{% url 'ietf.codematch.matches.views.show_list' %}">Cancel</a>
+									{% endif %}
 								</div>
 								<div class="clearfix"></div>
 							</div>

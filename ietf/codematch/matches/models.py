@@ -12,7 +12,7 @@ from ietf.codematch.requests.models import CodeRequest
 class Implementation(models.Model):
     """  """
     
-    link                   = models.URLField(blank=True)
+    link = models.URLField(blank=True)
     
     def __unicode__(self):
         return self.link
@@ -20,7 +20,7 @@ class Implementation(models.Model):
 class ProjectTag(models.Model):
     """ """
     
-    name                   = models.CharField(max_length=80)
+    name = models.CharField(max_length=80)
 
     def __unicode__(self):
         return self.name
@@ -58,23 +58,23 @@ class CodingProject (models.Model):
 class ProjectContainer (models.Model):
     """ The ProjectContainer associates the Documents to the projects  """
 
-    owner                  = models.ForeignKey(Person, null=True, blank=True)
+    owner         = models.ForeignKey(Person, null=True, blank=True)
 
-    title                  = models.CharField(max_length=80)
-    creation_date          = models.DateTimeField(auto_now_add=True)
+    title         = models.CharField(max_length=80)
+    creation_date = models.DateTimeField(auto_now_add=True)
 
     # Protocol that was implemented (if any):
     #(Note that this is a free text field )
-    protocol               = models.CharField(max_length=255)
-    description            = models.TextField()
+    protocol      = models.CharField(max_length=255)
+    description   = models.TextField()
     
     # Some elements will not have a CodeRequest
-    code_request           = models.ForeignKey(CodeRequest, blank=True, null=True)
-    docs                   = models.ManyToManyField(DocAlias)
+    code_request  = models.ForeignKey(CodeRequest, blank=True, null=True)
+    docs          = models.ManyToManyField(DocAlias)
     
-    codings                = models.ManyToManyField(CodingProject)
+    codings       = models.ManyToManyField(CodingProject)
     
-    tags                   = models.ManyToManyField(ProjectTag, blank=True, null=True)
+    tags          = models.ManyToManyField(ProjectTag, blank=True, null=True)
 
     def __unicode__(self):              # __unicode__ on Python 2
         return self.title

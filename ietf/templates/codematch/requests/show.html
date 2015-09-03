@@ -49,7 +49,7 @@
               <div class="widget">
                 <div class="widget-head">
                   <div class="pull-left">
-					<i class="fa fa-chevron-circle-right"></i>  {{ projectcontainer.title }}
+					<i class="fa fa-chevron-circle-right"></i> {{ projectcontainer.title }}
 				  </div>
                   <div class="clearfix"></div>
                 </div>
@@ -84,9 +84,15 @@
 		                      </div>
 		
 		                      <div class="col-md-4">
-		                      	{% if user.is_authenticated %}
-		                        <a href="{% url 'ietf.codematch.matches.views.new' projectcontainer.id %}" class="btn btn-info btn-xs" style="padding:1px 5px"><i class="fa fa-check"></i> Associate my project</a>
-								{% endif %}
+		                      	<div>
+			                      	{% if user.is_authenticated %}
+			                   			{% if projectcontainer.owner == owner %}
+				                   			<a class="label label-info" href="{% url 'ietf.codematch.requests.views.update' projectcontainer.id %}" ><i class="fa fa-pencil"></i> Edit</a> 
+						               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
+					               		{% endif %}
+				               			<a href="{% url 'ietf.codematch.matches.views.new' projectcontainer.id %}" class="label label-info" ><i class="fa fa-check"></i>Associate my project</a>
+									{% endif %}
+								</div>
 		                        <!-- Social Media strip -->
 		                        <div id="media-strip">
 		                        <a><i class="fa fa-facebook-square"></i></a>
@@ -102,7 +108,7 @@
 							{% if projectcontainer.docs.all %}
 								<h4><strong>Documents</strong></h4>
 								{% for doc in projectcontainer.docs.all %}
-									{{ doc.document.group }}: <a  href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
+									{{ doc.document.group }}: <a href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
 									<br />
 								{% endfor %}        
 								<br />
@@ -146,7 +152,11 @@
                   </div>
 					<div class="widget-foot">
 						<div class="pull-right">
-							<a class="btn btn-default btn-sm" href="{% url "ietf.codematch.requests.views.show_list" %}">Back</a>
+							{% if request.META.HTTP_REFERER %}
+								<a class="btn btn-default " href="{{request.META.HTTP_REFERER}}">Back</a>
+							{% else %}
+								<a class="btn btn-default" href="{% url 'ietf.codematch.requests.views.show_list' %}">Back</a>
+							{% endif %}
 						</div>
 						<div class="clearfix"></div>
 					</div>

@@ -29,6 +29,7 @@ def show_list(request):
     
     project_containers = ProjectContainer.objects.order_by('creation_date')[:20]
     codings            = CodingProject.objects.all()
+	
     return render_page(request, "codematch/matches/list.html", {
             'projectcontainers' : project_containers,
             'codings'           : codings
@@ -39,37 +40,31 @@ def show(request, pk, ck):
     
     project_container = get_object_or_404(ProjectContainer, id=pk)
     coding            = get_object_or_404(CodingProject,    id=ck)
-    links             = coding.links.all()
+    #links             = coding.links.all()
     link_form         = LinkImplementationForm()
-
-    my_request = False
     
     if request.user.is_authenticated():
         user        = Person.objects.get( user = request.user )
         is_my_match = coding.coder == user
 
+	# TODO: Migrate to 'new'
     if request.method == 'POST':
        link_to_implementation = LinkImplementationForm(request.POST)
       
-	   #Adding new implementation (Review this attribute name)
+	   # Adding new implementation (Review this attribute name)
        if link_to_implementation.is_valid():
           link = link_to_implementation.save()
           
           coding.links.add(link)
           coding.save()
-          return HttpResponseRedirect( settings.CODEMATCH_PREFIX + '/codematch/matches/'+str(pk)+'/'+str(ck))
-      
-       else:
-          print "Invalid doc" #reload page
+          return HttpResponseRedirect( settings.CODEMATCH_PREFIX + '/codematch/matches/' + str(pk) + '/' + str(ck) )
 
     return render_page(request, "codematch/matches/show.html",  {
         'projectcontainer': project_container,
         'coding'          : coding,
         'linkform'        : link_form,
-        'implementations' : links, #review this name
         'mymatch'         : is_my_match
     })
-
 
 def search(request):
     """ Shows the list of projects, filtering by some query (title, protocol, coder or doctitle) """
@@ -79,7 +74,6 @@ def search(request):
         form = SearchForm(request.GET)
         docs = None
         project_containers = []
-        template = "codematch/matches/list.html"
         codings = CodingProject.objects.all()
         
         # get query field
@@ -107,7 +101,7 @@ def search(request):
             else:
                 raise Http404("Unexpected search type in ProjectContainer query: %s" % search_type)
 
-            return render_page(request, template, {
+            return render_page(request, "codematch/matches/list.html", {
                 "projectcontainers" : project_containers,
                 "codings"           : codings,
                 "docs"              : docs,
@@ -117,47 +111,47 @@ def search(request):
         return HttpResponseRedirect(request.path)
 
     else:
-        form = SearchForm()
-        return render_page(request, "codematch/matches/search.html", { "form" : form })
+        return render_page(request, "codematch/matches/search.html", { "form" : SearchForm() })
 
 @login_required(login_url = settings.CODEMATCH_PREFIX + '/codematch/accounts/login')
 def new(request, pk=""):
-    """ New CodeMatch Entry """
+    ''' New CodeMatch Entry
+    When user presses 'Associate new project' there is a Project Container
+    associated, then you need reuse this information in the form '''
     
     proj_form = modelform_factory(ProjectContainer,form=ProjectContainerForm)
     code_form = modelform_factory(CodingProject,form=CodingProjectForm)
-    
-    project_container = None
-    if pk != "": #Already exists project container
-        project_container = get_object_or_404(ProjectContainer, id=pk)
-    
-    if request.method == 'POST':
-       
-       project = None
-       if project_container == None:
-           new_project = ProjectContainerForm(request.POST)
-           if new_project.is_valid():
-              project = new_project.save()
-       else:
-           project = project_container
-       
-       new_coding  = CodingProjectForm(request.POST)
-       
-       if project != None and new_coding.is_valid():
-          coding                   = new_coding.save(commit=False)
-          coding.coder             = Person.objects.get(user=request.user)
-          coding.save()
-          project.codings.add(coding)
-          project.save()
-          return HttpResponseRedirect( settings.CODEMATCH_PREFIX + '/codematch/matches/'+str(project.id)+'/'+str(coding.id))
-      
-       else:
-          print "Some form is not valid"
 
+    project_container = None
+    if pk != "": # Already exists project container (via CodeRequests)
+        project_container = get_object_or_404(ProjectContainer, id=pk)
+            
+    if request.method == 'POST':
+    	project = None
+    	# If there wasn't associated Project Container, must create a new one. Functionality used to legacy RFC.
+    	if project_container == None:
+    		new_project = ProjectContainerForm(request.POST) 
+    		
+    	if new_project.is_valid():
+    		project = new_project.save() # Create new
+    	else:
+    		project = project_container # Update only
+    
+    	new_coding  = CodingProjectForm(request.POST)
+    
+    	if project != None and new_coding.is_valid():
+    		coding                   = new_coding.save(commit=False)
+    		coding.coder             = Person.objects.get( user=request.user )
+    		coding.save()
+    		project.codings.add(coding)
+    		project.save()
+    
+    		return HttpResponseRedirect( settings.CODEMATCH_PREFIX + '/codematch/matches/' + str(project.id) + '/' + str(coding.id) )
+    
     return render_page(request, 'codematch/matches/new.html', {
-        'projform'         : proj_form,
-        'codeform'         : code_form,
-        'projectcontainer' : project_container,
-        'pk'               : pk
+    'projform'         : proj_form,
+    'codeform'         : code_form,
+    'projectcontainer' : project_container,
+    'pk'               : pk
     })
 

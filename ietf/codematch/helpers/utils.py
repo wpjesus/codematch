@@ -1,5 +1,7 @@
 from django.shortcuts import render
 
+from django.template import RequestContext
+
 from ietf.person.models import Person, Alias
 from ietf.codematch.matches.models import ProjectContainer, CodingProject
 from ietf.codematch.requests.models import CodeRequest
@@ -24,6 +26,10 @@ def get_menu_arguments(request, dict):
 		my_own_projects 	  = ProjectContainer.objects.filter( owner = user )
 		my_mentoring_projects = ProjectContainer.objects.filter( code_request__mentor = user )
 		
+		# Some tests are made on the templates, should be here in the code?
+		
+		dict['from'] = request.GET.get('from', None)
+		
 		dict["mycodings"] 		  = my_codings
 		dict["projectsowner"] 	  = my_own_projects
 		dict["projectsmentoring"] = my_mentoring_projects
@@ -36,11 +42,12 @@ def get_menu_arguments(request, dict):
 		 
 		#Try get pretty name user (otherwise, email will be used)
 		alias = Alias.objects.filter( person = user )
-		 
-		if alias:
-		    alias_name = alias[0].name
-		else:
-		    alias_name = user.name
+		
+		alias_name = alias[0].name if alias else user.name
+		#if alias:
+		#    alias_name = alias[0].name
+		#else:
+		#    alias_name = user.name
 		     
 		dict["username"] = alias_name
         
@@ -48,16 +55,12 @@ def get_menu_arguments(request, dict):
 
 def render_page(request, template, dict = {}):
 	""" Special method for rendering pages """
-	
-	keys = ["project_instance", "request_instance", "docs", "tags"]
-	
-	if 'actual_template' in request.session:
-		actual_template = request.session["actual_template"]
-		if actual_template != template:
-			for key in keys:
-				if key in request.session:
-					del request.session[key]
 		
-	request.session["actual_template"] = template
+	if 'actual_template' in request.session:
+		actual_template = request.session["actual_template"]				
+		if actual_template != request.path:
+			request.session["previous_template"] = actual_template
+	
+	request.session["actual_template"] = request.path
 	
 	return render(request, template, get_menu_arguments(request,dict))

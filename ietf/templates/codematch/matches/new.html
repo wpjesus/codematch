@@ -113,7 +113,11 @@
                                 <p class="buttonlist">
                                 	<div class="col-xs-offset-1" style="margin-left: 0px">
 								    	<input type="submit" class="btn btn-primary" value="Submit" />
-                                		<a class="btn btn-default " href="{% url "ietf.codematch.matches.views.show_list" %}">Back</a>
+    									{% if request.META.HTTP_REFERER %}
+											<a class="btn btn-default " href="{{request.META.HTTP_REFERER}}">Cancel</a>
+										{% else %}
+											<a class="btn btn-default" href="{% url 'ietf.codematch.matches.views.show_list' %}">Cancel</a>
+										{% endif %}
                                 	</div>
                                 </p>
                             	</div>
