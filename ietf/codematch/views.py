@@ -21,4 +21,5 @@ def back(request):
     if "previous_template" in request.session:
         template = request.session["previous_template"]
     
-    return HttpResponseRedirect( settings.CODEMATCH_PREFIX + template )
+    # TODO: Need settings.CODEMATCH_PREFIX???
+    return HttpResponseRedirect( template )

@@ -55,7 +55,7 @@
                         </div>
                         <div class="widget-content referrer">
                             <!-- Widget content -->
-                            <form class="form-horizontal" action="{% url 'ietf.codematch.matches.views.new' pk %}" method="post">
+                            <form class="form-horizontal" action="{% url 'ietf.codematch.matches.views.edit' pk ck %}" method="post">
                             	{% csrf_token %}
                             	<div class="padd">
                             	{% if projectcontainer != None %}
@@ -110,17 +110,17 @@
 									</div>
 								</div>
 								{% if user.is_authenticated %}
-								<form action="{% url 'ietf.codematch.matches.views.new' pk %}" method="post">
+								<form action="{% url 'ietf.codematch.matches.views.edit' pk ck %}" method="post">
 								<div>
 									{% if links %}
 										<h4><strong>Implementations</strong></h4>
 										{% for implementation in links %}
 											<a href="{{ implementation }}">{{ implementation }}</a>
-											<a class="label label-info" href="{% url 'ietf.codematch.matches.views.remove_link' 0 implementation.link %}" >delete</a>
+											<a class="label label-info" href="{% url 'ietf.codematch.matches.views.remove_link' ck implementation.link %}" >delete</a>
 										<br />
 										{% endfor %}
-										<br />
 									{% endif %}
+									<br />
 									{% if user.is_authenticated and canaddlinks %}
                                             {{ linkform }}
                                             {% csrf_token %}
@@ -159,7 +159,7 @@
 						   		<div class="widget-foot">
                                 <p class="buttonlist">
                                 	<div class="col-xs-offset-1" style="margin-left: 0px">
-								    	<input type="submit" name="save" class="btn btn-primary" value="Submit" />
+								    	<input type="submit" name="save" class="btn btn-primary" value="Update" />
 											<a class="btn btn-default" href="{% url 'ietf.codematch.views.back' %}">Cancel</a>
                                 	</div>
                                 </p>

@@ -1,3 +1,5 @@
+from ietf.codematch import constants
+
 from django.shortcuts import render
 
 from django.template import RequestContext
@@ -19,7 +21,7 @@ def is_user_allowed(user, permission):
 def get_menu_arguments(request, dict):
     
 	if request.user.is_authenticated():
-		#(TODO: Centralize this?)
+		# (TODO: Centralize this?)
 		user = Person.objects.get(user=request.user)
 		
 		my_codings 			  = CodingProject.objects.filter( coder = user )
@@ -35,32 +37,42 @@ def get_menu_arguments(request, dict):
 		dict["projectsmentoring"] = my_mentoring_projects
 		
 		# TODO: add here others permissions (check how are used permissions)
-		#TODO: Centralize the permissions and add the CRUD permissions
+		# TODO: Centralize the permissions and add the CRUD permissions
 		dict["canaddrequest"] = is_user_allowed(user, "canaddrequest")
 		dict["canaddcoding"]  = is_user_allowed(user, "canaddcoding")
 		dict["ismentor"]      = is_user_allowed(user, "ismentor")
 		 
-		#Try get pretty name user (otherwise, email will be used)
+		# Try get pretty name user (otherwise, email will be used)
 		alias = Alias.objects.filter( person = user )
 		
 		alias_name = alias[0].name if alias else user.name
-		#if alias:
-		#    alias_name = alias[0].name
-		#else:
-		#    alias_name = user.name
 		     
 		dict["username"] = alias_name
         
 	return dict
 
+def clear_session(request):
+	
+	keys = [constants.PROJECT_INSTANCE, constants.REQUEST_INSTANCE, constants.ACTUAL_PROJECT, constants.CODE_INSTANCE, 
+			constants.ADD_DOCS, constants.ADD_TAGS, constants.ADD_LINKS, constants.REM_DOCS, constants.REM_TAGS, constants.REM_LINKS]
+	
+	if constants.MAINTAIN_STATE not in request.session:
+		for key in keys:
+			if key in request.session:
+				del request.session[key]
+	else:
+		del request.session[constants.MAINTAIN_STATE]
+
 def render_page(request, template, dict = {}):
 	""" Special method for rendering pages """
-		
-	if 'actual_template' in request.session:
-		actual_template = request.session["actual_template"]				
-		if actual_template != request.path:
-			request.session["previous_template"] = actual_template
 	
-	request.session["actual_template"] = request.path
+	clear_session(request)
+	
+	if constants.ACTUAL_TEMPLATE in request.session:
+		actual_template = request.session[constants.ACTUAL_TEMPLATE]				
+		if actual_template != request.path:
+			request.session[constants.PREVIOUS_TEMPLATE] = actual_template
+	
+	request.session[constants.ACTUAL_TEMPLATE] = request.path
 	
 	return render(request, template, get_menu_arguments(request,dict))

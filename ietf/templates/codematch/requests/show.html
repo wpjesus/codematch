@@ -79,15 +79,17 @@
 		            				{% if not forloop.first %}
 		            				-
 		            				{% endif %}
-		            				<a href="#">{{ group }}</a>
+		            				<a href="#">{{ group }}</a><br />		            				
 	            				{% endfor %}
+	            				<strong>Estimated Level of Effort: </strong>
+	            				<a href="#">{{ projectcontainer.code_request.estimated_lof }}</a> <a> months</a>
 		                      </div>
 		
 		                      <div class="col-md-4">
 		                      	<div>
 			                      	{% if user.is_authenticated %}
 			                   			{% if projectcontainer.owner == owner %}
-				                   			<a class="label label-info" href="{% url 'ietf.codematch.requests.views.update' projectcontainer.id %}" ><i class="fa fa-pencil"></i> Edit</a> 
+				                   			<a class="label label-info" href="{% url 'ietf.codematch.requests.views.edit' projectcontainer.id %}" ><i class="fa fa-pencil"></i> Edit</a> 
 						               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
 					               		{% endif %}
 				               			<a href="{% url 'ietf.codematch.matches.views.new' projectcontainer.id %}" class="label label-info" ><i class="fa fa-check"></i>Associate my project</a>
@@ -127,7 +129,7 @@
 		            		Tags: 
 	            			{% for tag in tags %}
 	            				{% if not forloop.first %}
-	            				-
+	            				,
 	            				{% endif %}
 	            				<a href="#">{{ tag }}</a>
 	            			{% endfor %}
@@ -152,11 +154,7 @@
                   </div>
 					<div class="widget-foot">
 						<div class="pull-right">
-							{% if request.META.HTTP_REFERER %}
-								<a class="btn btn-default " href="{{request.META.HTTP_REFERER}}">Back</a>
-							{% else %}
-								<a class="btn btn-default" href="{% url 'ietf.codematch.requests.views.show_list' %}">Back</a>
-							{% endif %}
+							<a class="btn btn-default" href="{% url 'ietf.codematch.views.back' %}">Cancel</a>
 						</div>
 						<div class="clearfix"></div>
 					</div>

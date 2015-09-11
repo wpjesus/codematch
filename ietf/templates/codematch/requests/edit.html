@@ -3,7 +3,7 @@
 {% load ietf_filters bootstrap3 widget_tweaks %}
 {% load future %}
 
-{% block title %} Create a new CodeRequest {% endblock %}
+{% block title %} Edit CodeRequest {% endblock %}
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
@@ -28,7 +28,7 @@
 	          <span class="divider">/</span> 
 	          <a href="{% url "ietf.codematch.requests.views.show_list" %}" class="bread-current">Code Requests</a>
 	          <span class="divider">/</span>
-	          <a href="#" class="bread-current">New</a>
+	          <a href="#" class="bread-current">Edit</a>
 	        </div>
             
             <div class="clearfix"></div>
@@ -47,13 +47,13 @@
                         <!-- Widget title -->
                         <div class="widget-head">
                             <div class="pull-left">
-                                Edit CodeRequest
+                                Editing CodeRequest
                             </div>
                             <div class="clearfix"></div>
                         </div>
                         <div class="widget-content referrer">
                             <!-- Widget content -->
-                            <form class="form-horizontal" action="{% url 'ietf.codematch.requests.views.update' projectcontainer.id %}" method="post">
+                            <form class="form-horizontal" action="{% url 'ietf.codematch.requests.views.edit' projectcontainer.id %}" method="post">
                            	{% csrf_token %}
                             <div class="padd">
 								<div class="form-group">
@@ -83,7 +83,7 @@
 								<div class="form-group">
 									<label class="control-label col-xs-2">Estimated level of effort:</label>
 									<div class="col-xs-4">
-										{{ reqform.estimated_lof }}
+										{{ reqform.estimated_lof }} <label> months</label>
 									</div>
 								</div>
 								<div class="form-group">
@@ -96,28 +96,31 @@
 								<br />
 								
 								<div>
-									{% if user.is_authenticated and myrequest %}
-									<form action="{% url 'ietf.codematch.requests.views.update' projectcontainer.id %}" method="post">
+									{% if user.is_authenticated %}
+									<form action="{% url 'ietf.codematch.requests.views.edit' projectcontainer.id %}" method="post">
 										<div>
-										{% if user.is_authenticated and docs and myrequest %}
+										{% if docs %}
 				            				<h4><strong>Documents</strong></h4>
 											{% for doc in docs %}
 												{{ doc.document.group }}: <a  href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
 												<a class="label label-info" href="{% url 'ietf.codematch.requests.views.remove_document' projectcontainer.id doc.name %}" >delete</a>
 												<br />
 											{% endfor %}
-											<br />
 										{% endif %}
+										<br />
+									
 										</div>
-										{{ docform }}
-										{% csrf_token %}
-										<input type="submit" value="Add related Document" />
+										{% if canadddocuments %}
+											{{ docform }}
+											{% csrf_token %}
+											<input type="submit" value="Add related Document" />
+										{% endif %}
 										
 										<br />
 										<br />	
 										
 										<div>
-										{% if user.is_authenticated and tags and myrequest %}
+										{% if tags %}
 			            				<h4><strong>Tags</strong></h4> 
 			            					{% for tag in tags %}
 					            				{% if not forloop.first %}
@@ -129,13 +132,17 @@
 			            				{% endif %}
 			            				<div>
 										<br />
-										<label>Tag:</label>
-										{{ tagform.name }}
-										{% csrf_token %}
-										<input type="submit" value="Add new Tag" />
+										{% if canaddtags %}
+											<label>Tag:</label>
+											{{ tagform.name }}
+											{% csrf_token %}
+											<input type="submit" value="Add new Tag" />
+										{% endif %}
+									
 									</form>
-									<br />
 									{% endif %}
+									<br />
+									
 								</div>
 								
 								<br />

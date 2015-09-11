@@ -3,9 +3,6 @@ from django.forms import ModelForm, CharField
 
 from ietf.codematch.matches.models import ProjectContainer, CodingProject, Implementation
 
-from ietf.doc.fields import SearchableDocAliasField
-from ietf.doc.models import DocAlias
-
 class SearchForm(forms.Form):
     title       = forms.CharField(label="Title", max_length=255, required=False)
     protocol    = forms.CharField(label="Protocol", required=False)

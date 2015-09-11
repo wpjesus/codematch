@@ -71,11 +71,32 @@
 													<br />
 													<strong>Protocol:</strong><a href="#">{{ projectcontainer.protocol }}</a>
 													<br />
-													<strong>Area:</strong><a href="#">?</a>
+						                      		<strong>Area:</strong> 
+						                      		{% for area in areas %}
+							            				{% if not forloop.first %}
+							            				-
+							            				{% endif %}
+							            				<a href="#">{{ area }}</a>
+						            				{% endfor %}
+						                      		<a href="#">{{ area }}</a><br />
+								            		<strong>Tags:</strong> 
+							            			{% for tag in tags %}
+							            				{% if not forloop.first %}
+							            				,
+							            				{% endif %}
+							            				<a href="#">{{ tag }}</a>
+							            			{% endfor %}
 												</div>
 
 												<div class="col-md-4">
-
+							                      	<div>
+								                      	{% if user.is_authenticated %}
+								                   			{% if coding.coder == owner %}
+									                   			<a class="label label-info" href="{% url 'ietf.codematch.matches.views.edit' projectcontainer.id coding.id %}" ><i class="fa fa-pencil"></i> Edit</a> 
+											               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
+										               		{% endif %}
+														{% endif %}
+													</div>
 													<!-- Social Media strip -->
 													<div id="media-strip">
 														<a><i class="fa fa-facebook-square"></i></a>
@@ -92,22 +113,16 @@
 											<p>
 												{{ coding.additional_information }}
 											</p>
-
-											<br />
-										
-											{% if user.is_authenticated and mymatch %}
-											<h4><strong>Implementations</strong></h4>
-											{% for implementation in coding.links.all %}
-												<a href="{{ implementation.link }}">{{ implementation.link }}</a>
-											<br />
-											{% endfor %}
-											<hr />
-											<form action="/codematch/matches/{{projectcontainer.id}}/{{coding.id}}" method="post">
-												{{ linkform }}
-												{% csrf_token %}
-												<input type="submit" value="Add implementation" />
-											</form>
+											
+											{% if coding.links.all %}
+												<br />
+												<h4><strong>Implementations</strong></h4>
+												{% for implementation in coding.links.all %}
+													<a href="{{ implementation.link }}">{{ implementation.link }}</a>
+												<br />
+												{% endfor %}
 											{% endif %}
+											
 										</div>
 
 									</div>
@@ -116,11 +131,7 @@
 							</div>
 							<div class="widget-foot">
 								<div class="pull-right">
-									{% if request.META.HTTP_REFERER %}
-										<a class="btn btn-default " href="{{request.META.HTTP_REFERER}}">Cancel</a>
-									{% else %}
-										<a class="btn btn-default" href="{% url 'ietf.codematch.matches.views.show_list' %}">Cancel</a>
-									{% endif %}
+									<a class="btn btn-default" href="{% url 'ietf.codematch.views.back' %}">Back</a>
 								</div>
 								<div class="clearfix"></div>
 							</div>

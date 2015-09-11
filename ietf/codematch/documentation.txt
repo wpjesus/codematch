@@ -14,7 +14,11 @@
 - Adicionar settings_local.py no github
 - Fazer esquema para permitir novos cadastros de usu·rios
 - Atualizar interface para mockups v5
-- Ver bug do login (logar, deslogar e logar novamente sem percorrer p·ginas)
+- Colocar templates e outras strings em constants
+- Revisar onde estão permissões, ou centralizar tudo em utils ou entao descentralizar total (canadddocuments por exemplo)
+- Padronizar código de Matches e Requests
+- Rever Owner em Show (Será que não é melhor trocar para um bool já em código)
+- Back quando acabou de atualizar ou criar algum item
 
 ### DONE LIST ###
 - Adicionar documentos e tags dentro do formul·rio de novo coderequest
@@ -22,16 +26,21 @@
 - Coment·rio e centralizaÁ„o da funÁ„o new e update
 - Todas as preferÍncias relacionadas ao CodeMatch postas em settings_local
 - Codematch muito lento (!) (Melhorar, ainda tem um erro estranho acontencendo no servidor)
-- Separar tags por virgula (/)
-- Back voltar sensível ao contexto (/)
-- Update e Archive no show (/)
-- Colocar Associate my project antes de Edit (/)
-- Colocar mensagem quando não existem itens na lista (/)
-- Retirar a mensagem superior aos CodeRequests (/)
-- Permitir remoção de documentos e tags (/)
+- Separar tags por virgula 
+- Back voltar sensível ao contexto 
+- Update e Archive no show 
+- Colocar Associate my project antes de Edit 
+- Colocar mensagem quando não existem itens na lista 
+- Retirar a mensagem superior aos CodeRequests 
+- Permitir remoção de documentos e tags
+
+### BUGS ###
+- Login repetidas vezes
 
 ### QUESTION LIST ###
 - Existem diversos testes sendo feitos nos templates, deveriam ser passados para o cÛdigo?
+- Será que está correto criar constantes e centralizar as strings? (Botar num arquivo Constants)
+- Qual interface usar para editar Matches
 
 ### DOCUMENTATION ###
 Estrutura composta no momento de 4 pastas alÈm da raÌz (Accounts, Helpers, Matches e Requests).

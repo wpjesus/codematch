@@ -34,7 +34,7 @@ class CodingProject (models.Model):
     title                  = models.CharField(max_length=80)
     # URL to github or other repository:
     #link_to_implementation = models.URLField(blank=True)
-    links                  = models.ManyToManyField(Implementation, blank=True)
+    links                  = models.ManyToManyField(Implementation, blank=True, null=True)
     # Any other text that the coder would like to include as a description
     additional_information = models.CharField(max_length=255)
     

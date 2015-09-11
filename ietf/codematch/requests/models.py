@@ -17,8 +17,7 @@ class CodeRequest (models.Model):
     mentor                  = models.ForeignKey(Person, null=True, blank=True)
 
     #Estimated Level of Effort
-    #TODO: CharField?????
-    estimated_lof           = models.CharField(max_length=80, blank=True)
+    estimated_lof           = models.FloatField(null=True, blank=True)
     
     # The author can include additional text to describe his request
     additional_information  = models.CharField(max_length=255, null=True, blank=True)

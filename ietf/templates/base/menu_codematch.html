@@ -32,7 +32,7 @@
 				</li>
 				{% if mycodings or canaddcoding %}
 				<li>
-					<a href="#">My CodeMatches</a>
+					<a href="{% url "ietf.codematch.matches.views.show_my_list" %}">My CodeMatches</a>
 				</li>
 				{% endif %}
 			</ul>
@@ -75,7 +75,7 @@
             
             <!-- Dropdown menu -->
             <ul class="dropdown-menu">
-              <li><a href="#"><i class="fa fa-user"></i> {{ username }} </a></li>
+              <li><a href="{% url 'ietf.codematch.accounts.views.profile' %}"><i class="fa fa-user"></i> {{ username }} </a></li>
               <!--<li><a href="#"><i class="fa fa-cogs"></i> Settings</a></li>-->
               <li><a rel="nofollow" href="{% url 'django.contrib.auth.views.logout' %}" >Logout</a></li>
             </ul>
@@ -92,6 +92,7 @@
             
             <!-- Dropdown menu -->
             <ul class="dropdown-menu">
+              <li><a rel="nofollow" href="{% url 'ietf.codematch.accounts.views.register' %}">Register Here</a></li>
               <li><a rel="nofollow" href="{% url 'django.contrib.auth.views.login' %}?next={{request.get_full_path|urlencode}}">Sign in</a></li>
             </ul>
           </li>

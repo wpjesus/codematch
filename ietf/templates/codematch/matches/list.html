@@ -56,12 +56,18 @@
                             <!-- Widget content -->
                             <div class="padd">
                                 <ul class="latest-news">
+                            	{% if projectcontainers %}
                                     {% for projectcontainer in projectcontainers %}
                                     	{% for coding in projectcontainer.codings.all %}
                                     		{% if coding in codings %}
 		                               		<li>
 		                                    	<!-- Title and date -->
-		                                    	<h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a></h6>
+		                                    	<h5><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a>
+                		                      	{% if user.is_authenticated and projectcontainer.owner == owner %}
+						                   			<a class="label label-info" href="{% url 'ietf.codematch.matches.views.edit' projectcontainer.id coding.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a> 
+								               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
+												{% endif %}
+												</h5>
 		                                    	<!--<h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a></h6>-->
 		                                    	<p>{{ projectcontainer.description|linebreaks }}</p>
 		                                    	<p>
@@ -78,6 +84,13 @@
 		                                	{% endif %}
                                     	{% endfor %}
                                     {% endfor %}
+                                {% else %}
+								<div class="alert alert-info" style="margin: 5px;">
+								    <p align="center">
+									No data to display  
+								    </p>
+							    </div>
+								{% endif %}
                                 </ul> 
                             </div>
                             <div class="widget-foot">
