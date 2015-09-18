@@ -32,6 +32,9 @@ def get_menu_arguments(request, dict):
 		
 		dict['from'] = request.GET.get('from', None)
 		
+		dict['codematch_version'] = "1.0.0"
+		dict['codematch_revision_date'] = "2015-09-18"
+		
 		dict["mycodings"] 		  = my_codings
 		dict["projectsowner"] 	  = my_own_projects
 		dict["projectsmentoring"] = my_mentoring_projects

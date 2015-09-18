@@ -97,6 +97,7 @@
 									</div>
 								</div>
 								{% endif %}
+								<hr />
 								<div class="form-group">
 									<label class="control-label col-xs-2">Coding title:</label>
 									<div class="col-xs-4">
@@ -137,7 +138,7 @@
 				            				{% if not forloop.first %}
 		            						,
 		            						{% endif %}
-		            						<a>{{ tag }}</a>
+		            						<a>#{{ tag }}</a>
 		            					{% endfor %}
 		            					<br />	
 		            				{% endif %}

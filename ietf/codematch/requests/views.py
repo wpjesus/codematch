@@ -78,8 +78,6 @@ def show_mentoring_list(request):
     if not is_user_allowed(user, "ismentor") and project_containers.count() == 0:
         raise Http404
     
-    
-    
     return render_page(request, "codematch/requests/list.html", {
         'projectcontainers' : project_containers,
         'owner'             : user

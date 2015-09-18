@@ -63,7 +63,7 @@
 		                               		<li>
 		                                    	<!-- Title and date -->
 		                                    	<h5><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a>
-                		                      	{% if user.is_authenticated and projectcontainer.owner == owner %}
+                		                      	{% if user.is_authenticated and coding.coder == owner %}
 						                   			<a class="label label-info" href="{% url 'ietf.codematch.matches.views.edit' projectcontainer.id coding.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a> 
 								               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
 												{% endif %}
@@ -77,8 +77,24 @@
 		                                    	CodeRequest: 	 <a href="{% url 'ietf.codematch.requests.views.show' projectcontainer.id %}">{{ projectcontainer.title }}</a>
 		                                    	{% endif %} 
 		                                    	| Protocol:  	 <a href="#">{{ projectcontainer.protocol }}</a> 
-		                                    	| Area:    	 	 <a href="#">?</a> 
-		                                    	| Working Group: <a href="#">?</a>
+		                                    	| Area:    	 	 <a href="#">
+		                                    	{% for doc in docs %}	    
+		                                    		{% if doc in projectcontainer.docs.all %}                  		
+							            				{% if not forloop.first %}
+							            				-
+							            				{% endif %}
+							            				<a href="#">{{ doc.document.group.parent.name }}</a>
+						            				{% endif %}
+					            				{% endfor %}
+		                                    	| Working Group: 
+		                                    	{% for doc in docs %}	    
+		                                    		{% if doc in projectcontainer.docs.all %}                  		
+							            				{% if not forloop.first %}
+							            				-
+							            				{% endif %}
+							            				<a href="#">{{ doc.document.group.name }}</a>
+						            				{% endif %}
+					            				{% endfor %}
 		                                    	</p>
 		                                	</li>
 		                                	{% endif %}

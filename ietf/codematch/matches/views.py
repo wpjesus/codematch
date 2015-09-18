@@ -33,17 +33,28 @@ def show_list(request):
     
     project_containers = ProjectContainer.objects.order_by('creation_date')[:20]
     codings            = CodingProject.objects.all()
-	
+    
+    areas, working_groups = ([] for i in range(2))
+    
     user = None
     
     if request.user.is_authenticated():
         # (TODO: Centralize this?)
         user = Person.objects.get(user=request.user)
     
+    docs = []
+    
+    for project in project_containers.all():
+        for doc in project.docs.all():
+            docs.append(doc)
+        
+    docs = list(set(docs))
+    
     return render_page(request, "codematch/matches/list.html", {
-            'projectcontainers' : project_containers,
-            'codings'           : codings,
-            'owner'             : user,
+        'projectcontainers'  : project_containers,
+        'codings'            : codings,
+        'owner'              : user,
+        'docs'               : docs
     })
     
 @login_required(login_url=settings.CODEMATCH_PREFIX + '/codematch/accounts/login')
@@ -60,10 +71,19 @@ def show_my_list(request):
     if not is_user_allowed(user, "iscreator") and project_containers.count() == 0:
         raise Http404
     
+    docs = []
+    
+    for project in project_containers.all():
+        for doc in project.docs.all():
+            docs.append(doc)
+        
+    docs = list(set(docs))
+    
     return render_page(request, "codematch/matches/list.html", {
             'projectcontainers' : project_containers,
             'codings'           : codings,
             'owner'             : user,
+            'docs'              : docs
     })
 
 def show(request, pk, ck):
