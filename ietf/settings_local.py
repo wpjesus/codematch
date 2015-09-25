@@ -2,7 +2,7 @@ DATABASES = {
     'default': {
         'NAME': 'ietf_utf8',
         'ENGINE': 'django.db.backends.mysql',
-        'USER': 'matheuspfitscher',
+        'USER': 'matheus',
         'PASSWORD': 'ietf', # Contact henrik@levkowetz.com to get the password
         'HOST': '127.0.0.1'
     },
@@ -71,9 +71,9 @@ IDSUBMIT_IDNITS_BINARY = '<path to a local copy of idnits>'
 
 # If any folder structure on Apache 
 #(eg. codematch-dev - CODEMATCH_PREFIX="/codematch-dev/")
-CODEMATCH_PREFIX = ""
+CODEMATCH_PREFIX = "/codematch-master"
 #(eg. codematch-dev - STATIC_URL="/static/") 
-STATIC_URL = "/../"
+STATIC_URL = "/static/"
 
 #Application that must be installed by Codematch
 CODEMATCH_APPS = (

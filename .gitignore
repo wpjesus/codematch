@@ -1,7 +1,6 @@
 .project
 ietf/settings*
 !ietf/settings.py
-!ietf/settings_local.py
 buildbot/
 .pydevproject
 *.pyc
