@@ -86,7 +86,8 @@
 							            				<a href="#">{{ doc.document.group.parent.name }}</a>
 						            				{% endif %}
 					            				{% endfor %}
-		                                    	| Working Group: 
+					            				</a>
+		                                    	| Working Group: <a href="#">
 		                                    	{% for doc in docs %}	    
 		                                    		{% if doc in projectcontainer.docs.all %}                  		
 							            				{% if not forloop.first %}
@@ -95,6 +96,7 @@
 							            				<a href="#">{{ doc.document.group.name }}</a>
 						            				{% endif %}
 					            				{% endfor %}
+					            				</a>
 		                                    	</p>
 		                                	</li>
 		                                	{% endif %}
