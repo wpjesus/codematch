@@ -6,10 +6,10 @@ Whats new:
 + Create an account through DataTracker database
 + Login using Datatracker credentials
 + Show a list of all Codematches/CodeRequests
-+ Show a list of all Codematches/CodeRequests created for me*
-+ Show a list of all CodeRequests mentoring for me*
++ Show a list of all Codematches/CodeRequests created by the logged user*
++ Show a list of all CodeRequests mentored by the logged user*
 + Add/Edit a CodeRequest*
-+ Add/Edit a CodeMatch (To legacy CodeMatch)*
++ Add/Edit a CodeMatch (To include legacy projects)*
 + Associate a new CodeMatch to one CodeRequest*
 + Linking drafts/RFCs to the CodeRequest (add/remove)*
 + Linking code repositories to the CodeMatch (add/remove)*
@@ -21,5 +21,5 @@ Whats new:
 * User must have permission
 
 Known bugs:
-- Sometimes if user made login and logout several times in a row doesn't save credentials
+- Sometimes if the user login and logout several times in a row, credentials are not saved
 - If reducing the screen size the top bar buttons disappear
