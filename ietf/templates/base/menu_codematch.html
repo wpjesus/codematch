@@ -32,7 +32,7 @@
 				</li>
 				{% if mycodings or canaddcoding %}
 				<li>
-					<a href="{% url "ietf.codematch.matches.views.show_my_list" %}">My CodeMatches</a>
+					<a href="{% url "ietf.codematch.matches.views.show_list" 'True' %}">My CodeMatches</a>
 				</li>
 				{% endif %}
 			</ul>
@@ -46,12 +46,12 @@
 				</li>
 				{% if projectsowner or canaddrequest %}
 				<li>
-					<a href="{% url "ietf.codematch.requests.views.show_my_list" %}">CodeRequests I've Created</a>
+					<a href="{% url "ietf.codematch.requests.views.show_list" 'mylist' %}">CodeRequests I've Created</a>
 				</li>
 				{% endif %}
 				{% if projectsmentoring or ismentor %}
 				<li>
-					<a href="{% url "ietf.codematch.requests.views.show_mentoring_list" %}">CodeRequests I'm Mentoring</a>
+					<a href="{% url "ietf.codematch.requests.views.show_list" 'mentoring' %}">CodeRequests I'm Mentoring</a>
 				</li>
 				{% endif %}
 			</ul>

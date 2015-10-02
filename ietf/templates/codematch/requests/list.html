@@ -45,17 +45,26 @@
                 <div class="widget-head">
                   <div class="pull-left">
 					<i class="fa fa-sort"></i> <span style="font-weight: lighter">Order by: </span> 
-					<a href="#">Code Request</a> |
-					<a href="#">Protocol </a> | 
-					<a href="#">Area</a> | 
-					<a href="#">Release date</a> | 
-					<a href="#">Popularity</a> | 
-					<a href="#">Working Group</a>
+					<a 
+					{% if attribute == "title" %} style="color: #A0A0A0"
+					{% else %} href="{% url template typelist 'title' state %}"
+					{% endif %}>Title/Project</a> |
+					<a 
+					{% if attribute == "protocol" %} style="color: #A0A0A0"
+					{% else %} href="{% url template typelist 'protocol' state %}"
+					{% endif %}>Protocol</a> |
+					<a 
+					{% if attribute == "creation_date" %} style="color: #A0A0A0"
+					{% else %} href="{% url template typelist 'creation_date' state %}"
+					{% endif %}>Release date</a>
+					
+					<!--<a href="{% url "ietf.codematch.requests.views.show_list" 'title' %}">Area</a> | -->
+					<!--<a href="#">Popularity</a> | -->
+					<!-- <a href="#">Working Group</a> -->
 				  </div>
                   <div class="clearfix"></div>
                 </div>
                 <div class="widget-content">
-                  
 		
 		{% if projectcontainers %}
 			{% for projectcontainer in projectcontainers %}
@@ -100,7 +109,7 @@
                  		<a class="btn btn-default" href="{% url "ietf.codematch.requests.views.new" %}">New Code Request</a>
                  	{% endif %}
                  	{% if projectcontainers %}
-                 		<a class="btn btn-default" href="{% url "ietf.codematch.requests.views.search" %}">Search</a>
+                 		<a class="btn btn-default" href="{% url "ietf.codematch.requests.views.search" typelist %}">Search</a>
                  	{% endif %}
                  </p>
               </div>

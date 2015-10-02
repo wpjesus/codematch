@@ -22,68 +22,51 @@ from ietf.codematch.requests.forms import TagForm
 from ietf.codematch.matches.models import ProjectContainer, CodingProject, Implementation, ProjectTag
 from ietf.codematch.requests.models import CodeRequest
 
-from ietf.codematch.helpers.utils import (render_page, is_user_allowed, clear_session)
+from ietf.codematch.helpers.utils import (render_page, is_user_allowed, clear_session, get_user)
+
+from django.core.urlresolvers import resolve
 
 from django.conf import settings
 
 import debug                            
 
-def show_list(request):
+def show_list(request, is_my_list="False", att="creation_date", state=""):
     """ List all ProjectContaineres by Title """
     
-    project_containers = ProjectContainer.objects.order_by('creation_date')[:20]
-    codings            = CodingProject.objects.all()
+    user = get_user(request)
     
-    areas, working_groups = ([] for i in range(2))
+    all_projects = []
     
-    user = None
+    if state == "True" and constants.ALL_PROJECTS in request.session:
+        all_projects = request.session[constants.ALL_PROJECTS]
+        request.session[constants.MAINTAIN_STATE] = True
+    else:
+        all_projects = ProjectContainer.objects.all()
     
-    if request.user.is_authenticated():
-        # (TODO: Centralize this?)
-        user = Person.objects.get(user=request.user)
+    # Centralize this?
+    project_containers  = []
+    codings             = CodingProject.objects.order_by(att)[:20]
+    for coding in codings:
+        for project in all_projects:
+            if project not in project_containers and coding in project.codings.all() and (is_my_list == "False" or user == coding.coder):
+                project_containers.append(project)
     
     docs = []
     
-    for project in project_containers.all():
+    for project in project_containers:
         for doc in project.docs.all():
             docs.append(doc)
         
     docs = list(set(docs))
     
-    return render_page(request, "codematch/matches/list.html", {
+    return render_page(request, constants.TEMPLATE_MATCHES_LIST, {
         'projectcontainers'  : project_containers,
-        'codings'            : codings,
         'owner'              : user,
-        'docs'               : docs
-    })
-    
-@login_required(login_url=settings.CODEMATCH_PREFIX + '/codematch/accounts/login')
-def show_my_list(request):
-    """ List CodeRequests i've created """
-    
-    # (TODO: Centralize this?)
-    user = Person.objects.get(user=request.user)
-    
-    project_containers = ProjectContainer.objects.filter(owner=user).order_by('creation_date')[:20]
-    codings            = CodingProject.objects.filter(coder=user).order_by('creation_date')[:20]
-    
-    # Project must have been created by the current user and user must have permission mentor
-    if not is_user_allowed(user, "iscreator") and project_containers.count() == 0:
-        raise Http404
-    
-    docs = []
-    
-    for project in project_containers.all():
-        for doc in project.docs.all():
-            docs.append(doc)
-        
-    docs = list(set(docs))
-    
-    return render_page(request, "codematch/matches/list.html", {
-            'projectcontainers' : project_containers,
-            'codings'           : codings,
-            'owner'             : user,
-            'docs'              : docs
+        'docs'               : docs,
+        'attribute'          : att,
+        'mylist'             : is_my_list,
+        'state'              : state,
+        'template'           : 'ietf.codematch.matches.views.show_list' # TODO fix this
     })
 
 def show(request, pk, ck):
@@ -94,11 +77,7 @@ def show(request, pk, ck):
     
     areas, tags = ([] for i in range(2))
     
-    user = None
-    
-    if request.user.is_authenticated():
-        # (TODO: Centralize this?)
-        user = Person.objects.get(user=request.user)
+    user = get_user(request)
     
     # According to model areas and working groups should come from documents
     for doc in project_container.docs.all():
@@ -127,62 +106,80 @@ def show(request, pk, ck):
           coding.links.add(link)
           coding.save()
           return HttpResponseRedirect( settings.CODEMATCH_PREFIX + '/codematch/matches/' + str(pk) + '/' + str(ck) )
-
-    return render_page(request, "codematch/matches/show.html",  {
-        'projectcontainer': project_container,
+		  
+    return render_page(request, constants.TEMPLATE_MATCHES_SHOW, {
+		'projectcontainer': project_container,
         'coding'          : coding,
         'areas'           : areas,
         'tags'            : tags,
         'owner'           : user
     })
 
-def search(request):
+def search(request, is_my_list="False"):
     """ Shows the list of projects, filtering by some query (title, protocol, coder or doctitle) """
     
     search_type = request.GET.get("submit")
     if search_type:
         form = SearchForm(request.GET)
-        docs = None
+        docs = []
         project_containers = []
-        codings = CodingProject.objects.all()
         
         # get query field
         query = ''
-        if request.GET.get(search_type):
-            query = request.GET.get(search_type)
+        if request.GET.get('search'):
+            query = request.GET.get('search')
 
         if query :
-
-            # Search by ProjectContainer Title or description
-            if search_type == "title":
-                project_containers =  ProjectContainer.objects.filter(title__icontains=query) | ProjectContainer.objects.filter(description__icontains=query) 
-
-            elif search_type == "protocol":
-                project_containers = ProjectContainer.objects.filter(protocol__icontains=query) 
-
-            elif search_type == "coder":
-                # TODO: review this
-                project_containers = ProjectContainer.objects.filter(codings__coder__name__icontains=query).distinct()
-                codings            = CodingProject.objects.filter(coder__name__icontains=query)
-            # Document list with a Codematch project (MOVE IT TO CODEREQUESTS)
-            elif search_type == "doctitle":
-                project_containers = ProjectContainer.objects.filter(docs__name__icontains=query)
-
-            else:
-                raise Http404("Unexpected search type in ProjectContainer query: %s" % search_type)
-
-            return render_page(request, "codematch/matches/list.html", {
-                "projectcontainers" : project_containers,
-                "codings"           : codings,
-                "docs"              : docs,
-                "form"              : form,
-            })
+            
+            project_containers = []
+            
+            if request.GET.get('title'):
+                codings = CodingProject.objects.filter(title__icontains=query)
+                for p in ProjectContainer.objects.all():
+                    for coding in codings:
+                        if coding in p.codings.all() and p not in project_containers:
+                            project_containers.append(p)
+                            
+            if request.GET.get('description'):
+                codings = CodingProject.objects.filter(additional_information__icontains=query)
+                for p in ProjectContainer.objects.all():
+                    for coding in codings:
+                        if coding in p.codings.all() and p not in project_containers:
+                            project_containers.append(p)
+                
+            if request.GET.get('protocol'):
+                projects = ProjectContainer.objects.filter(protocol__icontains=query)
+                for p in projects:
+                    if p not in project_containers:
+                        project_containers.append(p)
+            
+            if request.GET.get('coder'):
+                projects = ProjectContainer.objects.filter(codings__coder__name__icontains=query).distinct()
+                for p in projects:
+                    if p not in project_containers:
+                        project_containers.append(p)
+            
+            user = get_user(request)
+            
+            request.session[constants.ALL_PROJECTS] = project_containers
+            
+            request.session[constants.MAINTAIN_STATE] = True
+            
+            for project in project_containers:
+                for doc in project.docs.all():
+                    docs.append(doc)
+        
+            docs = list(set(docs))
+            
+            return HttpResponseRedirect(settings.CODEMATCH_PREFIX + '/codematch/matches/show_list/' + is_my_list + '/creation_date/' +'True')
 
         return HttpResponseRedirect(request.path)
 
     else:
-        return render_page(request, "codematch/matches/search.html", { "form" : SearchForm() })
-
+		return render_page(request, constants.TEMPLATE_MATCHES_SEARCH, { 
+			"form" : SearchForm() 
+		})
+		
 def save_code(request, template, pk, ck="", coding=None ):
     ''' Used to create or update a CodeRequest.
     When project container is null then a new 
@@ -197,9 +194,9 @@ def save_code(request, template, pk, ck="", coding=None ):
     link_form = LinkImplementationForm()
     tag_form  = modelform_factory(ProjectTag, form=TagForm)
     
-    # (TODO: Centralize this?)
-    user = Person.objects.get(user=request.user)
-    # TODO: check permission
+    user = get_user(request)
+    
+	# TODO: check permission
     can_add_links = is_user_allowed(user, "canaddlinks")
     can_add_tags  = is_user_allowed(user, "canaddtags")
     
@@ -214,8 +211,8 @@ def save_code(request, template, pk, ck="", coding=None ):
     links = request.session[constants.ADD_LINKS]
     tags  = request.session[constants.ADD_TAGS]
     
-    previous_template = "codematch/matches/show_list"
-    
+    previous_template = "codematch/matches/show_list" # Fix this
+	
     if constants.PREVIOUS_TEMPLATE not in request.session:
         request.session[constants.PREVIOUS_TEMPLATE] = previous_template
     
@@ -301,8 +298,8 @@ def save_code(request, template, pk, ck="", coding=None ):
             if modify:
                 coding_project.save()
 
-            return HttpResponseRedirect( settings.CODEMATCH_PREFIX + '/codematch/matches/' + str(project.id) + '/' + str(coding_project.id) )
-        
+            return HttpResponseRedirect( settings.CODEMATCH_PREFIX + "/codematch/matches/" + str(project.id) + '/' + str(coding_project.id) )
+			
         # Updating session variables
         if new_project != None:
             request.session[constants.PROJECT_INSTANCE] = new_project
@@ -325,12 +322,12 @@ def save_code(request, template, pk, ck="", coding=None ):
         'canaddtags'       : can_add_tags
     })
 
-@login_required(login_url=settings.CODEMATCH_PREFIX + '/codematch/accounts/login')
+@login_required(login_url = settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def edit(request, pk, ck):
     """ Edit CodeRequest Entry """
     
-    template = 'codematch/matches/edit.html'
-    
+    #template = 'codematch/matches/edit.html'
+	
     project_container = get_object_or_404(ProjectContainer, id=pk)
     coding            = get_object_or_404(CodingProject, id=ck)
     
@@ -349,8 +346,7 @@ def edit(request, pk, ck):
         tags = coding.tags.all()
         request.session[constants.ADD_TAGS] = list(tags)
     
-    # (TODO: Centralize this?)
-    user = Person.objects.get(user=request.user)
+	user = get_user(request)
     
     # Project must have been created by the current user and
     # User must have permission to add new CodeRequest
@@ -361,15 +357,15 @@ def edit(request, pk, ck):
     request.session[constants.ACTUAL_PROJECT] = project_container
     request.session[constants.CODE_INSTANCE]  = CodingProjectForm(instance=coding)
     
-    return save_code(request, template, pk, ck, coding )
+    return save_code(request, constants.TEMPLATE_MATCHES_EDIT, pk, ck, coding )
 
-@login_required(login_url = settings.CODEMATCH_PREFIX + '/codematch/accounts/login')
+@login_required(login_url = settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def new(request, pk=""):
     ''' New CodeMatch Entry
     When user presses 'Associate new project' there is a Project Container
     associated, then you need reuse this information in the form '''
     
-    template = 'codematch/matches/new.html'
+    #template = 'codematch/matches/new.html'
     
     if request.path != request.session[constants.ACTUAL_TEMPLATE]:
         clear_session(request)
@@ -387,9 +383,9 @@ def new(request, pk=""):
     if not is_user_allowed(request.user, "canaddmatch"):
         raise Http404
 
-    return save_code(request, template, pk)
+    return save_code(request, constants.TEMPLATE_MATCHES_NEW, pk)
     
-@login_required(login_url=settings.CODEMATCH_PREFIX + '/codematch/accounts/login')
+@login_required(login_url = settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def remove_link(request, ck, link_name):
     
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
@@ -399,7 +395,6 @@ def remove_link(request, ck, link_name):
     
     if ck != "0":
         coding = get_object_or_404(CodingProject, id=ck)
-        #template = '/codematch/matches/edit/' + str(coding.id)
     
         if coding.links.filter(link=link_name):
             cache_list = request.session[constants.REM_LINKS]
@@ -409,9 +404,9 @@ def remove_link(request, ck, link_name):
     request.session[constants.ADD_LINKS] = links
     
     # TODO: Centralize this?
-    return HttpResponseRedirect(refresh_template)
+    return HttpResponseRedirect(request.path)
     
-@login_required(login_url=settings.CODEMATCH_PREFIX + '/codematch/accounts/login')
+@login_required(login_url = settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def remove_tag(request, ck, tag_name):
     
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
@@ -430,5 +425,4 @@ def remove_tag(request, ck, tag_name):
     tags.remove(tag)
     request.session[constants.ADD_TAGS] = tags
     
-    # TODO: Centralize this?
-    return HttpResponseRedirect(refresh_template)
+    return HttpResponseRedirect(request.path)

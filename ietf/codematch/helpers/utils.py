@@ -17,12 +17,19 @@ def is_user_allowed(user, permission):
 	""" Check if the user has permission """
 	
 	return True
-   
+
+def get_user(request):
+
+	if request.user.is_authenticated():
+		return Person.objects.get(user=request.user)
+	else:
+		return None
+	
 def get_menu_arguments(request, dict):
     
-	if request.user.is_authenticated():
-		# (TODO: Centralize this?)
-		user = Person.objects.get(user=request.user)
+	user = get_user(request)
+	
+	if user != None:
 		
 		my_codings 			  = CodingProject.objects.filter( coder = user )
 		my_own_projects 	  = ProjectContainer.objects.filter( owner = user )
@@ -32,18 +39,16 @@ def get_menu_arguments(request, dict):
 		
 		dict['from'] = request.GET.get('from', None)
 		
-		dict['codematch_version'] = "1.0.0"
-		dict['codematch_revision_date'] = "2015-09-18"
+		dict['codematch_version'] = constants.VERSION
+		dict['codematch_revision_date'] = constants.RELEASE_DATE
 		
 		dict["mycodings"] 		  = my_codings
 		dict["projectsowner"] 	  = my_own_projects
 		dict["projectsmentoring"] = my_mentoring_projects
 		
-		# TODO: add here others permissions (check how are used permissions)
-		# TODO: Centralize the permissions and add the CRUD permissions
-		dict["canaddrequest"] = is_user_allowed(user, "canaddrequest")
-		dict["canaddcoding"]  = is_user_allowed(user, "canaddcoding")
-		dict["ismentor"]      = is_user_allowed(user, "ismentor")
+		dict["canaddcoding"] 	  = is_user_allowed(user, "canaddcoding")
+		dict["canaddrequest"] 	  = is_user_allowed(user, "canaddrequest")
+		dict["ismentor"] 	 	  = is_user_allowed(user, "ismentor")
 		 
 		# Try get pretty name user (otherwise, email will be used)
 		alias = Alias.objects.filter( person = user )
@@ -56,7 +61,7 @@ def get_menu_arguments(request, dict):
 
 def clear_session(request):
 	
-	keys = [constants.PROJECT_INSTANCE, constants.REQUEST_INSTANCE, constants.ACTUAL_PROJECT, constants.CODE_INSTANCE, 
+	keys = [constants.ALL_PROJECTS, constants.PROJECT_INSTANCE, constants.REQUEST_INSTANCE, constants.ACTUAL_PROJECT, constants.CODE_INSTANCE, 
 			constants.ADD_DOCS, constants.ADD_TAGS, constants.ADD_LINKS, constants.REM_DOCS, constants.REM_TAGS, constants.REM_LINKS]
 	
 	if constants.MAINTAIN_STATE not in request.session:

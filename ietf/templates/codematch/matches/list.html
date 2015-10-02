@@ -43,12 +43,22 @@
                         <div class="widget-head">
                             <div class="pull-left">
                                 <i class="fa fa-sort"></i> <span style="font-weight: lighter">Order by: </span> 
-                                <a href="#">Title/Project</a> | 
-                                <a href="#">Coder</a> | 
-                                <a href="#">Coding Request</a> | 
-                                <a href="#">Protocol</a> | 
-                                <a href="#">Area</a> | 
-                                <a href="#">Working Group</a>
+                                <a 
+								{% if attribute == "title" %} style="color: #A0A0A0"
+								{% else %} href="{% url template mylist 'title' state %}"
+								{% endif %}>Title/Project</a> |
+								<a 
+								{% if attribute == "coder" %} style="color: #A0A0A0"
+								{% else %} href="{% url template mylist 'coder' state %}"
+								{% endif %}>Coder</a> |
+								<a 
+								{% if attribute == "creation_date" %} style="color: #A0A0A0"
+								{% else %} href="{% url template mylist 'creation_date' state %}"
+								{% endif %}>Release date</a>
+                                <!--<a href="{% url "ietf.codematch.matches.views.show_list" 'title' %}">Code Request</a> | -->
+                                <!--<a href="{% url "ietf.codematch.matches.views.show_list" 'title' %}">Protocol</a> | -->
+                                <!--<a href="{% url "ietf.codematch.matches.views.show_list" 'title' %}">Area</a> | 
+                                <a href="{% url "ietf.codematch.matches.views.show_list" 'title' %}">Working Group</a>-->
                             </div>
                             <div class="clearfix"></div>
                         </div>
@@ -59,7 +69,6 @@
                             	{% if projectcontainers %}
                                     {% for projectcontainer in projectcontainers %}
                                     	{% for coding in projectcontainer.codings.all %}
-                                    		{% if coding in codings %}
 		                               		<li>
 		                                    	<!-- Title and date -->
 		                                    	<h5><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a>
@@ -99,7 +108,6 @@
 					            				</a>
 		                                    	</p>
 		                                	</li>
-		                                	{% endif %}
                                     	{% endfor %}
                                     {% endfor %}
                                 {% else %}
@@ -117,7 +125,7 @@
                                 	<a class="btn btn-default" href="{% url "ietf.codematch.matches.views.new" %}">New CodeMatch Project</a>
                                 {% endif %}
                                 {% if projectcontainers %}
-                                	<a class="btn btn-default" href="{% url "ietf.codematch.matches.views.search" %}">Search</a>
+                                	<a class="btn btn-default" href="{% url "ietf.codematch.matches.views.search" mylist %}">Search</a>
                                 {% endif %}
                                 </p>
                             </div>
