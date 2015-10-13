@@ -46,7 +46,7 @@
                                 <a 
 								{% if attribute == "title" %} style="color: #A0A0A0"
 								{% else %} href="{% url template mylist 'title' state %}"
-								{% endif %}>Title/Project</a> |
+								{% endif %}>Title</a> |
 								<a 
 								{% if attribute == "coder" %} style="color: #A0A0A0"
 								{% else %} href="{% url template mylist 'coder' state %}"
@@ -78,7 +78,7 @@
 												{% endif %}
 												</h5>
 		                                    	<!--<h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a></h6>-->
-		                                    	<p>{{ projectcontainer.description|linebreaks }}</p>
+		                                    	<p>{{ coding.additional_information|linebreaks }}</p>
 		                                    	<p>
 		                                    	{% if projectcontainer.code_request == None %}
 		                                    	CodeRequest: 	 <a href="#">None</a>
@@ -127,6 +127,9 @@
                                 {% if projectcontainers %}
                                 	<a class="btn btn-default" href="{% url "ietf.codematch.matches.views.search" mylist %}">Search</a>
                                 {% endif %}
+                             	{% if state != ""%}                          
+                 					<a class="btn btn-default" href="{% url 'ietf.codematch.views.back' %}">Back</a>
+                 				{% endif %}
                                 </p>
                             </div>
                         </div>

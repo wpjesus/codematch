@@ -131,45 +131,33 @@ def search(request, is_my_list="False"):
 
         if query :
             
-            project_containers = []
+            ids = []
             
             if request.GET.get('title'):
-                codings = CodingProject.objects.filter(title__icontains=query)
-                for p in ProjectContainer.objects.all():
-                    for coding in codings:
-                        if coding in p.codings.all() and p not in project_containers:
-                            project_containers.append(p)
+                ids += ProjectContainer.objects.filter(codings__title__icontains=query).values_list('id', flat=True)
                             
             if request.GET.get('description'):
-                codings = CodingProject.objects.filter(additional_information__icontains=query)
-                for p in ProjectContainer.objects.all():
-                    for coding in codings:
-                        if coding in p.codings.all() and p not in project_containers:
-                            project_containers.append(p)
+                ids += ProjectContainer.objects.filter(codings__additional_information__icontains=query).values_list('id', flat=True)
                 
             if request.GET.get('protocol'):
-                projects = ProjectContainer.objects.filter(protocol__icontains=query)
-                for p in projects:
-                    if p not in project_containers:
-                        project_containers.append(p)
+                ids += ProjectContainer.objects.filter(protocol__icontains=query).values_list('id', flat=True)
             
             if request.GET.get('coder'):
-                projects = ProjectContainer.objects.filter(codings__coder__name__icontains=query).distinct()
-                for p in projects:
-                    if p not in project_containers:
-                        project_containers.append(p)
+                ids += ProjectContainer.objects.filter(codings__coder__name__icontains=query).values_list('id', flat=True)
+                
+            if request.GET.get('area'):
+                ids += ProjectContainer.objects.filter(docs__document__group__parent__name__icontains=query).values_list('id', flat=True)
+                        
+            if request.GET.get('workinggroup'):
+                ids += ProjectContainer.objects.filter(docs__document__group__name__icontains=query).values_list('id', flat=True)    
+            
+            project_containers = ProjectContainer.objects.filter(id__in=list(set(ids)))
             
             user = get_user(request)
             
             request.session[constants.ALL_PROJECTS] = project_containers
             
             request.session[constants.MAINTAIN_STATE] = True
-            
-            for project in project_containers:
-                for doc in project.docs.all():
-                    docs.append(doc)
-        
-            docs = list(set(docs))
             
             return HttpResponseRedirect(settings.CODEMATCH_PREFIX + '/codematch/matches/show_list/' + is_my_list + '/creation_date/' +'True')
 

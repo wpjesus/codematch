@@ -48,15 +48,31 @@
 					<a 
 					{% if attribute == "title" %} style="color: #A0A0A0"
 					{% else %} href="{% url template typelist 'title' state %}"
-					{% endif %}>Title/Project</a> |
+					{% endif %}>Title</a> |
+					<a 
+					{% if attribute == "creation_date" %} style="color: #A0A0A0"
+					{% else %} href="{% url template typelist 'creation_date' state %}"
+					{% endif %}>Release date</a> |
+					<a 
+					{% if attribute == "code_request__estimated_lof" %} style="color: #A0A0A0"
+					{% else %} href="{% url template typelist 'code_request__estimated_lof' state %}"
+					{% endif %}>Estimated level of effort</a> |
+					<a 
+					{% if attribute == "popularity" %} style="color: #A0A0A0"
+					{% else %} href="{% url template typelist 'popularity' state %}"
+					{% endif %}>Popularity</a> |
 					<a 
 					{% if attribute == "protocol" %} style="color: #A0A0A0"
 					{% else %} href="{% url template typelist 'protocol' state %}"
 					{% endif %}>Protocol</a> |
 					<a 
-					{% if attribute == "creation_date" %} style="color: #A0A0A0"
-					{% else %} href="{% url template typelist 'creation_date' state %}"
-					{% endif %}>Release date</a>
+					{% if attribute == "docs__document__group__parent__name" %} style="color: #A0A0A0"
+					{% else %} href="{% url template typelist 'docs__document__group__parent__name' state %}"
+					{% endif %}>Working Group</a> |
+					<a 
+					{% if attribute == "docs__document__group__name" %} style="color: #A0A0A0"
+					{% else %} href="{% url template typelist 'docs__document__group__name' state %}"
+					{% endif %}>Area</a>
 					
 					<!--<a href="{% url "ietf.codematch.requests.views.show_list" 'title' %}">Area</a> | -->
 					<!--<a href="#">Popularity</a> | -->
@@ -66,12 +82,20 @@
                 </div>
                 <div class="widget-content">
 		
+		
 		{% if projectcontainers %}
-			{% for projectcontainer in projectcontainers %}
+			{% for list, prop in projectcontainers %}
 	          <div class="padd">
 	               <div class="user">
 	                   <div class="user-details" style="margin-left: 0px; margin-bottom:20px;">
-	                   <h5><i class="fa fa-chevron-circle-right"> <a href="{% url 'show' projectcontainer.id %}">{{ projectcontainer.title }}</a> </i> {{ projectcontainer.code_request.creation_date|date:"d M Y" }}
+	                {% if prop != "" %}
+	                	<div>
+	             			<h4><i class="fa fa-chevron-circle-right"> <a href="#">{{ prop }}</a></i></h4>
+	             		</div>
+	             	{% endif %}
+				{% for projectcontainer in list %}   
+						<h5><i> <a href="{% url 'ietf.codematch.requests.views.show' projectcontainer.id %}">{{ projectcontainer.title }}</a>
+		                   	</i> {{ projectcontainer.code_request.creation_date|date:"d M Y" }}
 	                      	{% if user.is_authenticated %}
 	                   			{% if projectcontainer.owner == owner %}
 		                   			<a class="label label-info" href="{% url 'ietf.codematch.requests.views.edit' projectcontainer.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a> 
@@ -91,6 +115,7 @@
 			            		</div>
 	                        </div>
 	                    {% endfor %}
+				{% endfor %}
 					   </div>
 	 	    		</div>
 	 	       </div>  
@@ -110,6 +135,9 @@
                  	{% endif %}
                  	{% if projectcontainers %}
                  		<a class="btn btn-default" href="{% url "ietf.codematch.requests.views.search" typelist %}">Search</a>
+                 	{% endif %}
+                 	{% if state != ""%}
+                 		<a class="btn btn-default" href="{% url 'ietf.codematch.views.back' %}">Back</a>
                  	{% endif %}
                  </p>
               </div>

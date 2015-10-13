@@ -12,4 +12,5 @@ urlpatterns = patterns('ietf.codematch.accounts.views',
     url(r'^logout/$', logout, {'template_name': 'codematch/index.html'}),
     url(r'^register/$', 'register', name='register'),
     url(r'^profile/$', 'profile', name='profile'),
+    url(r'^top_coders/$', 'top_coders', name='top_coders'),
 )

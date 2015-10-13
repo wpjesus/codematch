@@ -19,7 +19,6 @@ def is_user_allowed(user, permission):
 	return True
 
 def get_user(request):
-
 	if request.user.is_authenticated():
 		return Person.objects.get(user=request.user)
 	else:

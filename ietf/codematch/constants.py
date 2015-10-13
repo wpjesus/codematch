@@ -43,4 +43,6 @@ TEMPLATE_MATCHES_EDIT     = "codematch/matches/edit.html"
 TEMPLATE_MATCHES_NEW      = "codematch/matches/new.html"
 TEMPLATE_MATCHES_SHOW     = "codematch/matches/show.html"
 TEMPLATE_MATCHES_SEARCH   = "codematch/matches/search.html"
+# ACCOUNTS
+TEMPLATE_TOPCODERS        = "codematch/accounts/topcoders.html"
 

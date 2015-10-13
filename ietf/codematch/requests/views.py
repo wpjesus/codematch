@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 
 from django import forms
 from django.forms.models import modelform_factory
+from django.db.models import Count
 
 from django.http import Http404, HttpResponseRedirect
 
@@ -42,22 +43,56 @@ def show_list(request, type_list="all", att="creation_date", state=""):
             # Project must have been created by the current user and user must have permission mentor
             if not is_user_allowed(user, "iscreator"):
                 raise Http404
-            project_containers = ProjectContainer.objects.exclude(code_request__isnull=True).filter(owner=user).order_by(att)[:20]
+            project_containers = ProjectContainer.objects.exclude(code_request__isnull=True).filter(owner=user)
         elif type_list == "mentoring":
             # Project must have been mentored by the current user and user must have permission mentor
             if not is_user_allowed(user, "ismentor"):
                 raise Http404
-            project_containers = ProjectContainer.objects.exclude(code_request__isnull=True).filter(code_request__mentor=user).order_by(att)[:20]
+            project_containers = ProjectContainer.objects.exclude(code_request__isnull=True).filter(code_request__mentor=user)
         else:
             # TODO: Allow sorting by different parameters (for others templates too)
             # Exclude ProjectContainers that don't have an associated CodeRequest (TODO: Centralize this?)
-            project_containers = ProjectContainer.objects.exclude(code_request__isnull=True).order_by(att)[:20]
+            project_containers = ProjectContainer.objects.exclude(code_request__isnull=True)
     
-    user = get_user(request)
+    if att == 'popularity': # TODO: Fix this
+        project_containers = project_containers.annotate(count=Count('codings')).order_by('-count')[:20]
+    else:
+        project_containers = project_containers.order_by(att)[:20]
+            
+    list_of_lists = []
     
-    #return render_page(request, "codematch/requests/list.html", {
+    dict = {'protocol':'protocol', 'docs__document__group__parent__name':'working_group', 'docs__document__group__name':'area'}
+    
+    if att in dict: # TODO: Fix this
+    #or att == "docs__document__group__parent__name": 
+        select = list(set(project_containers.values_list(att, flat=True)))
+        print select
+        for s in select:
+            newlist = []
+            val = dict[att]
+            for p in project_containers:
+                if att == 'protocol':
+                    prop = getattr(p, val)
+                else:
+                    prop = None
+                    for d in p.docs.all():
+                        if val == 'working_group':
+                            prop = d.document.group.parent.name
+                        else:
+                            prop = d.document.group.name
+                        print prop
+                if prop == s:
+                    newlist.append(p)
+            if len(newlist) > 0:
+                list_of_lists.append((newlist,s))
+    else:
+        for p in project_containers:
+            newlist = []
+            newlist.append(p)
+            list_of_lists.append((newlist,""))
+    
     return render_page(request, constants.TEMPLATE_REQUESTS_LIST, {
-		'projectcontainers' : project_containers,
+		'projectcontainers' : list_of_lists,
         'owner'             : user,
         'attribute'         : att,
         'typelist'          : type_list,
@@ -80,38 +115,33 @@ def search(request, type_list="all"):
                     
             user = None
             
-            project_containers = []
+            ids = []
+            
+            # TODO: Localize strings
             
             if request.GET.get('title'):
-                projects = ProjectContainer.objects.filter(title__icontains=query)
-                for p in projects:
-                    if p not in project_containers:
-                        project_containers.append(p)
+                ids += ProjectContainer.objects.filter(title__icontains=query).values_list('id', flat=True)
            
             if request.GET.get('description'):
-                projects = ProjectContainer.objects.filter(description__icontains=query)
-                for p in projects:
-                    if p not in project_containers:
-                        project_containers.append(p)
+                ids += ProjectContainer.objects.filter(description__icontains=query).values_list('id', flat=True)
                 
             if request.GET.get('protocol'):
-                projects = ProjectContainer.objects.filter(protocol__icontains=query)
-                for p in projects:
-                    if p not in project_containers:
-                        project_containers.append(p)
+                ids += ProjectContainer.objects.filter(protocol__icontains=query).values_list('id', flat=True)
             
             if request.GET.get('mentor'):
-                projects = ProjectContainer.objects.filter(code_request__mentor__name__icontains=query).distinct()
-                for p in projects:
-                    if p not in project_containers:
-                        project_containers.append(p)
+                ids += ProjectContainer.objects.filter(code_request__mentor__name__icontains=query).values_list('id', flat=True)
                         
             if request.GET.get('docs'):
-                projects = ProjectContainer.objects.filter(docs__name__icontains=query).distinct()
-                for p in projects:
-                    if p not in project_containers:
-                        project_containers.append(p)
-            
+                ids += ProjectContainer.objects.filter(docs__name__icontains=query).values_list('id', flat=True)
+                        
+            if request.GET.get('area'):
+                ids += ProjectContainer.objects.filter(docs__document__group__parent__name__icontains=query).values_list('id', flat=True)
+                        
+            if request.GET.get('workinggroup'):
+                ids += ProjectContainer.objects.filter(docs__document__group__name__icontains=query).values_list('id', flat=True)         
+                        
+            project_containers = ProjectContainer.objects.filter(id__in=list(set(ids)))
+                        
             user = get_user(request)
             
             request.session[constants.ALL_PROJECTS] = project_containers
@@ -124,10 +154,8 @@ def search(request, type_list="all"):
             return HttpResponseRedirect(request.path)
     
     else:
-        form = SearchForm()
-        #return render_page(request, "codematch/requests/search.html", { 
         return render_page(request, constants.TEMPLATE_REQUESTS_SEARCH, {
-			"form" : form 
+			"form" : SearchForm() 
         })
 
 def show(request, pk):
@@ -158,8 +186,7 @@ def show(request, pk):
         working_groups = ["None"]
     if not tags:
         tags = ["None"]
-    
-    #return render_page(request, "codematch/requests/show.html", {
+
     return render_page(request, constants.TEMPLATE_REQUESTS_SHOW, {
 		'projectcontainer': project_container,
         'areas'           : areas,
@@ -298,7 +325,6 @@ def edit(request, pk):
         request.session[constants.REM_TAGS] = []
     
     request.session[constants.MAINTAIN_STATE] = True
-    
     if constants.ADD_DOCS not in request.session:
         docs = project_container.docs.all()
         request.session[constants.ADD_DOCS] = list(docs)
@@ -306,13 +332,12 @@ def edit(request, pk):
     if constants.ADD_TAGS not in request.session:
         tags = project_container.tags.all()
         request.session[constants.ADD_TAGS] = list(tags)
-    
-	user = get_user(request)
-	
+        
+    user = get_user(request)
     # Project must have been created by the current user and
 	# User must have permission to add new CodeRequest
-    if project_container.owner != user or is_user_allowed(user, "caneditrequest"):
-        raise Http404
+    #if project_container.owner != user or is_user_allowed(user, "caneditrequest"):
+    #    raise Http404
     
 	# Save project and code request in the cache to make 'update' and 'new' use the same code (save_project)
     request.session[constants.PROJECT_INSTANCE] = ProjectContainerForm(instance=project_container)
@@ -355,7 +380,6 @@ def remove_document(request, pk, doc_name):
     docs.remove(document)
     request.session[constants.ADD_DOCS] = docs
         
-    # TODO: Centralize this?
     return HttpResponseRedirect(request.path)
     
 @login_required(login_url = settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
@@ -376,6 +400,5 @@ def remove_tag(request, pk, tag_name):
     tags.remove(tag)
     request.session[constants.ADD_TAGS] = tags
         
-    # TODO: Centralize this?
     return HttpResponseRedirect(request.path)
 
