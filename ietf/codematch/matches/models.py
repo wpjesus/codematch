@@ -3,6 +3,8 @@ from django.db import models
 import debug
 import datetime
 
+from ietf.codematch import constants
+
 from ietf.group.models import Group
 from ietf.person.models import Person
 from ietf.doc.models import DocAlias
@@ -22,6 +24,15 @@ class ProjectTag(models.Model):
     
     name = models.CharField(max_length=80)
 
+    def __unicode__(self):
+        return self.name
+
+class ProjectMail(models.Model):
+    """ """
+    
+    mail = models.CharField(max_length=80)
+    type = models.CharField(max_length=50, choices=constants.MAIL_TYPES)
+    
     def __unicode__(self):
         return self.name
 
@@ -75,6 +86,8 @@ class ProjectContainer (models.Model):
     codings       = models.ManyToManyField(CodingProject)
     
     tags          = models.ManyToManyField(ProjectTag, blank=True, null=True)
+    
+    mails         = models.ManyToManyField(ProjectMail, blank=True, null=True)
 
     def __unicode__(self):              # __unicode__ on Python 2
         return self.title

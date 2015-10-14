@@ -123,19 +123,23 @@
 		                    
 		                    <h4><strong>Resources</strong></h4>
 		                    Mentor: <a href="#">{{ projectcontainer.code_request.mentor.name }}</a><br />
-		            		Mailing list: <a href="#">None</a><br /> <!-- <a href="#">None</a><br />-->
-		            		Twitter: <a href="#">None</a><br />
-		            		Facebook: <a href="#">None</a><br />
-		            		Tags: 
-	            			{% for tag in tags %}
-	            				{% if not forloop.first %}
-	            				,
-	            				{% endif %}
-	            				<a href="#">#{{ tag }}</a>
-	            			{% endfor %}
-		            		
-		            		<br />
-		            		<br />           		
+		                    
+		                    {% for mail in projectcontainer.mails.all %}
+		                    	{{ mail.type }}: <a href="#">
+		                    		{{ mail.mail }}</a><br />
+		                    {% endfor %}
+		                    
+		                    {% if projectcontainer.tags.all %}
+		            		Tags:
+		            			{% for tag in projectcontainer.tags.all %}
+		            				{% if not forloop.first %}
+		            				,
+		            				{% endif %}
+		            				<a href="#">#{{ tag }}</a>
+		            			{% endfor %}
+						        <br />
+		            		{% endif %}         	
+	            			<br />  	
 		            		
 		            		{% if projectcontainer.codings.all %}
 			            		<h4><strong>CodeMatches</strong></h4>

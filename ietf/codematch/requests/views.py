@@ -16,10 +16,10 @@ from ietf.group.models import Group
 from ietf.person.models import Person
 from ietf.doc.models import DocAlias, Document
 
-from ietf.codematch.matches.forms import SearchForm, ProjectContainerForm
+from ietf.codematch.matches.forms import SearchForm, ProjectContainerForm, MailForm
 from ietf.codematch.requests.forms import CodeRequestForm, DocNameForm, TagForm
 
-from ietf.codematch.matches.models import ProjectContainer, CodingProject, ProjectTag
+from ietf.codematch.matches.models import ProjectContainer, CodingProject, ProjectTag, ProjectMail
 from ietf.codematch.requests.models import CodeRequest
 
 from ietf.codematch.helpers.utils import (render_page, is_user_allowed, clear_session, get_user)
@@ -63,8 +63,7 @@ def show_list(request, type_list="all", att="creation_date", state=""):
     
     dict = {'protocol':'protocol', 'docs__document__group__parent__name':'working_group', 'docs__document__group__name':'area'}
     
-    if att in dict: # TODO: Fix this
-    #or att == "docs__document__group__parent__name": 
+    if att in dict:
         select = list(set(project_containers.values_list(att, flat=True)))
         print select
         for s in select:
@@ -178,20 +177,15 @@ def show(request, pk):
         else:
             areas.append(working_group) 
     
-    tags += project_container.tags.all()
-    
     if not areas:
         areas = ["None"]
     if not working_groups:
         working_groups = ["None"]
-    if not tags:
-        tags = ["None"]
 
     return render_page(request, constants.TEMPLATE_REQUESTS_SHOW, {
 		'projectcontainer': project_container,
         'areas'           : areas,
         'workinggroups'   : working_groups,
-        'tags'            : tags,
         'owner'           : user
     })
 
@@ -210,13 +204,16 @@ def save_project(request, template, project_container=None):
 	# TODO: check permission
     can_add_documents = is_user_allowed(user, "canadddocuments")
     can_add_tags      = is_user_allowed(user, "canaddtags")
+    can_add_mail      = is_user_allowed(user, "canaddmail")
     
 	# If not there in the current session then should be setted a default
     proj_form = request.session[constants.PROJECT_INSTANCE] if constants.PROJECT_INSTANCE in request.session else ProjectContainerForm()
     req_form = request.session[constants.REQUEST_INSTANCE] if constants.REQUEST_INSTANCE in request.session else CodeRequestForm()
+    mail_form = request.session[constants.MAIL_INSTANCE] if constants.MAIL_INSTANCE in request.session else MailForm()
     
-    docs = request.session[constants.ADD_DOCS]
-    tags = request.session[constants.ADD_TAGS]
+    docs  = request.session[constants.ADD_DOCS]
+    tags  = request.session[constants.ADD_TAGS]
+    mails = request.session[constants.ADD_MAILS]
     
     previous_template = "codematch/requests/show_list"
     
@@ -227,6 +224,8 @@ def save_project(request, template, project_container=None):
         
         doc_name = request.POST.get("doc")
         tag = TagForm(request.POST)
+        new_mail = MailForm(request.POST)
+        print new_mail
         
         if project_container != None:
             new_proj = ProjectContainerForm(request.POST, instance=project_container)
@@ -246,6 +245,13 @@ def save_project(request, template, project_container=None):
         elif tag.is_valid():
             new_tag = tag.save(commit=False)
             tags.append(new_tag)  # Updating tags to appear after rendering
+            
+        # Adding new mail to the mailing list to be saved in the project
+        elif new_mail.is_valid():
+            m = new_mail.save(commit=False)
+            if m.type == 'Twitter': # TODO: Padronize for this and others
+                m.mail = '@' + m.mail 
+            mails.append(m)
 		
 		# Saving project (new or not) in the database
         elif request.POST.get('save') and new_proj.is_valid() and new_req.is_valid():
@@ -274,6 +280,16 @@ def save_project(request, template, project_container=None):
                 project.docs.add(doc)
                 modify = True
             
+            for mail in mails:
+                try:
+                    new_m = ProjectMail.objects.get(mail=mail.mail, type=mail.type)
+                except:
+                    mail.save()
+                    new_m = mail
+                    
+                project.mails.add(new_m)
+                modify = True
+            
             for tag in tags:
                 try:
                     # Trying get an existing tag
@@ -295,20 +311,25 @@ def save_project(request, template, project_container=None):
 		# Updating session variables
         request.session[constants.PROJECT_INSTANCE] = new_proj
         request.session[constants.REQUEST_INSTANCE] = new_req
+        #request.session[constants.MAIL_INSTANCE] = new_mail
         
         proj_form = new_proj
         req_form = new_req
+        #mail_form = new_mail
     
     return render_page(request, template, {
         'projectcontainer' : project_container,
         'projform'         : proj_form,
         'reqform'          : req_form,
+        'mailform'         : mail_form,
         'docform'          : doc_form,
         'tagform'          : tag_form,
         'docs'             : docs,
         'tags'             : tags,
+        'mails'            : mails,
         'canadddocuments'  : can_add_documents,
-        'canaddtags'       : can_add_tags
+        'canaddtags'       : can_add_tags,
+        'canaddmail'       : can_add_mail
     })
 
 @login_required(login_url = settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
@@ -333,6 +354,10 @@ def edit(request, pk):
         tags = project_container.tags.all()
         request.session[constants.ADD_TAGS] = list(tags)
         
+    if constants.ADD_MAILS not in request.session:
+        mails = project_container.mails.all()
+        request.session[constants.ADD_MAILS] = list(mails)
+        
     user = get_user(request)
     # Project must have been created by the current user and
 	# User must have permission to add new CodeRequest
@@ -355,6 +380,7 @@ def new(request):
         clear_session(request)
         request.session[constants.REM_DOCS] = []
         request.session[constants.REM_TAGS] = []
+        request.session[constants.ADD_MAILS] = []
         request.session[constants.ADD_DOCS] = []
         request.session[constants.ADD_TAGS] = []
     

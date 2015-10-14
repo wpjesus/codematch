@@ -13,10 +13,12 @@ ALL_PROJECTS      = 'all_projects'
 PROJECT_INSTANCE  = 'project_instance'
 REQUEST_INSTANCE  = 'request_instance'
 CODE_INSTANCE     = 'code_instance'
+MAIL_INSTANCE     = 'mail_instance'
 ACTUAL_PROJECT    = 'actual_project' 
 ADD_DOCS          = 'add_docs' 
 ADD_TAGS          = 'add_tags'
 ADD_LINKS         = 'add_links' 
+ADD_MAILS         = 'add_mails'
 REM_DOCS          = 'rem_docs' 
 REM_TAGS          = 'rem_tags'
 REM_LINKS         = 'rem_links' 
@@ -45,4 +47,12 @@ TEMPLATE_MATCHES_SHOW     = "codematch/matches/show.html"
 TEMPLATE_MATCHES_SEARCH   = "codematch/matches/search.html"
 # ACCOUNTS
 TEMPLATE_TOPCODERS        = "codematch/accounts/topcoders.html"
+
+MAIL_TYPES = [
+    # core events
+    ("Twitter", "Twitter"),
+    ("Facebook", "Facebook"),
+    ("Jabber", "Jabber"),
+    ("Mail", "Email"),
+    ]
 

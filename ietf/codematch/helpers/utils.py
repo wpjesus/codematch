@@ -60,8 +60,9 @@ def get_menu_arguments(request, dict):
 
 def clear_session(request):
 	
-	keys = [constants.ALL_PROJECTS, constants.PROJECT_INSTANCE, constants.REQUEST_INSTANCE, constants.ACTUAL_PROJECT, constants.CODE_INSTANCE, 
-			constants.ADD_DOCS, constants.ADD_TAGS, constants.ADD_LINKS, constants.REM_DOCS, constants.REM_TAGS, constants.REM_LINKS]
+	keys = [constants.ALL_PROJECTS, constants.PROJECT_INSTANCE, constants.REQUEST_INSTANCE, constants.MAIL_INSTANCE, constants.ACTUAL_PROJECT, 
+			constants.CODE_INSTANCE, constants.ADD_DOCS, constants.ADD_TAGS, constants.ADD_LINKS, constants.ADD_MAILS, 
+			constants.REM_DOCS, constants.REM_TAGS, constants.REM_LINKS]
 	
 	if constants.MAINTAIN_STATE not in request.session:
 		for key in keys:

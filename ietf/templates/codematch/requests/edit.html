@@ -117,7 +117,27 @@
 										{% endif %}
 										
 										<br />
-										<br />	
+										<br />
+										
+										<div>
+										{% if mails %}
+				            				<h4><strong>Mails</strong></h4>
+											{% for mail in mails %}
+												{{ mail.type }}: <a  href="#"> {{ mail.mail }} </a>
+												<br />
+											{% endfor %}
+										{% endif %}
+										<br />
+									
+										</div>
+										{% if canaddmail %}
+											{{ mailform }}
+											{% csrf_token %}
+											<input type="submit" value="Add mail" />
+										{% endif %}
+										
+										<br />
+										<br />		
 										
 										<div>
 										{% if tags %}

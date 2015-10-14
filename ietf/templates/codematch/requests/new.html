@@ -117,6 +117,28 @@
 										<br />	
 										
 										<div>
+										{% if mails %}
+				            				<h4><strong>Mails</strong></h4>
+											{% for mail in mails %}
+												{{ mail.type }}: <a  href="#"> {{ mail.name }} </a>
+												<br />
+											{% endfor %}
+										{% endif %}
+										<br />
+									
+										</div>
+										{% if canaddmail %}
+											<label>New mail:</label>
+											{{ mailform.name }}
+											{{ mailform.type }}
+											{% csrf_token %}
+											<input type="submit" value="Add mail" />
+										{% endif %}
+										
+										<br />
+										<br />	
+										
+										<div>
 										{% if user.is_authenticated and tags and canaddtags %}
 			            				<h4><strong>Tags</strong></h4> 
 			            					{% for tag in tags %}
