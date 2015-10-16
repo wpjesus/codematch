@@ -61,11 +61,10 @@ def show_list(request, type_list="all", att="creation_date", state=""):
             
     list_of_lists = []
     
-    dict = {'protocol':'protocol', 'docs__document__group__parent__name':'working_group', 'docs__document__group__name':'area'}
+    dict = {'protocol':'protocol', 'docs__document__group__name':'working_group', 'docs__document__group__parent__name':'area'}
     
     if att in dict:
         select = list(set(project_containers.values_list(att, flat=True)))
-        print select
         for s in select:
             newlist = []
             val = dict[att]
@@ -76,11 +75,10 @@ def show_list(request, type_list="all", att="creation_date", state=""):
                     prop = None
                     for d in p.docs.all():
                         if val == 'working_group':
-                            prop = d.document.group.parent.name
-                        else:
                             prop = d.document.group.name
-                        print prop
-                if prop == s:
+                        else:
+                            prop = d.document.group.parent.name
+                if prop != None and prop == s:
                     newlist.append(p)
             if len(newlist) > 0:
                 list_of_lists.append((newlist,s))
@@ -113,11 +111,9 @@ def search(request, type_list="all"):
         if query:
                     
             user = None
-            
             ids = []
             
             # TODO: Localize strings
-            
             if request.GET.get('title'):
                 ids += ProjectContainer.objects.filter(title__icontains=query).values_list('id', flat=True)
            
@@ -225,7 +221,6 @@ def save_project(request, template, project_container=None):
         doc_name = request.POST.get("doc")
         tag = TagForm(request.POST)
         new_mail = MailForm(request.POST)
-        print new_mail
         
         if project_container != None:
             new_proj = ProjectContainerForm(request.POST, instance=project_container)
@@ -311,11 +306,9 @@ def save_project(request, template, project_container=None):
 		# Updating session variables
         request.session[constants.PROJECT_INSTANCE] = new_proj
         request.session[constants.REQUEST_INSTANCE] = new_req
-        #request.session[constants.MAIL_INSTANCE] = new_mail
         
         proj_form = new_proj
         req_form = new_req
-        #mail_form = new_mail
     
     return render_page(request, template, {
         'projectcontainer' : project_container,
@@ -335,8 +328,6 @@ def save_project(request, template, project_container=None):
 @login_required(login_url = settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def edit(request, pk):
     """ Edit CodeRequest Entry """
-    
-    #template = 'codematch/requests/edit.html'
     
     project_container = get_object_or_404(ProjectContainer, id=pk)
     
@@ -374,8 +365,6 @@ def edit(request, pk):
 def new(request):
     """ New CodeRequest Entry """
     
-    #template = 'codematch/requests/new.html'
-    
     if request.path != request.session[constants.ACTUAL_TEMPLATE]:
         clear_session(request)
         request.session[constants.REM_DOCS] = []
@@ -391,7 +380,7 @@ def new(request):
 @login_required(login_url = settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def remove_document(request, pk, doc_name):
     
-    #refresh_template = request.session[constants.ACTUAL_TEMPLATE]
+    refresh_template = request.session[constants.ACTUAL_TEMPLATE]
     
     docs = request.session[constants.ADD_DOCS]
     document = next(el for el in docs if el.name == doc_name)
@@ -406,12 +395,12 @@ def remove_document(request, pk, doc_name):
     docs.remove(document)
     request.session[constants.ADD_DOCS] = docs
         
-    return HttpResponseRedirect(request.path)
+    return HttpResponseRedirect(refresh_template)
     
 @login_required(login_url = settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def remove_tag(request, pk, tag_name):
     
-    #refresh_template = request.session[constants.ACTUAL_TEMPLATE]
+    refresh_template = request.session[constants.ACTUAL_TEMPLATE]
     
     tags = request.session[constants.ADD_TAGS]
     tag = next(el for el in tags if el.name == tag_name)
@@ -426,5 +415,5 @@ def remove_tag(request, pk, tag_name):
     tags.remove(tag)
     request.session[constants.ADD_TAGS] = tags
         
-    return HttpResponseRedirect(request.path)
+    return HttpResponseRedirect(refresh_template)
 

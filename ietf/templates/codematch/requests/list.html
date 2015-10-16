@@ -66,12 +66,12 @@
 					{% else %} href="{% url template typelist 'protocol' state %}"
 					{% endif %}>Protocol</a> |
 					<a 
-					{% if attribute == "docs__document__group__parent__name" %} style="color: #A0A0A0"
-					{% else %} href="{% url template typelist 'docs__document__group__parent__name' state %}"
-					{% endif %}>Working Group</a> |
-					<a 
 					{% if attribute == "docs__document__group__name" %} style="color: #A0A0A0"
 					{% else %} href="{% url template typelist 'docs__document__group__name' state %}"
+					{% endif %}>Working Group</a> |
+					<a 
+					{% if attribute == "docs__document__group__parent__name" %} style="color: #A0A0A0"
+					{% else %} href="{% url template typelist 'docs__document__group__parent__name' state %}"
 					{% endif %}>Area</a>
 					
 					<!--<a href="{% url "ietf.codematch.requests.views.show_list" 'title' %}">Area</a> | -->

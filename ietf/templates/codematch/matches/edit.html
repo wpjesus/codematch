@@ -123,9 +123,10 @@
 									{% endif %}
 									<br />
 									{% if user.is_authenticated and canaddlinks %}
-                                            {{ linkform }}
-                                            {% csrf_token %}
-                                            <input type="submit" value="Add implementation" />
+										<label class="control-label col-xs-2">URL:</label>
+										{{ linkform.link }}
+                                        {% csrf_token %}
+                                        <input type="submit" value="Add implementation" />
                                     {% endif %}
 								</div>
 								
@@ -138,14 +139,14 @@
 				            				{% if not forloop.first %}
 		            						,
 		            						{% endif %}
-		            						<a>#{{ tag }}</a>
+		            						<a >#{{ tag }}</a>
 		            					{% endfor %}
 		            					<br />	
 		            				{% endif %}
 		            				<div>
 									<br />
 									{% if user.is_authenticated and canaddtags %}
-										<label>Tag:</label>
+										<label class="control-label col-xs-2">Tag:</label>
 										{{ tagform.name }}
 										{% csrf_token %}
 										<input type="submit" name="tag" value="Add new Tag" />

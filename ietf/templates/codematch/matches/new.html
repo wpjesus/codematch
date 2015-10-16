@@ -123,9 +123,14 @@
 										<br />
 									{% endif %}
 									{% if user.is_authenticated and canaddlinks %}
-                                            {{ linkform }}
-                                            {% csrf_token %}
-                                            <input type="submit" value="Add implementation" />
+        								<div class="form-group">
+											<label class="control-label col-xs-2">URL:</label>
+											<div class="col-xs-4">
+												{{ linkform.link }}
+											</div>
+										</div>
+                                        {% csrf_token %}
+                                        <input type="submit" value="Add implementation" />
                                     {% endif %}
 								</div>
 								

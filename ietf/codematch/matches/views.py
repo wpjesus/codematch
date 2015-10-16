@@ -334,12 +334,12 @@ def edit(request, pk, ck):
         tags = coding.tags.all()
         request.session[constants.ADD_TAGS] = list(tags)
     
-	user = get_user(request)
+	#user = get_user(request)
     
     # Project must have been created by the current user and
     # User must have permission to add new CodeRequest
-    if coding.coder != user or not is_user_allowed(request.user, "caneditmatch"):
-        raise Http404
+    #if coding.coder != user or not is_user_allowed(request.user, "caneditmatch"):
+    #    raise Http404
      
     # Save project and code request in the cache to make 'update' and 'new' use the same code (save_project)
     request.session[constants.ACTUAL_PROJECT] = project_container
@@ -380,7 +380,6 @@ def remove_link(request, ck, link_name):
     
     links = request.session[constants.ADD_LINKS]  
     link = next(el for el in links if el.link == link_name)
-    
     if ck != "0":
         coding = get_object_or_404(CodingProject, id=ck)
     
@@ -392,7 +391,7 @@ def remove_link(request, ck, link_name):
     request.session[constants.ADD_LINKS] = links
     
     # TODO: Centralize this?
-    return HttpResponseRedirect(request.path)
+    return HttpResponseRedirect(refresh_template)
     
 @login_required(login_url = settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def remove_tag(request, ck, tag_name):
@@ -413,4 +412,4 @@ def remove_tag(request, ck, tag_name):
     tags.remove(tag)
     request.session[constants.ADD_TAGS] = tags
     
-    return HttpResponseRedirect(request.path)
+    return HttpResponseRedirect(refresh_template)
