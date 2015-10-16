@@ -65,6 +65,7 @@ def show_list(request, type_list="all", att="creation_date", state=""):
     
     if att in dict:
         select = list(set(project_containers.values_list(att, flat=True)))
+        print select
         for s in select:
             newlist = []
             val = dict[att]
@@ -78,7 +79,7 @@ def show_list(request, type_list="all", att="creation_date", state=""):
                             prop = d.document.group.name
                         else:
                             prop = d.document.group.parent.name
-                if prop != None and prop == s:
+                if prop != None and p not in newlist and prop == s:
                     newlist.append(p)
             if len(newlist) > 0:
                 list_of_lists.append((newlist,s))
