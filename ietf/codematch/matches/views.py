@@ -46,6 +46,7 @@ def show_list(request, is_my_list="False", att="creation_date", state=""):
     # Centralize this?
     project_containers  = []
     codings             = CodingProject.objects.order_by(att)[:20]
+    print codings
     for coding in codings:
         for project in all_projects:
             if project not in project_containers and coding in project.codings.all() and (is_my_list == "False" or user == coding.coder):

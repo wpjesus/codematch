@@ -49,7 +49,7 @@
 								{% endif %}>Title</a> |
 								<a 
 								{% if attribute == "coder" %} style="color: #A0A0A0"
-								{% else %} href="{% url template mylist 'coder' state %}"
+								{% else %} href="{% url template mylist 'coder__name' state %}"
 								{% endif %}>Coder</a> |
 								<a 
 								{% if attribute == "creation_date" %} style="color: #A0A0A0"
