@@ -58,7 +58,7 @@
                             <form class="form-horizontal" action="{% url 'ietf.codematch.matches.views.edit' pk ck %}" method="post">
                             	{% csrf_token %}
                             	<div class="padd">
-                            	{% if projectcontainer != None %}
+                            	{% if projectcontainer != None and projectcontainer.code_request != None %}
 								<div class="form-group">
 									<label class="control-label col-xs-2">Title:</label>
 									<div class="col-xs-4" style="margin-top: 5px">
@@ -78,24 +78,43 @@
 									</div>
 								</div>
 								{% else %}
-								<div class="form-group">
-									<label class="control-label col-xs-2">Project title:</label>
-									<div class="col-xs-4">
-										{{ projform.title }}
+									<div class="form-group">
+										<label class="control-label col-xs-2">Project title:</label>
+										<div class="col-xs-4">
+											{{ projform.title }}
+										</div>
 									</div>
-								</div>
-								<div class="form-group">
-									<label class="control-label col-xs-2">Protocol:</label>
-									<div class="col-xs-4">
-										{{ projform.protocol}}
+									<div class="form-group">
+										<label class="control-label col-xs-2">Protocol:</label>
+										<div class="col-xs-4">
+											{{ projform.protocol}}
+										</div>
 									</div>
-								</div>
-								<div class="form-group">
-									<label class="control-label col-xs-2">Description:</label>
-									<div class="col-xs-4">
-										{{ projform.description }}
+									<div class="form-group">
+										<label class="control-label col-xs-2">Description:</label>
+										<div class="col-xs-4">
+											{{ projform.description }}
+										</div>
 									</div>
-								</div>
+									<div>
+										{% if docs %}
+				            				<h4><strong>Documents</strong></h4>
+											{% for doc in docs %}
+												{{ doc.document.group }}: <a  href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
+												<a class="label label-info" href="{% url 'ietf.codematch.requests.views.remove_document' projectcontainer.id doc.name %}" >delete</a>
+												<br />
+											{% endfor %}
+										{% endif %}
+										<br />
+									</div>
+									{% if canadddocuments %}
+										{{ docform }}
+										{% csrf_token %}
+										<input type="submit" value="Add related Document" />
+									{% endif %}
+										
+									<br />
+									<br />
 								{% endif %}
 								<hr />
 								<div class="form-group">

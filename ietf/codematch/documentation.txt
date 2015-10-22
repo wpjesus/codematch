@@ -1,25 +1,18 @@
 #### TODO LIST ###
 - Melhorar performance (principalmente new e edit CodeRequest)
-- Migrar versão estável para Master
-- Migrar implementações para dentro do formulário de new Match (tq CodeRequest)
-- Colocar constantes para melhorar legibilidade (para váriaveis de sessão e para strings de templates)
 - Definir padrão para permissões
-- Atualizar feature list
 - Pensar em unir o template de update e new
 - Estudar outras aplicações do DataTracker para padronizar código
 - Pensar em separar as funções dentro de POST dos métodos
-- Criar uma nova base de dados para hospedar o Master
-- Criar tag no github para manter versões master
 - Criar Script de migração de base se necessário
-- Adicionar settings_local.py no github
 - Fazer esquema para permitir novos cadastros de usuários
 - Atualizar interface para mockups v5
-- Colocar templates e outras strings em constants
 - Revisar onde est‹o permiss›es, ou centralizar tudo em utils ou entao descentralizar total (canadddocuments por exemplo)
 - Padronizar c—digo de Matches e Requests
 - Rever Owner em Show (Ser‡ que n‹o Ž melhor trocar para um bool j‡ em c—digo)
 - Back quando acabou de atualizar ou criar algum item
 - Ver como commitar settings_local.py sem dar conflitos ao dar pull
+- Rever base.html da vers‹o 6.6.1 (reaproveitei o da vers‹o que eu tinha modificado)
 
 ### DONE LIST ###
 - Adicionar documentos e tags dentro do formulário de novo coderequest
@@ -42,7 +35,7 @@
 ### QUESTION LIST ###
 - Existem diversos testes sendo feitos nos templates, deveriam ser passados para o código?
 - Ser‡ que est‡ correto criar constantes e centralizar as strings? (Botar num arquivo Constants)
-- Qual interface usar para editar Matches
+- Sera que deveria ser definido Mentor para o Codematch StandAlone
 
 ### DOCUMENTATION ###
 Estrutura composta no momento de 4 pastas além da raíz (Accounts, Helpers, Matches e Requests).
@@ -51,7 +44,7 @@ Estrutura composta no momento de 4 pastas além da raíz (Accounts, Helpers, Match
 - Matches é a aplicação que cuida dos Codings
 - Requests é a aplicação que dos ProjectContainers e CodeRequests
 - A raíz não deve ter grandes funcionalidades além de ativar as outras aplicações, é apenas uma porta de entrada
-* Obs: A mesma estrutura é usada para o código e para os templates
+- Obs: A mesma estrutura é usada para o código e para os templates
 
 Como é utilizado esquema de permissões, algumas permissões devem ser sempre adicionadas para toda página que for ser renderizada, por isso foi centralizado em Helpers/Utils.py um método que adiciona váriaveis de contexto ao dicionário. É preciso que sempre seja chamado o método render_page quando se quiser renderizar uma página, NÃO USAR o método render pois algumas coisas poderão ficar inconsistentes.
 

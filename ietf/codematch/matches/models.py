@@ -34,7 +34,7 @@ class ProjectMail(models.Model):
     type = models.CharField(max_length=50, choices=constants.MAIL_TYPES)
     
     def __unicode__(self):
-        return self.name
+        return self.mail
 
 class CodingProject (models.Model):
     """ an element in ProjectContainer can have several Coding Projects"""

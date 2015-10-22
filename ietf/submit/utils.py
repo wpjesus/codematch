@@ -4,8 +4,12 @@ import datetime
 
 from django.conf import settings
 
-from ietf.doc.models import Document, State, DocAlias, DocEvent, DocumentAuthor, NewRevisionDocEvent, save_document_in_history
+from ietf.doc.models import Document, State, DocAlias, DocEvent, DocumentAuthor
+from ietf.doc.models import NewRevisionDocEvent, save_document_in_history
+from ietf.doc.models import RelatedDocument, DocRelationshipName
 from ietf.doc.utils import add_state_change_event, rebuild_reference_relations
+from ietf.doc.utils import set_replaces_for_document
+from ietf.doc.mails import send_review_possibly_replaces_request
 from ietf.group.models import Group
 from ietf.ietfauth.utils import has_role
 from ietf.name.models import StreamName
@@ -67,6 +71,15 @@ def validate_submission(submission):
 
     return errors
 
+def has_been_replaced_by(name):
+    docs=Document.objects.filter(name=name)
+
+    if docs:
+        doc=docs[0]
+        return doc.related_that("replaces")
+
+    return None
+
 def validate_submission_rev(name, rev):
     if not rev:
         return 'Revision not found'
@@ -86,6 +99,10 @@ def validate_submission_rev(name, rev):
 
         if rev != expected:
             return 'Invalid revision (revision %02d is expected)' % expected
+
+    replaced_by=has_been_replaced_by(name)
+    if replaced_by:
+        return 'This document has been replaced by %s' % ",".join(rd.name for rd in replaced_by)
 
     return None
 
@@ -202,12 +219,66 @@ def post_submission(request, submission):
     move_files_to_repository(submission)
     submission.state = DraftSubmissionStateName.objects.get(slug="posted")
 
+    new_replaces, new_possibly_replaces = update_replaces_from_submission(request, submission, draft)
+
     announce_to_lists(request, submission)
     announce_new_version(request, submission, draft, state_change_msg)
     announce_to_authors(request, submission)
 
+    if new_possibly_replaces:
+        send_review_possibly_replaces_request(request, draft)
+
     submission.save()
 
+def update_replaces_from_submission(request, submission, draft):
+    if not submission.replaces:
+        return [], []
+
+    is_secretariat = has_role(request.user, "Secretariat")
+    is_chair_of = []
+    if request.user.is_authenticated():
+        is_chair_of = list(Group.objects.filter(role__person__user=request.user, role__name="chair"))
+
+    replaces = DocAlias.objects.filter(name__in=submission.replaces.split(",")).select_related("document", "document__group")
+    existing_replaces = list(draft.related_that_doc("replaces"))
+    existing_suggested = set(draft.related_that_doc("possibly-replaces"))
+
+    submitter_email = submission.submitter_parsed()["email"]
+
+    approved = []
+    suggested = []
+    for r in replaces:
+        if r in existing_replaces:
+            continue
+
+        rdoc = r.document
+
+        if rdoc == draft:
+            continue
+
+        # TODO - I think the .exists() is in the wrong place below....
+        if (is_secretariat
+            or (draft.group in is_chair_of and (rdoc.group.type_id == "individ" or rdoc.group in is_chair_of))
+            or (submitter_email and rdoc.authors.filter(address__iexact=submitter_email)).exists()):
+            approved.append(r)
+        else:
+            if r not in existing_suggested:
+                suggested.append(r)
+
+    by = request.user.person if request.user.is_authenticated() else Person.objects.get(name="(System)")
+    set_replaces_for_document(request, draft, existing_replaces + approved, by,
+                              email_subject="%s replacement status set during submit by %s" % (draft.name, submission.submitter_parsed()["name"]))
+
+
+    if suggested:
+        possibly_replaces = DocRelationshipName.objects.get(slug="possibly-replaces")
+        for r in suggested:
+            RelatedDocument.objects.create(source=draft, target=r, relationship=possibly_replaces)
+
+        DocEvent.objects.create(doc=draft, by=by, type="added_suggested_replaces",
+                                desc="Added suggested replacement relationships: %s" % ", ".join(d.name for d in suggested))
+
+    return approved, suggested
 
 def get_person_from_name_email(name, email):
     # try email
@@ -286,21 +357,24 @@ def cancel_submission(submission):
     remove_submission_files(submission)
 
 def rename_submission_files(submission, prev_rev, new_rev):
-    for ext in submission.file_types.split(','):
-        source = os.path.join(settings.IDSUBMIT_STAGING_PATH, '%s-%s%s' % (submission.name, prev_rev, ext))
-        dest = os.path.join(settings.IDSUBMIT_STAGING_PATH, '%s-%s%s' % (submission.name, new_rev, ext))
-        os.rename(source, dest)
+    from ietf.submit.forms import SubmissionUploadForm
+    for ext in SubmissionUploadForm.base_fields.keys():
+        source = os.path.join(settings.IDSUBMIT_STAGING_PATH, '%s-%s.%s' % (submission.name, prev_rev, ext))
+        dest = os.path.join(settings.IDSUBMIT_STAGING_PATH, '%s-%s.%s' % (submission.name, new_rev, ext))
+        if os.path.exists(source):
+            os.rename(source, dest)
 
 def move_files_to_repository(submission):
-    for ext in submission.file_types.split(','):
-        source = os.path.join(settings.IDSUBMIT_STAGING_PATH, '%s-%s%s' % (submission.name, submission.rev, ext))
-        dest = os.path.join(settings.IDSUBMIT_REPOSITORY_PATH, '%s-%s%s' % (submission.name, submission.rev, ext))
+    from ietf.submit.forms import SubmissionUploadForm
+    for ext in SubmissionUploadForm.base_fields.keys():
+        source = os.path.join(settings.IDSUBMIT_STAGING_PATH, '%s-%s.%s' % (submission.name, submission.rev, ext))
+        dest = os.path.join(settings.IDSUBMIT_REPOSITORY_PATH, '%s-%s.%s' % (submission.name, submission.rev, ext))
         if os.path.exists(source):
             os.rename(source, dest)
         else:
             if os.path.exists(dest):
                 log("Intended to move '%s' to '%s', but found source missing while destination exists.")
-            else:
+            elif ext in submission.file_types.split(','):
                 raise ValueError("Intended to move '%s' to '%s', but found source and destination missing.")
 
 def remove_submission_files(submission):

@@ -1,5 +1,7 @@
 import datetime
 import json
+import os
+import time
 
 from django.conf import settings
 from django.contrib import messages
@@ -25,8 +27,8 @@ from ietf.secr.meetings.forms import ( BaseMeetingRoomFormSet, MeetingModelForm,
 from ietf.secr.proceedings.views import build_choices, handle_upload_file, make_directories
 from ietf.secr.sreq.forms import GroupSelectForm
 from ietf.secr.sreq.views import get_initial_session
-from ietf.secr.utils.mail import get_cc_list
 from ietf.secr.utils.meeting import get_session, get_timeslot
+from ietf.mailtrigger.utils import gather_address_lists
 
 
 # prep for agenda changes
@@ -188,9 +190,7 @@ def send_notifications(meeting, groups, person):
     now = datetime.datetime.now()
     for group in groups:
         sessions = group.session_set.filter(meeting=meeting)
-        to_email = sessions[0].requested_by.role_email('chair').address
-        # TODO confirm list, remove requested_by from cc, add session-request@ietf.org?
-        cc_list = get_cc_list(group)
+        addrs = gather_address_lists('session_scheduled',group=group,session=sessions[0])
         from_email = ('"IETF Secretariat"','agenda@ietf.org')
         if len(sessions) == 1:
             subject = '%s - Requested session has been scheduled for IETF %s' % (group.acronym, meeting.number)
@@ -223,12 +223,12 @@ def send_notifications(meeting, groups, person):
         context['login'] = sessions[0].requested_by
 
         send_mail(None,
-                  to_email,
+                  addrs.to,
                   from_email,
                   subject,
                   template,
                   context,
-                  cc=cc_list)
+                  cc=addrs.cc)
         
         # create sent_notification event
         GroupEvent.objects.create(group=group,time=now,type='sent_notification',
@@ -334,9 +334,15 @@ def blue_sheet(request, meeting_id):
     Blue Sheet view.  The user can generate blue sheets or upload scanned bluesheets
     '''
     meeting = get_object_or_404(Meeting, number=meeting_id)
-
     url = settings.SECR_BLUE_SHEET_URL
-
+    blank_sheets_path = settings.SECR_BLUE_SHEET_PATH
+    try:
+        last_run = time.ctime(os.stat(blank_sheets_path).st_ctime)
+    except OSError:
+        last_run = None
+    uploaded_sheets_path = os.path.join(settings.SECR_PROCEEDINGS_DIR,meeting.number,'bluesheets')
+    uploaded_files = sorted(os.listdir(uploaded_sheets_path))
+    
     if request.method == 'POST':
         form = UploadBlueSheetForm(request.POST,request.FILES)
         if form.is_valid():
@@ -350,7 +356,9 @@ def blue_sheet(request, meeting_id):
     return render_to_response('meetings/blue_sheet.html', {
         'meeting': meeting,
         'url': url,
-        'form': form},
+        'form': form,
+        'last_run': last_run,
+        'uploaded_files': uploaded_files},
         RequestContext(request, {}),
     )
 

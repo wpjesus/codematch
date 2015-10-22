@@ -336,6 +336,7 @@ Man                    Expires September 22, 2015               [Page 3]
         if not os.path.exists(self.id_dir):
             os.mkdir(self.id_dir)
         settings.INTERNET_DRAFT_PATH = self.id_dir
+        settings.INTERNET_ALL_DRAFTS_ARCHIVE_DIR = self.id_dir
         f = open(os.path.join(self.id_dir, 'draft-ietf-mars-test-01.txt'), 'w')
         f.write(self.draft_text)
         f.close()
@@ -717,8 +718,9 @@ class AddCommentTestCase(TestCase):
         self.assertEqual("This is a test.", draft.latest_event().desc)
         self.assertEqual("added_comment", draft.latest_event().type)
         self.assertEqual(len(outbox), mailbox_before + 1)
-        self.assertTrue("updated" in outbox[-1]['Subject'])
+        self.assertTrue("Comment added" in outbox[-1]['Subject'])
         self.assertTrue(draft.name in outbox[-1]['Subject'])
+        self.assertTrue('draft-ietf-mars-test@' in outbox[-1]['To'])
 
         # Make sure we can also do it as IANA
         self.client.login(username="iana", password="iana+password")
@@ -738,7 +740,6 @@ class TemplateTagTest(unittest.TestCase):
         self.assertEqual(failures, 0)
 
 class ReferencesTest(TestCase):
-    perma_fixtures = ['names']
 
     def test_references(self):
         make_test_data()
@@ -781,20 +782,28 @@ expand-draft-ietf-ames-test.all@virtual.ietf.org  ames-author@example.ames, ames
 
 """)
         self.doc_alias_file.close()
+        self.saved_draft_virtual_path = settings.DRAFT_VIRTUAL_PATH
         settings.DRAFT_VIRTUAL_PATH = self.doc_alias_file.name
 
     def tearDown(self):
+        settings.DRAFT_VIRTUAL_PATH = self.saved_draft_virtual_path
         os.unlink(self.doc_alias_file.name)
 
     def testAliases(self):
-        url = urlreverse('ietf.doc.views_doc.email_aliases', kwargs=dict(name="draft-ietf-mars-test"))
+        url = urlreverse('doc_specific_email_aliases', kwargs=dict(name="draft-ietf-mars-test"))
         r = self.client.get(url)
-        self.assertTrue(all([x in r.content for x in ['mars-test@','mars-test.authors@','mars-test.chairs@']]))
-        self.assertFalse(any([x in r.content for x in ['ames-test@','ames-test.authors@','ames-test.chairs@']]))
+        self.assertEqual(r.status_code, 302)
 
         url = urlreverse('ietf.doc.views_doc.email_aliases', kwargs=dict())
         login_testing_unauthorized(self, "plain", url)
         r = self.client.get(url)
+        self.assertEqual(r.status_code, 200)
         self.assertTrue(all([x in r.content for x in ['mars-test@','mars-test.authors@','mars-test.chairs@']]))
         self.assertTrue(all([x in r.content for x in ['ames-test@','ames-test.authors@','ames-test.chairs@']]))
 
+    def testExpansions(self):
+        url = urlreverse('ietf.doc.views_doc.document_email', kwargs=dict(name="draft-ietf-mars-test"))
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue('draft-ietf-mars-test.all@ietf.org' in r.content)
+        self.assertTrue('ballot_saved' in r.content)

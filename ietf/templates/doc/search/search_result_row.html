@@ -15,11 +15,11 @@
     {% if user.is_authenticated %}
       {% if doc.name in doc_is_tracked %}
         <a href="{% url "community_remove_track_document" doc.name %}" class="community-list-add-remove-doc" title="Remove from your personal ID list">
-          <span class="fa fa-bookmark-o"></span>
+          <span class="fa fa-bookmark"></span>
         </a>
       {% else %}
         <a href="{% url "community_add_track_document" doc.name %}" class="community-list-add-remove-doc" title="Add to your personal ID list">
-          <span class="fa fa-bookmark"></span>
+          <span class="fa fa-bookmark-o"></span>
         </a>
       {% endif %}
     {% endif %}
@@ -65,7 +65,7 @@
 
 
     {% if doc.latest_revision_date|timesince_days|new_enough:request %}
-    <wbr><span class="label label-success">New</span>
+    <wbr><span class="label label-success pull-right">New</span>
     {% endif %}
 
     {% if doc.get_state_slug == "active" and doc.expirable and doc.expires|timesince_days|expires_soon:request %}
@@ -87,9 +87,9 @@
   {% if ad_name == None or ad_name != doc.ad.plain_name %}
     <td class="ad">
       {% if doc.ad %}
-        <div><a title="AD" href="mailto:doc.ad.email.address">{{ doc.ad }}</a></div>
+        <a title="AD" href="mailto:{{ doc.ad.email_address|urlencode }}">{{ doc.ad }}</a><br>
       {% endif %}
-      {% if doc.shepherd %}<a title="Shepherd" href="{{doc.shepherd}}"><small class="text-muted">{{doc.shepherd|emailwrap|default:""}}</small></a>{% endif %}
+      {% if doc.shepherd %}<a title="Shepherd" href="mailto:{{doc.shepherd}}"><small class="text-muted">{{doc.shepherd.person.name}}</small></a>{% endif %}
     </td>
   {% else %}
      <td></td>

@@ -48,7 +48,7 @@
 								{% else %} href="{% url template mylist 'title' state %}"
 								{% endif %}>Title</a> |
 								<a 
-								{% if attribute == "coder" %} style="color: #A0A0A0"
+								{% if attribute == "coder__name" %} style="color: #A0A0A0"
 								{% else %} href="{% url template mylist 'coder__name' state %}"
 								{% endif %}>Coder</a> |
 								<a 
@@ -86,24 +86,28 @@
 		                                    	CodeRequest: 	 <a href="{% url 'ietf.codematch.requests.views.show' projectcontainer.id %}">{{ projectcontainer.title }}</a>
 		                                    	{% endif %} 
 		                                    	| Protocol:  	 <a href="#">{{ projectcontainer.protocol }}</a> 
-		                                    	| Area:    	 	 <a href="#">
-		                                    	{% for doc in docs %}	    
-		                                    		{% if doc in projectcontainer.docs.all %}                  		
-							            				{% if not forloop.first %}
-							            				-
-							            				{% endif %}
-							            				<a href="#">{{ doc.document.group.parent.name }}</a>
-						            				{% endif %}
+		                                    	| Area:    	 	 <a href="#">	    
+	                                    		{% for areas, proj in areas_list %}                 
+                                    				{% if proj == projectcontainer %}
+                                    					{% for a in areas %}		
+								            				{% if not forloop.first %}
+		            										-
+	            											{% endif %}	
+							            					<a href="#">{{ a }}</a>
+							            				{% endfor %}
+							            			{% endif %}
 					            				{% endfor %}
 					            				</a>
-		                                    	| Working Group: <a href="#">
-		                                    	{% for doc in docs %}	    
-		                                    		{% if doc in projectcontainer.docs.all %}                  		
-							            				{% if not forloop.first %}
-							            				-
-							            				{% endif %}
-							            				<a href="#">{{ doc.document.group.name }}</a>
-						            				{% endif %}
+		                                    	| Working Group: <a href="#">  
+	                                    		{% for workinggroups, proj in workinggroups_list %}                 
+                                    				{% if proj == projectcontainer %}
+                                    					{% for wg in workinggroups %}
+								            				{% if not forloop.first %}
+		            										-
+	            											{% endif %}		
+							            					<a href="#">{{ wg }}</a>
+							            				{% endfor %}
+							            			{% endif %}
 					            				{% endfor %}
 					            				</a>
 		                                    	</p>

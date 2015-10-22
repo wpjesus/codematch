@@ -21,7 +21,8 @@ ADD_LINKS         = 'add_links'
 ADD_MAILS         = 'add_mails'
 REM_DOCS          = 'rem_docs' 
 REM_TAGS          = 'rem_tags'
-REM_LINKS         = 'rem_links' 
+REM_LINKS         = 'rem_links'
+REM_MAILS         = 'rem_mails' 
 MAINTAIN_STATE    = 'maintain_state' 
 ACTUAL_TEMPLATE   = 'actual_template' 
 PREVIOUS_TEMPLATE = 'previous_template'
@@ -47,6 +48,25 @@ TEMPLATE_MATCHES_SHOW     = "codematch/matches/show.html"
 TEMPLATE_MATCHES_SEARCH   = "codematch/matches/search.html"
 # ACCOUNTS
 TEMPLATE_TOPCODERS        = "codematch/accounts/topcoders.html"
+
+# ----------------------------------------------------------------
+# Localized String
+# ----------------------------------------------------------------
+STRING_TITLE 		= 'title'
+STRING_DESCRIPTION  = 'description'
+STRING_PROTOCOL 	= 'protocol'
+STRING_MENTOR 		= 'mentor'
+STRING_DOCS 		= 'docs'
+STRING_AREA 		= 'area'
+STRING_WORKINGGROUP = 'workinggroup'
+STRING_TAG          = 'tag'
+STRING_LINK         = 'link'
+STRING_SAVE         = 'save'
+STRING_POPULARITY   = 'popularity'
+STRING_TWITTER 		= 'twitter'
+STRING_NONE         = 'None'
+
+ATT_CREATION_DATE   = 'creation_date'
 
 MAIL_TYPES = [
     # core events

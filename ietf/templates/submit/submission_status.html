@@ -1,10 +1,17 @@
 {% extends "submit/submit_base.html" %}
 {# Copyright The IETF Trust 2015, All Rights Reserved #}
 {% load origin %}
+{% load staticfiles %}
 {% load ietf_filters submit_tags %}
 {% load future %}
 
 {% block title %}Submission status of {{ submission.name }}-{{ submission.rev }}{% endblock %}
+
+{% block pagehead %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'select2/select2.css' %}">
+  <link rel="stylesheet" href="{% static 'select2-bootstrap-css/select2-bootstrap.min.css' %}">
+{% endblock %}
 
 {% block submit_content %}
   {% origin %}
@@ -26,7 +33,7 @@
     </p>
   {% endif %}
 
-  {% if submitter_form.errors %}
+  {% if submitter_form.errors or replaces_form.errors %}
     <p class="alert alert-danger">Please fix errors in the form below.</p>
   {% endif %}
 
@@ -83,7 +90,7 @@
       <p>Please make sure that your Internet-Draft includes all of the required meta-data in the proper format.</p>
 
       <p>If your Internet-Draft <b>does</b> include all of the required meta-data in the proper format, and if
-        the error(s) identified above are due to the failure of the tool to extract the meta-data correctly,
+        the error(s) identified below are due to the failure of the tool to extract the meta-data correctly,
         then please use the "Adjust meta-data" button below, which will take you to the "Adjust screen" where
         you can correct the improperly extracted meta-data. You will then be able to submit your Internet-Draft
         to the Secretariat for manual posting.</p>
@@ -203,13 +210,12 @@
   </table>
 
   {% if can_edit %}
-    <p>
-      <form method="post">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="edit">
-        <button class="btn btn-warning" type="submit" value="adjust">Adjust meta-data</button>
-      </form>
-    </p>
+    <p></p>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="edit">
+      <button class="btn btn-warning" type="submit" value="adjust">Adjust meta-data</button>
+    </form>
     <p>Leads to manual post by the secretariat.</p>
 
     {% if passes_idnits and not errors %}
@@ -218,6 +224,7 @@
       <form class="idsubmit" method="post">
         {% csrf_token %}
         {% include "submit/submitter_form.html" %}
+        {% include "submit/replaces_form.html" %}
         <input type="hidden" name="action" value="autopost">
         <button class="btn btn-primary" type="submit">Post submission</button>
       </form>
@@ -243,39 +250,39 @@
         <tr><th>Email address</th><td>{{ submission.submitter_parsed.email }}</td></tr>
       </table>
     {% endif %}
+    {% if submission.replaces %}
+      <h3>Replaced documents</h3>
+      <table class="table table-condensed table-striped">
+        <tr><th>Replaces</th><td>{{ submission.replaces|split:","|join:", "|urlize_ietf_docs }}</td></tr>
+      </table>
+    {% endif %}
   {% endif %}
 
   {% if can_cancel %}
     <h2>Cancel submission</h2>
-    <p>
-      <form id="cancel-submission" method="post">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="cancel">
-        <button class="btn btn-danger" type="submit">Cancel submission</button>
-      </form>
-    </p>
-    <p>Deletes the uploaded file{{ submission.file_types|split:","|pluralize }} permanently.</p>
+    <form id="cancel-submission" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="cancel">
+      <button class="btn btn-danger" type="submit" data-toggle="tooltip" title="Deletes the uploaded file{{ submission.file_types|split:","|pluralize }} permanently.">Cancel submission</button>
+    </form>
   {% endif %}
 
   {% if can_group_approve %}
     <h2>Approve submission</h2>
-    <p>
       <form method="post">
         {% csrf_token %}
         <input type="hidden" name="action" value="approve">
         <button class="btn btn-danger" type="submit">Approve this submission</button>
       </form>
-    </p>
   {% endif %}
 
   {% if can_force_post %}
-    <p>
-      <form method="post">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="forcepost">
-        <button class="btn btn-danger" type="submit">Force post of submission</button>
-      </form>
-    </p>
+    <p></p>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="forcepost">
+      <button class="btn btn-danger" type="submit">Force post of submission</button>
+    </form>
   {% endif %}
 
   {% if show_send_full_url %}
@@ -292,12 +299,11 @@
         button. An email will then be sent to the authors and submitter
         (if submitter email was entered): {{ confirmation_list|join:", " }}.</p>
 
-      <p>
-        <form method="post">{% csrf_token %}
-          <input type="hidden" name="action" value="sendfullurl">
-          <button class="btn btn-danger" type="submit">Request full access URL</button>
-        </form>
-      </p>
+      <p></p>
+      <form method="post">{% csrf_token %}
+        <input type="hidden" name="action" value="sendfullurl">
+        <button class="btn btn-danger" type="submit">Request full access URL</button>
+      </form>
     </div>
   {% endif %}
 
@@ -320,4 +326,9 @@
 
   {% include "submit/problem-reports-footer.html" %}
 
+{% endblock %}
+
+{% block js %}
+  <script src="{% static 'select2/select2.min.js' %}"></script>
+  <script src="{% static 'ietf/js/select2-field.js' %}"></script>
 {% endblock %}

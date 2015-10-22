@@ -1,9 +1,14 @@
 # Copyright The IETF Trust 2007, All Rights Reserved
+import checks                           # pyflakes:ignore
 
-__version__ = "6.0.4"
+# Don't add patch number here:
+__version__ = "6.6.1"
 
-__date__    = "$Date: 2015-06-23 17:03:13 -0300 (Tue, 23 Jun 2015) $"
+# set this to ".p1", ".p2", etc. after patching
+__patch__   = ""                        
 
-__rev__     = "$Rev: 9689 $"
+__date__    = "$Date: 2015-10-19 14:26:42 -0200 (Mon, 19 Oct 2015) $"
 
-__id__      = "$Id: __init__.py 9689 2015-06-23 20:03:13Z henrik@levkowetz.com $"
+__rev__     = "$Rev: 10246 $"
+
+__id__      = "$Id: __init__.py 10246 2015-10-19 16:26:42Z henrik@levkowetz.com $"

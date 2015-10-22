@@ -13,16 +13,20 @@ from django.contrib.auth.decorators import login_required
 from django.template.defaultfilters import pluralize
 from django.contrib import messages
 
-from ietf.doc.models import ( Document, DocAlias, DocRelationshipName, RelatedDocument, State,
+import debug                            # pyflakes:ignore
+
+from ietf.doc.models import ( Document, DocAlias, RelatedDocument, State,
     StateType, DocEvent, ConsensusDocEvent, TelechatDocEvent, WriteupDocEvent, IESG_SUBSTATE_TAGS,
     save_document_in_history )
-from ietf.doc.mails import ( email_ad, email_pulled_from_rfc_queue, email_resurrect_requested,
+from ietf.doc.mails import ( email_pulled_from_rfc_queue, email_resurrect_requested,
     email_resurrection_completed, email_state_changed, email_stream_changed,
     email_stream_state_changed, email_stream_tags_changed, extra_automation_headers,
-    generate_publication_request, html_to_text )
+    generate_publication_request, email_adopted, email_intended_status_changed,
+    email_iesg_processing_document )
 from ietf.doc.utils import ( add_state_change_event, can_adopt_draft,
     get_tags_for_stream_id, nice_consensus,
-    update_reminder, update_telechat, make_notify_changed_event, get_initial_notify )
+    update_reminder, update_telechat, make_notify_changed_event, get_initial_notify,
+    set_replaces_for_document )
 from ietf.doc.lastcall import request_last_call
 from ietf.doc.fields import SearchableDocAliasesField
 from ietf.group.models import Group, Role
@@ -36,6 +40,7 @@ from ietf.person.models import Person, Email
 from ietf.secr.lib.template import jsonapi
 from ietf.utils.mail import send_mail, send_mail_message
 from ietf.utils.textupload import get_cleaned_text_file_content
+from ietf.mailtrigger.utils import gather_address_lists
 
 class ChangeStateForm(forms.Form):
     state = forms.ModelChoiceField(State.objects.filter(used=True, type="draft-iesg"), empty_label=None, required=True)
@@ -108,8 +113,7 @@ def change_state(request, name):
                 doc.time = e.time
                 doc.save()
 
-                email_state_changed(request, doc, msg)
-                email_ad(request, doc, doc.ad, login, msg)
+                email_state_changed(request, doc, msg,'doc_state_edited')
 
 
                 if prev_state and prev_state.slug in ("ann", "rfcqueue") and new_state.slug not in ("rfcqueue", "pub"):
@@ -287,26 +291,6 @@ def doc_ajax_internet_draft(request):
     response = [dict(id=r.id, label=r.name) for r in results]
     return response
 
-def collect_email_addresses(emails, doc):
-    for author in doc.authors.all():
-        if author.address not in emails:
-            emails[author.address] = '"%s"' % (author.person.name)
-    if doc.group.acronym != 'none':
-        for role in doc.group.role_set.filter(name='chair'):
-            if role.email.address not in emails:
-                emails[role.email.address] = '"%s"' % (role.person.name)
-        if doc.group.type.slug == 'wg':
-            address = '%s-ads@tools.ietf.org' % doc.group.acronym
-            if address not in emails:
-                emails[address] = '"%s-ads"' % (doc.group.acronym)
-        elif doc.group.type.slug == 'rg':
-            for role in doc.group.parent.role_set.filter(name='chair'):
-                if role.email.address not in emails:
-                    emails[role.email.address] = '"%s"' % (role.person.name)
-    if doc.shepherd and doc.shepherd.address not in emails:
-        emails[doc.shepherd.address] = u'"%s"' % (doc.shepherd.person.name or "")
-    return emails
-
 class ReplacesForm(forms.Form):
     replaces = SearchableDocAliasesField(required=False)
     comment = forms.CharField(widget=forms.Textarea, required=False)
@@ -333,68 +317,96 @@ def replaces(request, name):
     if not (has_role(request.user, ("Secretariat", "Area Director"))
             or is_authorized_in_doc_stream(request.user, doc)):
         return HttpResponseForbidden("You do not have the necessary permissions to view this page")
-    login = request.user.person
+
     if request.method == 'POST':
         form = ReplacesForm(request.POST, doc=doc)
         if form.is_valid():
             new_replaces = set(form.cleaned_data['replaces'])
             comment = form.cleaned_data['comment'].strip()
             old_replaces = set(doc.related_that_doc("replaces"))
+            by = request.user.person
+
             if new_replaces != old_replaces:
                 save_document_in_history(doc)
-                emails = {}
-                emails = collect_email_addresses(emails, doc)
-                relationship = DocRelationshipName.objects.get(slug='replaces')
-                for d in old_replaces:
-                    if d not in new_replaces:
-                        emails = collect_email_addresses(emails, d.document)
-                        RelatedDocument.objects.filter(source=doc, target=d, relationship=relationship).delete()
-                        if not RelatedDocument.objects.filter(target=d, relationship=relationship):
-                            d.document.set_state(State.objects.get(type='draft',slug='active' if d.document.expires>datetime.datetime.now() else 'expired'))
-                for d in new_replaces:
-                    if d not in old_replaces:
-                        emails = collect_email_addresses(emails, d.document)
-                        RelatedDocument.objects.create(source=doc, target=d, relationship=relationship)
-                        d.document.set_state(State.objects.get(type='draft',slug='repl'))
-                e = DocEvent(doc=doc,by=login,type='changed_document')
-                new_replaces_names = ", ".join([d.name for d in new_replaces])
-                if not new_replaces_names:
-                    new_replaces_names = "None"
-                old_replaces_names = ", ".join([d.name for d in old_replaces])
-                if not old_replaces_names:
-                    old_replaces_names = "None"
-                e.desc = u"This document now replaces <b>%s</b> instead of %s"% (new_replaces_names, old_replaces_names)
-                e.save()
-                email_desc = e.desc.replace(", ", "\n    ")
-                if comment:
-                    c = DocEvent(doc=doc,by=login,type="added_comment")
-                    c.desc = comment
-                    c.save()
-                    email_desc += "\n"+c.desc
-                doc.time = e.time
+                doc.time = datetime.datetime.now()
                 doc.save()
-                email_list = []
-                for key in sorted(emails):
-                    if emails[key]:
-                        email_list.append('%s <%s>' % (emails[key], key))
-                    else:
-                        email_list.append('<%s>' % key)
-                email_string = ", ".join(email_list)
-                send_mail(request, email_string,
-                 "DraftTracker Mail System <iesg-secretary@ietf.org>",
-                 "%s updated by %s" % (doc.name, login),
-                 "doc/mail/change_notice.txt",
-                 dict(text=html_to_text(email_desc),
-                      doc=doc,
-                      url=settings.IDTRACKER_BASE_URL + doc.get_absolute_url()))
+
+                set_replaces_for_document(request, doc, new_replaces, by=by,
+                                          email_subject="%s replacement status updated by %s" % (doc.name, by),
+                                          email_comment=comment)
+
+                if comment:
+                    DocEvent.objects.create(doc=doc, by=by, type="added_comment", desc=comment)
+
             return HttpResponseRedirect(doc.get_absolute_url())
     else:
         form = ReplacesForm(doc=doc)
-    return render_to_response('doc/draft/change_replaces.html',
-                              dict(form=form,
-                                   doc=doc,
-                                   ),
-                              context_instance=RequestContext(request))
+    return render(request, 'doc/draft/change_replaces.html',
+                  dict(form=form,
+                       doc=doc,
+                   ))
+
+class SuggestedReplacesForm(forms.Form):
+    replaces = forms.ModelMultipleChoiceField(queryset=DocAlias.objects.all(),
+                                              label="Suggestions", required=False, widget=forms.CheckboxSelectMultiple,
+                                              help_text="Select only the documents that are replaced by this document")
+    comment = forms.CharField(label="Optional comment", widget=forms.Textarea, required=False)
+
+    def __init__(self, suggested, *args, **kwargs):
+        super(SuggestedReplacesForm, self).__init__(*args, **kwargs)
+        pks = [d.pk for d in suggested]
+        self.fields["replaces"].initial = pks
+        self.fields["replaces"].queryset = self.fields["replaces"].queryset.filter(pk__in=pks)
+        self.fields["replaces"].choices = [(d.pk, d.name) for d in suggested]
+
+def review_possibly_replaces(request, name):
+    doc = get_object_or_404(Document, docalias__name=name)
+    if doc.type_id != 'draft':
+        raise Http404
+    if not (has_role(request.user, ("Secretariat", "Area Director"))
+            or is_authorized_in_doc_stream(request.user, doc)):
+        return HttpResponseForbidden("You do not have the necessary permissions to view this page")
+
+    suggested = list(doc.related_that_doc("possibly-replaces"))
+    if not suggested:
+        raise Http404
+
+    if request.method == 'POST':
+        form = SuggestedReplacesForm(suggested, request.POST)
+        if form.is_valid():
+            replaces = set(form.cleaned_data['replaces'])
+            old_replaces = set(doc.related_that_doc("replaces"))
+            new_replaces = old_replaces.union(replaces)
+
+            comment = form.cleaned_data['comment'].strip()
+            by = request.user.person
+
+            save_document_in_history(doc)
+            doc.time = datetime.datetime.now()
+            doc.save()
+
+            # all suggestions reviewed, so get rid of them
+            DocEvent.objects.create(doc=doc, by=by, type="reviewed_suggested_replaces",
+                                    desc="Reviewed suggested replacement relationships: %s" % ", ".join(d.name for d in suggested))
+            RelatedDocument.objects.filter(source=doc, target__in=suggested,relationship__slug='possibly-replaces').delete()
+
+            if new_replaces != old_replaces:
+                set_replaces_for_document(request, doc, new_replaces, by=by,
+                                          email_subject="%s replacement status updated by %s" % (doc.name, by),
+                                          email_comment=comment)
+
+            if comment:
+                DocEvent.objects.create(doc=doc, by=by, type="added_comment", desc=comment)
+
+            return HttpResponseRedirect(doc.get_absolute_url())
+    else:
+        form = SuggestedReplacesForm(suggested)
+
+    return render(request, 'doc/draft/review_possibly_replaces.html',
+                  dict(form=form,
+                       doc=doc,
+                   ))
+
 
 class ChangeIntentionForm(forms.Form):
     intended_std_level = forms.ModelChoiceField(IntendedStdLevelName.objects.filter(used=True), empty_label="(None)", required=True, label="Intended RFC status")
@@ -440,7 +452,7 @@ def change_intention(request, name):
                 doc.time = e.time
                 doc.save()
 
-                email_ad(request, doc, doc.ad, login, email_desc)
+                email_intended_status_changed(request, doc, email_desc)
 
             return HttpResponseRedirect(doc.get_absolute_url())
 
@@ -572,10 +584,11 @@ def to_iesg(request,name):
 
             doc.save()
 
+            addrs= gather_address_lists('pubreq_iesg',doc=doc)
             extra = {}
-            extra['Cc'] = "%s-chairs@tools.ietf.org, iesg-secretary@ietf.org, %s" % (doc.group.acronym,doc.notify)
+            extra['Cc'] = addrs.as_strings().cc
             send_mail(request=request,
-                      to = doc.ad.email_address(),
+                      to = addrs.to,
                       frm = login.formatted_email(),
                       subject = "Publication has been requested for %s-%s" % (doc.name,doc.rev),
                       template = "doc/submit_to_iesg_email.txt",
@@ -659,8 +672,6 @@ def edit_info(request, name):
                 e.desc = "IESG process started in state <b>%s</b>" % doc.get_state("draft-iesg").name
                 e.save()
                     
-            orig_ad = doc.ad
-
             changes = []
 
             def desc(attr, new, old):
@@ -710,13 +721,14 @@ def edit_info(request, name):
                 e.type = "changed_document"
                 e.save()
 
+            # Todo - chase this
             update_telechat(request, doc, login,
                             r['telechat_date'], r['returning_item'])
 
             doc.time = datetime.datetime.now()
 
-            if changes and not new_document:
-                email_ad(request, doc, orig_ad, login, "\n".join(changes))
+            if changes:
+                email_iesg_processing_document(request, doc, changes)
                 
             doc.save()
             return HttpResponseRedirect(doc.get_absolute_url())
@@ -1123,7 +1135,7 @@ def request_publication(request, name):
 
     m = Message()
     m.frm = request.user.person.formatted_email()
-    m.to = "RFC Editor <rfc-editor@rfc-editor.org>"
+    (m.to, m.cc) = gather_address_lists('pubreq_rfced',doc=doc)
     m.by = request.user.person
 
     next_state = State.objects.get(used=True, type="draft-stream-%s" % doc.stream.slug, slug="rfc-edit")
@@ -1153,7 +1165,7 @@ def request_publication(request, name):
             send_mail_message(request, m)
 
             # IANA copy
-            m.to = settings.IANA_APPROVE_EMAIL
+            (m.to, m.cc) = gather_address_lists('pubreq_rfced_iana',doc=doc)
             send_mail_message(request, m, extra=extra_automation_headers(doc))
 
             e = DocEvent(doc=doc, type="requested_publication", by=request.user.person)
@@ -1289,7 +1301,7 @@ def adopt_draft(request, name):
 
                 update_reminder(doc, "stream-s", e, due_date)
 
-                email_stream_state_changed(request, doc, prev_state, new_state, by, comment)
+                email_adopted(request, doc, prev_state, new_state, by, comment)
 
             # comment
             if comment:

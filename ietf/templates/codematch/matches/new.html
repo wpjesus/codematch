@@ -78,24 +78,43 @@
 									</div>
 								</div>
 								{% else %}
-								<div class="form-group">
-									<label class="control-label col-xs-2">Project title:</label>
-									<div class="col-xs-4">
-										{{ projform.title }}
+									<div class="form-group">
+										<label class="control-label col-xs-2">Project title:</label>
+										<div class="col-xs-4">
+											{{ projform.title }}
+										</div>
 									</div>
-								</div>
-								<div class="form-group">
-									<label class="control-label col-xs-2">Protocol:</label>
-									<div class="col-xs-4">
-										{{ projform.protocol}}
+									<div class="form-group">
+										<label class="control-label col-xs-2">Protocol:</label>
+										<div class="col-xs-4">
+											{{ projform.protocol}}
+										</div>
 									</div>
-								</div>
-								<div class="form-group">
-									<label class="control-label col-xs-2">Description:</label>
-									<div class="col-xs-4">
-										{{ projform.description }}
+									<div class="form-group">
+										<label class="control-label col-xs-2">Description:</label>
+										<div class="col-xs-4">
+											{{ projform.description }}
+										</div>
 									</div>
-								</div>
+									<div>
+										{% if docs %}
+				            				<h4><strong>Documents</strong></h4>
+											{% for doc in docs %}
+												{{ doc.document.group }}: <a  href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
+												<a class="label label-info" href="{% url 'ietf.codematch.requests.views.remove_document' projectcontainer.id doc.name %}" >delete</a>
+												<br />
+											{% endfor %}
+										{% endif %}
+										<br />
+									</div>
+									{% if canadddocuments %}
+										{{ docform }}
+										{% csrf_token %}
+										<input type="submit" value="Add related Document" />
+									{% endif %}
+										
+									<br />
+									<br />
 								{% endif %}
 								<hr />
 								<div class="form-group">
@@ -110,66 +129,62 @@
 										{{ codeform.additional_information }}
 									</div>
 								</div>
-								{% if user.is_authenticated %}
-								<form action="{% url 'ietf.codematch.matches.views.new' pk %}" method="post">
-								<div>
-									{% if links %}
-										<h4><strong>Implementations</strong></h4>
-										{% for implementation in links %}
-											<a href="{{ implementation }}">{{ implementation }}</a>
-											<a class="label label-info" href="{% url 'ietf.codematch.matches.views.remove_link' 0 implementation.link %}" >delete</a>
-										<br />
-										{% endfor %}
-										<br />
-									{% endif %}
-									{% if user.is_authenticated and canaddlinks %}
-        								<div class="form-group">
+									{% if user.is_authenticated %}
+									<form action="{% url 'ietf.codematch.matches.views.new' pk %}" method="post">
+									<div>
+										{% if links %}
+											<h4><strong>Implementations</strong></h4>
+											{% for implementation in links %}
+												<a href="{{ implementation }}">{{ implementation }}</a>
+												<a class="label label-info" href="{% url 'ietf.codematch.matches.views.remove_link' 0 implementation.link %}" >delete</a>
+											<br />
+											{% endfor %}
+											<br />
+										{% endif %}
+										{% if user.is_authenticated and canaddlinks %}
 											<label class="control-label col-xs-2">URL:</label>
-											<div class="col-xs-4">
-												{{ linkform.link }}
-											</div>
-										</div>
-                                        {% csrf_token %}
-                                        <input type="submit" value="Add implementation" />
-                                    {% endif %}
-								</div>
-								
-								<br />
-								
-								<div>
-									{% if tags %}
-		            					<h4><strong>Tags</strong></h4> 
-		            					{% for tag in tags %}
-				            				{% if not forloop.first %}
-		            						,
-		            						{% endif %}
-		            						<a>#{{ tag }}</a>
-		            					{% endfor %}
-		            					<br />	
-		            				{% endif %}
-		            				<div>
-									<br />
-									{% if user.is_authenticated and canaddtags %}
-										<label>Tag:</label>
-										{{ tagform.name }}
-										{% csrf_token %}
-										<input type="submit" name="tag" value="Add new Tag" />
-									{% endif %}
+											{{ linkform.link }}
+	                                        {% csrf_token %}
+	                                        <input type="submit" value="Add implementation" />
+	                                    {% endif %}
 									</div>
-								</div>
-								</form>
-								{% endif %}
+									
+									<br />
 								
-								<br />
+									<div>
+										{% if tags %}
+			            					<h4><strong>Tags</strong></h4> 
+			            					{% for tag in tags %}
+					            				{% if not forloop.first %}
+			            						,
+			            						{% endif %}
+			            						<a>#{{ tag }}</a>
+			            					{% endfor %}
+			            					<br />	
+			            				{% endif %}
+			            				<div>
+										<br />
+										{% if user.is_authenticated and canaddtags %}
+											<label class="control-label col-xs-2">Tag:</label>
+											{{ tagform.name }}
+											{% csrf_token %}
+											<input type="submit" name="tag" value="Add new Tag" />
+										{% endif %}
+										</div>
+									</div>
+									</form>
+									{% endif %}
+									
+									<br />
 								
-						   		<div class="widget-foot">
-                                <p class="buttonlist">
-                                	<div class="col-xs-offset-1" style="margin-left: 0px">
-								    	<input type="submit" name="save" class="btn btn-primary" value="Submit" />
-											<a class="btn btn-default" href="{% url 'ietf.codematch.views.back' %}">Cancel</a>
-                                	</div>
-                                </p>
-                            	</div>
+							   		<div class="widget-foot">
+	                                <p class="buttonlist">
+	                                	<div class="col-xs-offset-1" style="margin-left: 0px">
+									    	<input type="submit" name="save" class="btn btn-primary" value="Submit" />
+												<a class="btn btn-default" href="{% url 'ietf.codematch.views.back' %}">Cancel</a>
+	                                	</div>
+	                                </p>
+	                            	</div>
 								</div>
 							</form>
                         </div>

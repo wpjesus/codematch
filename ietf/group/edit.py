@@ -21,7 +21,7 @@ from ietf.group.utils import get_group_or_404
 from ietf.ietfauth.utils import has_role
 from ietf.person.fields import SearchableEmailsField
 from ietf.person.models import Person, Email
-from ietf.group.mails import email_iesg_secretary_re_charter, email_iesg_secretary_personnel_change
+from ietf.group.mails import ( email_admin_re_charter, email_personnel_change)
 from ietf.utils.ordereddict import insert_after_in_ordered_dict
 
 MAX_GROUP_DELEGATES = 3
@@ -31,7 +31,7 @@ class GroupForm(forms.Form):
     acronym = forms.CharField(max_length=10, label="Acronym", required=True)
     state = forms.ModelChoiceField(GroupStateName.objects.all(), label="State", required=True)
     chairs = SearchableEmailsField(label="Chairs", required=False, only_users=True)
-    secretaries = SearchableEmailsField(label="Secretarias", required=False, only_users=True)
+    secretaries = SearchableEmailsField(label="Secretaries", required=False, only_users=True)
     techadv = SearchableEmailsField(label="Technical Advisors", required=False, only_users=True)
     delegates = SearchableEmailsField(label="Delegates", required=False, only_users=True, max_entries=MAX_GROUP_DELEGATES,
                                       help_text=mark_safe("Chairs can delegate the authority to update the state of group documents - at most %s persons at a given time." % MAX_GROUP_DELEGATES))
@@ -166,13 +166,28 @@ def get_or_create_initial_charter(group, group_type):
     return charter
 
 @login_required
-def submit_initial_charter(request, group_type, acronym=None):
-    if not can_manage_group_type(request.user, group_type):
-        return HttpResponseForbidden("You don't have permission to access this view")
+def submit_initial_charter(request, group_type=None, acronym=None):
+
+    # This needs refactoring.
+    # The signature assumed you could have groups with the same name, but with different types, which we do not allow.
+    # Consequently, this can be called with an existing group acronym and a type 
+    # that doesn't match the existing group type. The code below essentially ignores the group_type argument.
+    #
+    # If possible, the use of get_or_create_initial_charter should be moved
+    # directly into charter_submit, and this function should go away.
+
+    if acronym==None:
+        raise Http404
 
     group = get_object_or_404(Group, acronym=acronym)
     if not group.features.has_chartering_process:
         raise Http404
+
+    # This is where we start ignoring the passed in group_type
+    group_type = group.type_id
+
+    if not can_manage_group_type(request.user, group_type):
+        return HttpResponseForbidden("You don't have permission to access this view")
 
     if not group.charter:
         group.charter = get_or_create_initial_charter(group, group_type)
@@ -254,6 +269,7 @@ def edit(request, group_type=None, acronym=None, action="edit"):
             diff('list_archive', "Mailing list archive")
 
             personnel_change_text=""
+            changed_personnel = set()
             # update roles
             for attr, slug, title in [('ad','ad','Shepherding AD'), ('chairs', 'chair', "Chairs"), ('secretaries', 'secr', "Secretaries"), ('techadv', 'techadv', "Tech Advisors"), ('delegates', 'delegate', "Delegates")]:
                 new = clean[attr]
@@ -275,9 +291,10 @@ def edit(request, group_type=None, acronym=None, action="edit"):
                     if deleted:
                         change_text=title + ' deleted: ' + ", ".join(x.formatted_email() for x in deleted)
                         personnel_change_text+=change_text+"\n"
+                    changed_personnel.update(set(old)^set(new))
 
             if personnel_change_text!="":
-                email_iesg_secretary_personnel_change(request, group, personnel_change_text)
+                email_personnel_change(request, group, personnel_change_text, changed_personnel)
 
             # update urls
             new_urls = clean['urls']
@@ -355,7 +372,7 @@ def conclude(request, acronym, group_type=None):
         if form.is_valid():
             instructions = form.cleaned_data['instructions']
 
-            email_iesg_secretary_re_charter(request, group, "Request closing of group", instructions)
+            email_admin_re_charter(request, group, "Request closing of group", instructions, 'group_closure_requested')
 
             e = GroupEvent(group=group, by=request.user.person)
             e.type = "requested_close"

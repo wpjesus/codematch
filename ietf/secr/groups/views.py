@@ -45,6 +45,7 @@ def add_legacy_fields(group):
     group.techadvisors = group.role_set.filter(name="techadv")
     group.editors = group.role_set.filter(name="editor")
     group.secretaries = group.role_set.filter(name="secr")
+    group.liaison_contacts = group.liaisonstatementgroupcontacts_set.first()
 
     #fill_in_charter_info(group)
 
@@ -125,17 +126,17 @@ def add(request):
 @role_required('Secretariat')
 def blue_dot(request):
     '''
-    This is a report view.  It returns a text/plain listing of chairs for active and bof groups.
+    This is a report view.  It returns a text/plain listing of working group chairs.
     '''
     people = Person.objects.filter(role__name__slug='chair',
                                    role__group__type='wg',
-                                   role__group__state__slug__in=('active','bof')).distinct()
+                                   role__group__state__slug__in=('active','bof','proposed')).distinct()
     chairs = []
     for person in people:
         parts = person.name_parts()
         groups = [ r.group.acronym for r in person.role_set.filter(name__slug='chair',
                                                                    group__type='wg',
-                                                                   group__state__slug__in=('active','bof')) ]
+                                                                   group__state__slug__in=('active','bof','proposed')) ]
         entry = {'name':'%s, %s' % (parts[3], parts[1]),
                  'groups': ', '.join(groups)}
         chairs.append(entry)

@@ -30,8 +30,11 @@ from django.conf import settings
 
 import debug                            
 
-def show_list(request, type_list="all", att="creation_date", state=""):
-    """ List all CodeRequests """
+def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state=""):
+    """ List all CodeRequests 
+		type_list (all = All CodeRequests / mylist = CodeRequests I've Created / mentoring = CodeRequests i'm mentoring)
+		att = List will be sorted by this attribute (eg. if creation_date then ordered by date)
+		state = if the state is true then the project_containers has been previously loaded (eg. Loaded from the search) """
     
     user = get_user(request)
     
@@ -50,40 +53,40 @@ def show_list(request, type_list="all", att="creation_date", state=""):
                 raise Http404
             project_containers = ProjectContainer.objects.exclude(code_request__isnull=True).filter(code_request__mentor=user)
         else:
-            # TODO: Allow sorting by different parameters (for others templates too)
             # Exclude ProjectContainers that don't have an associated CodeRequest (TODO: Centralize this?)
             project_containers = ProjectContainer.objects.exclude(code_request__isnull=True)
     
-    if att == 'popularity': # TODO: Fix this
+    if att == constants.STRING_POPULARITY:
         project_containers = project_containers.annotate(count=Count('codings')).order_by('-count')[:20]
     else:
         project_containers = project_containers.order_by(att)[:20]
             
     list_of_lists = []
     
-    dict = {'protocol':'protocol', 'docs__document__group__name':'working_group', 'docs__document__group__parent__name':'area'}
+	# Attributes that should grouping
+    dict = {'protocol':constants.STRING_PROTOCOL, 'docs__document__group__name':constants.STRING_WORKINGGROUP, 'docs__document__group__parent__name':constants.STRING_AREA}
     
+	# If the attribute is in the dictionary then should do the sorting and grouping for this attribute
     if att in dict:
-        select = list(set(project_containers.values_list(att, flat=True)))
-        print select
+        select = list(set(project_containers.values_list(att, flat=True))) # Get all values for this attribute (eg. protocol: OSPF, RIP, NewProtocol) 
         for s in select:
             newlist = []
             val = dict[att]
             for p in project_containers:
-                if att == 'protocol':
-                    prop = getattr(p, val)
+                if att == constants.STRING_PROTOCOL:
+                    prop = getattr(p, val) # Get Protocol name
                 else:
                     prop = None
                     for d in p.docs.all():
-                        if val == 'working_group':
-                            prop = d.document.group.name
+                        if val == constants.STRING_WORKINGGROUP:
+                            prop = d.document.group.name # Get working group name
                         else:
-                            prop = d.document.group.parent.name
+                            prop = d.document.group.parent.name # Get area name
                 if prop != None and p not in newlist and prop == s:
                     newlist.append(p)
             if len(newlist) > 0:
                 list_of_lists.append((newlist,s))
-    else:
+    else: # Just show all CodeRequests in order
         for p in project_containers:
             newlist = []
             newlist.append(p)
@@ -99,59 +102,46 @@ def show_list(request, type_list="all", att="creation_date", state=""):
     }) 
 
 def search(request, type_list="all"):
-    """ Shows the list of projects, filtering by some query (title, protocol or mentor) """
+    """ Shows the list of CodeProjects, filtering according to the selected checkboxes """
     
     search_type = request.GET.get("submit")
     if search_type:
-    
-        # get query field
-        query = ''
-        if request.GET.get(search_type):
-            query = request.GET.get(search_type)
-        
-        if query:
-                    
-            user = None
-            ids = []
-            
-            # TODO: Localize strings
-            if request.GET.get('title'):
-                ids += ProjectContainer.objects.filter(title__icontains=query).values_list('id', flat=True)
-           
-            if request.GET.get('description'):
-                ids += ProjectContainer.objects.filter(description__icontains=query).values_list('id', flat=True)
-                
-            if request.GET.get('protocol'):
-                ids += ProjectContainer.objects.filter(protocol__icontains=query).values_list('id', flat=True)
-            
-            if request.GET.get('mentor'):
-                ids += ProjectContainer.objects.filter(code_request__mentor__name__icontains=query).values_list('id', flat=True)
-                        
-            if request.GET.get('docs'):
-                ids += ProjectContainer.objects.filter(docs__name__icontains=query).values_list('id', flat=True)
-                        
-            if request.GET.get('area'):
-                ids += ProjectContainer.objects.filter(docs__document__group__parent__name__icontains=query).values_list('id', flat=True)
-                        
-            if request.GET.get('workinggroup'):
-                ids += ProjectContainer.objects.filter(docs__document__group__name__icontains=query).values_list('id', flat=True)         
-                        
-            project_containers = ProjectContainer.objects.filter(id__in=list(set(ids)))
-                        
-            user = get_user(request)
-            
-            request.session[constants.ALL_PROJECTS] = project_containers
-            
-            request.session[constants.MAINTAIN_STATE] = True
-            
-            return HttpResponseRedirect(settings.CODEMATCH_PREFIX + '/codematch/requests/show_list/' + type_list + '/creation_date/' +'True')
-            
-        else:
-            return HttpResponseRedirect(request.path)
-    
+       
+    	ids = []
+       
+    	if request.GET.get(constants.STRING_TITLE):
+    		ids += ProjectContainer.objects.filter(title__icontains=query).values_list('id', flat=True)
+       
+    	if request.GET.get(constants.STRING_DESCRIPTION):
+    		ids += ProjectContainer.objects.filter(description__icontains=query).values_list('id', flat=True)
+    		
+    	if request.GET.get(constants.STRING_PROTOCOL):
+    		ids += ProjectContainer.objects.filter(protocol__icontains=query).values_list('id', flat=True)
+    	
+    	if request.GET.get(constants.STRING_MENTOR):
+    		ids += ProjectContainer.objects.filter(code_request__mentor__name__icontains=query).values_list('id', flat=True)
+    				
+    	if request.GET.get(constants.STRING_DOCS):
+    		ids += ProjectContainer.objects.filter(docs__name__icontains=query).values_list('id', flat=True)
+    				
+    	if request.GET.get(constants.STRING_AREA):
+    		ids += ProjectContainer.objects.filter(docs__document__group__parent__name__icontains=query).values_list('id', flat=True)
+    				
+    	if request.GET.get(constants.STRING_WORKINGGROUP):
+    		ids += ProjectContainer.objects.filter(docs__document__group__name__icontains=query).values_list('id', flat=True)         
+    	
+    	project_containers = ProjectContainer.objects.filter(id__in=list(set(ids)))
+    				
+    	user = get_user(request)
+    	
+    	request.session[constants.ALL_PROJECTS] = project_containers
+    	
+    	request.session[constants.MAINTAIN_STATE] = True
+    	
+    	return HttpResponseRedirect(settings.CODEMATCH_PREFIX + '/codematch/requests/show_list/' + type_list + '/creation_date/' +'True')
     else:
         return render_page(request, constants.TEMPLATE_REQUESTS_SEARCH, {
-			"form" : SearchForm() 
+    		"form" : SearchForm() 
         })
 
 def show(request, pk):
@@ -175,9 +165,9 @@ def show(request, pk):
             areas.append(working_group) 
     
     if not areas:
-        areas = ["None"]
+        areas = [constants.STRING_NONE]
     if not working_groups:
-        working_groups = ["None"]
+        working_groups = [constants.STRING_NONE]
 
     return render_page(request, constants.TEMPLATE_REQUESTS_SHOW, {
 		'projectcontainer': project_container,
@@ -188,8 +178,8 @@ def show(request, pk):
 
 def save_project(request, template, project_container=None):
     ''' Used to create or update a CodeRequest.
-    When project container is null then a new 
-    instance is created in the database'''
+		When project container is null then a new 
+		instance is created in the database '''
 
     # NOTE: Is slow 'cause of the mentors list (?)
 	
@@ -205,7 +195,7 @@ def save_project(request, template, project_container=None):
     
 	# If not there in the current session then should be setted a default
     proj_form = request.session[constants.PROJECT_INSTANCE] if constants.PROJECT_INSTANCE in request.session else ProjectContainerForm()
-    req_form = request.session[constants.REQUEST_INSTANCE] if constants.REQUEST_INSTANCE in request.session else CodeRequestForm()
+    req_form  = request.session[constants.REQUEST_INSTANCE] if constants.REQUEST_INSTANCE in request.session else CodeRequestForm()
     mail_form = request.session[constants.MAIL_INSTANCE] if constants.MAIL_INSTANCE in request.session else MailForm()
     
     docs  = request.session[constants.ADD_DOCS]
@@ -220,15 +210,15 @@ def save_project(request, template, project_container=None):
     if request.method == 'POST':
         
         doc_name = request.POST.get("doc")
-        tag = TagForm(request.POST)
+        tag 	 = TagForm(request.POST)
         new_mail = MailForm(request.POST)
         
         if project_container != None:
             new_proj = ProjectContainerForm(request.POST, instance=project_container)
-            new_req = CodeRequestForm(request.POST, instance=project_container.code_request)
+            new_req  = CodeRequestForm(request.POST, instance=project_container.code_request)
         else:
             new_proj = ProjectContainerForm(request.POST)
-            new_req = CodeRequestForm(request.POST)
+            new_req  = CodeRequestForm(request.POST)
 
         # Adding document to the documents list to be saved in the project
         if doc_name:
@@ -245,7 +235,7 @@ def save_project(request, template, project_container=None):
         # Adding new mail to the mailing list to be saved in the project
         elif new_mail.is_valid():
             m = new_mail.save(commit=False)
-            if m.type == 'Twitter': # TODO: Padronize for this and others
+            if m.type.lower() == constants.STRING_TWITTER: # TODO: Padronize for all
                 m.mail = '@' + m.mail 
             mails.append(m)
 		
@@ -259,32 +249,40 @@ def save_project(request, template, project_container=None):
             project.code_request = code_request  # Linking CodeRequest to Project
             project.save()
             
-            modify = False
+            modified = False
             
-            rem_docs = request.session[constants.REM_DOCS]
-            rem_tags = request.session[constants.REM_TAGS]
+            rem_docs  = request.session[constants.REM_DOCS]
+            rem_tags  = request.session[constants.REM_TAGS]
+            rem_mails = request.session[constants.REM_MAILS]
             
             for doc in rem_docs:
                 project.docs.remove(doc)
-                modify = True
+                modified = True
                 
             for tag in rem_tags:
                 project.tags.remove(tags)
-                modify = True
+                modified = True
+                
+            for m in rem_mails:
+                project.mails.remove(m)
+                modified = True
             
             for doc in docs:
                 project.docs.add(doc)
-                modify = True
+                modified = True
             
-            for mail in mails:
+            for m in mails:
                 try:
-                    new_m = ProjectMail.objects.get(mail=mail.mail, type=mail.type)
+					# Trying get an existing mail
+					# TODO: Rename fields 'mail'
+                    new_m = ProjectMail.objects.get(mail=m.mail, type=m.type)
                 except:
-                    mail.save()
-                    new_m = mail
+					# Otherwise you need to create a new mail
+                    m.save()
+                    new_m = m
                     
                 project.mails.add(new_m)
-                modify = True
+                modified = True
             
             for tag in tags:
                 try:
@@ -297,9 +295,9 @@ def save_project(request, template, project_container=None):
             
                 # Save the tag in the project (existing or new)
                 project.tags.add(new_tag)		
-                modify = True	
+                modified = True	
             
-            if modify:
+            if modified:
                 project.save()
 
             return HttpResponseRedirect(settings.CODEMATCH_PREFIX + '/codematch/requests/' + str(project.id))
@@ -309,7 +307,7 @@ def save_project(request, template, project_container=None):
         request.session[constants.REQUEST_INSTANCE] = new_req
         
         proj_form = new_proj
-        req_form = new_req
+        req_form  = new_req
     
     return render_page(request, template, {
         'projectcontainer' : project_container,
@@ -334,10 +332,14 @@ def edit(request, pk):
     
     if request.path != request.session[constants.ACTUAL_TEMPLATE]:
         clear_session(request)
-        request.session[constants.REM_DOCS] = []
-        request.session[constants.REM_TAGS] = []
+        request.session[constants.REM_DOCS]  = []
+        request.session[constants.REM_MAILS] = []
+        request.session[constants.REM_TAGS]  = []
     
     request.session[constants.MAINTAIN_STATE] = True
+	
+	# Fills session variables with project values already saved
+	
     if constants.ADD_DOCS not in request.session:
         docs = project_container.docs.all()
         request.session[constants.ADD_DOCS] = list(docs)
@@ -353,7 +355,7 @@ def edit(request, pk):
     user = get_user(request)
     # Project must have been created by the current user and
 	# User must have permission to add new CodeRequest
-    #if project_container.owner != user or is_user_allowed(user, "caneditrequest"):
+    # if project_container.owner != user or is_user_allowed(user, "caneditrequest"):
     #    raise Http404
     
 	# Save project and code request in the cache to make 'update' and 'new' use the same code (save_project)
@@ -368,18 +370,44 @@ def new(request):
     
     if request.path != request.session[constants.ACTUAL_TEMPLATE]:
         clear_session(request)
-        request.session[constants.REM_DOCS] = []
-        request.session[constants.REM_TAGS] = []
+        request.session[constants.REM_DOCS]  = []
+        request.session[constants.REM_TAGS]  = []
+        request.session[constants.REM_MAILS] = []
         request.session[constants.ADD_MAILS] = []
-        request.session[constants.ADD_DOCS] = []
-        request.session[constants.ADD_TAGS] = []
+        request.session[constants.ADD_DOCS]  = []
+        request.session[constants.ADD_TAGS]  = []
     
     request.session[constants.MAINTAIN_STATE] = True
 
     return save_project(request, constants.TEMPLATE_REQUESTS_NEW)
 
 @login_required(login_url = settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
+def remove_mail(request, pk, mail_name):
+    ''' Adds the removal list, but will only be removed when saving changes
+        pk (pk = 0 - new ProjectContainer / pk > 0 - edit ProjectContainer '''
+    
+    refresh_template = request.session[constants.ACTUAL_TEMPLATE]
+    
+    mails = request.session[constants.ADD_MAILS]
+    mail = next(el for el in mails if el.mail == mail_name)
+    
+    if pk != "0":
+        project_container = get_object_or_404(ProjectContainer, id=pk)
+        
+        if project_container.mails.filter(mail=mail_name):
+            cache_list = request.session[constants.REM_MAILS]
+            cache_list.append(mail)
+            
+    mails.remove(mail)
+    request.session[constants.ADD_MAILS] = mails
+    
+    # TODO: Centralize this?
+    return HttpResponseRedirect(refresh_template)
+
+@login_required(login_url = settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def remove_document(request, pk, doc_name):
+    ''' Adds the removal list, but will only be removed when saving changes
+    	pk (pk = 0 - new ProjectContainer / pk > 0 - edit ProjectContainer '''
     
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
     
@@ -395,11 +423,14 @@ def remove_document(request, pk, doc_name):
             
     docs.remove(document)
     request.session[constants.ADD_DOCS] = docs
-        
+    
+    # TODO: Centralize this?
     return HttpResponseRedirect(refresh_template)
     
 @login_required(login_url = settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def remove_tag(request, pk, tag_name):
+    ''' Adds the removal list, but will only be removed when saving changes
+    	pk (0 = new ProjectContainer / 0 >= edit ProjectContainer '''
     
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
     
@@ -415,6 +446,6 @@ def remove_tag(request, pk, tag_name):
     
     tags.remove(tag)
     request.session[constants.ADD_TAGS] = tags
-        
+    
+    # TODO: Centralize this?
     return HttpResponseRedirect(refresh_template)
-

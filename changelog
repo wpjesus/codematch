@@ -1,3 +1,422 @@
+ietfdb (6.6.1) ietf; urgency=low
+
+  This is a combined bugfix and feature maintenance release:
+
+  * Updated the code to use version 4.0.1 of coverage.py for code coverage
+    measurements.  Moved the code which starts coverage measurements to
+    settings_sqlitetest.py to avoid coverage measurements running when not
+    doing tests. Did some additional coveage measurement refactoring.
+
+  * Changed to use a gzipped release coverage JSON file, instead of a plain 
+    JSON file, if the name given in settings.py ends in .gz.  Reduces the 
+    current release coverage file size from ~1.6MB to ~200kB.  This is a 
+    preparation for saving more information in the release coverage file than 
+    we currently do.
+
+  * Merged in [10220] from rjsparks@nostrum.com:
+    Preserve linefeeds (using class pasted) when viewing nomcom feedback
+    messages.  
+
+  * Merged in [10219] from rjsparks@nostrum.com:
+    Recognize and remove duplicate addresses while gathering. Fixes bug 
+    #1815.  
+
+  * Removed support for perma_fixtures, using the global test fixtures 
+    instead.
+
+  * Merged in [10218] from rjsparks@nostrum.com:
+    Fixed an initialization problem for the new work message for recharters.  
+
+  * Merged in [10206] from rcross@amsl.com:
+    Cleaned up bluesheets upload page.  Added display of uploaded files.   
+
+ -- Henrik Levkowetz <henrik@levkowetz.com>  19 Oct 2015 16:26:34 +0000
+
+
+ietfdb (6.6.0) ietf; urgency=low
+
+  **Mail Sending Triggers**
+
+  This release improves visibility into where and when the datatracker
+  sends email. It makes where the datatracker sends email for a given
+  action data driven, and it shows where email will be sent for actions
+  on documents and groups by adding an 'Email Expansions' tab to group
+  and document pages, which shows which email sending triggers exist.
+
+  * Merged in [10186] from rjsparks@nostrum.com:
+    This release improves visibility into where and when the datatracker
+    sends email. It makes where the datatracker sends email for a given
+    action data driven, and it shows where email will be sent for actions
+    on documents and groups.
+
+ -- Henrik Levkowetz <henrik@levkowetz.com>  14 Oct 2015 19:09:29 +0000
+
+
+ietfdb (6.5.1) ietf; urgency=low
+
+  This is a minor bugfix release to clear the way for the coming email
+  triggers release:
+
+  * Merged in [10159] from rcross@amsl.com:
+    Improve secretariat rolodex roles section, sort and identify concluded 
+    groups.   
+
+  * Merged in [10156] from rcross@amsl.com:
+    Adjust audio file glob pattern.   
+
+  * Added custom style to fix a problem with the navbar search field width 
+    on iPads.
+
+  * Fixed incorrect case of some urls in the ptsans stylesheet.
+
+  * Tweaked the mkrelease verbose output.
+
+ -- Henrik Levkowetz <henrik@levkowetz.com>  13 Oct 2015 16:53:54 +0000
+
+ietfdb (6.5.0) ietf; urgency=medium
+
+  **Liaison tool rewrite**
+
+  This release merges in work from rcross@amsl.com and esanchez@yaco.es which
+  provides a major rewrite of the IETF datatracker liaison support.  It
+  introduces a simplified user interface, new improved and reworked data
+  models, liaison statement history, improved handling of liaison-related
+  emails in many ways, generalisations of liaison sender and recipient
+  handling, making the tool much more flexible, improved search, status
+  overview and attachment handling, and a greatly expanded test coverage.
+
+  This work was funded by the IAOC.  The statement of work is available here:
+  http://iaoc.ietf.org/documents/liaison-sow-04.pdf
+
+ -- Henrik Levkowetz <henrik@levkowetz.com>  10 Oct 2015 09:54:56 +0000
+
+
+ietfdb (6.4.2) ietf; urgency=medium
+
+  This is a bugfix release, with details as follows:
+
+  * Merged in [10144] from rcross@amsl.com:
+    Make email address formatting consistent.   
+
+  * Adjusted numerous document action button colours as requested by the 
+    secretariat.  Fixes issue #1803
+
+  * Provided a bit more information in rfc-editor sync warnings.
+
+  * Added an eyecatching symbol to indicate bug-reporting, starting out very 
+    large, with the intention of reducing the size as people get used to it.
+
+  * Fixed an html issue in the agenda template, and added information to be 
+    shown when no WG/RG groups have been scheduled, and the agenda session 
+    customization table is empty.
+
+  * Tweaked the anchor ids for agenda timeslots to avoid identical ids for 
+    different slots.
+
+  * Added information about which the required submission upload format 
+    alternatives are (.txt or .xml).
+
+  * Tweaked the error message for 2 submission form validation errors.
+
+  * Changed the default settings for the test crawler from ietf.settings to 
+    ietf.settings_testcrawl.
+
+  * In [10079], the inline template was inadvertently changed from unicode 
+    to ascii, which breaks a number of pages.  Fixed this.
+
+  * Merged in [10115] from rjsparks@nostrum.com:
+    Remove an extraneous field from the form that lets the nomcom chair paste
+    in a questionnaire response.  
+
+  * Merged in [10109] from rjsparks@nostrum.com:
+    Make it clearer in search results when one IPR disclosure updates another.
+    Fixes #1798.  
+
+  * Fixed a typo in the meeting agenda template.  Fixes issue #1793.
+
+  * Do utf-8 encoding of the fields in the JSON blob for meeting sessions.
+    Fixes issue #1790
+
+  * Merged in [10079] from rcross@amsl.com:
+    Fixed message formatting in IPR event history.   
+
+  * Merged in [10078] from rcross@amsl.com:
+    Resolved issue where partially entered IPR related document info causes
+    500 error.  
+
+  * Added a menu item linking to the session request tool.  Fixes issue #1789.
+
+  * Made some submission form validation errors apply to all uploads, not 
+    only to .txt uploads.  Tweaked som validation error wordings.
+
+  * Merged in [10062] from olau@iola.dk:
+    Fixed a problem with timeslot.location = None in agenda_csv. 
+
+  * Added branch/iola to places checked for 'ready for merge' tags in the 
+    commit messages.
+
+
+ -- Henrik Levkowetz <henrik@levkowetz.com>  08 Oct 2015 19:40:04 +0000
+
+
+
+ietfdb (6.4.1) ietf; urgency=medium
+
+  This is a minor release with various enhancements and bugfixes:
+
+  * Merged in [10026] from rcross@amsl.com:
+    Fixed an issue with the select2-field.js path in templates.   
+
+  * Merged in [10004] from rjsparks@nostrum.com:
+    Return new forms instead of validated forms for nomcom nominations and 
+    feedback. Fixes #1703.  
+
+  * Merged in [9996] from olau@iola.dk:
+    Fixed missing save button when deleting milestones. Fixes #1762. 
+
+  * Merged in [10002] from rjsparks@nostrum.com:
+    Added a checkbox to the nomination form to indicate permission to nomcom 
+    to share the nominator's name with the nominee.  
+
+  * Added a migration for the Nomination.share_nominator field.
+
+  * Merged in [9989] from rjsparks@nostrum.com:
+    Restored the color bands to the email-alias page.  
+
+  * Merged in [9966],[9967],[9968],[9969] from lars@netapp.com:
+    Fixed HTML errors.
+
+  * Fixed the day-of-week agenda links to not pull the agenda up so high 
+    that the start of the day is obscured by the top navbar.
+
+  * Merged in [9669] from olau@iola.dk:
+    Makede the meeting agenda code use the historic info available for groups.
+    In the process, added some select_related/prefetch_related code to cut the
+    number of database queries in the agenda down from 4000-5000 to about 50.
+    Rewritten agenda CSV code to use Python arrays rather than a template for
+    improved readability/reuse. Rewritten week view to assemble its data in
+    Python. Plus a few other minor cleanups, e.g. lame_description is now
+    gone.  Fixes #1088.
+
+  * Added a very simple html version of the json API, to make it easier to 
+    explore the api manually.
+
+  * Makede the selenium tests work with statifiles.
+
+  * Improved the verification of submitted file extensions and mimetype.
+
+ -- Henrik Levkowetz <henrik@levkowetz.com>  23 Aug 2015 19:41:24 +0000
+
+
+ietfdb (6.4.0) ietf; urgency=medium
+
+  **Serve static assets via CDN**
+
+  This release adds support for serving static files through a CDN, rather
+  than having them served by the datatracker webserver.  This will both
+  offload the datatracker webserver and speed up retrieval of static files.
+
+  By default, all external static assets (such as jquery, bootstrap,
+  font-awesome, qunit, select2) are served via CDN, while the datatracker's
+  own static files are not.  It is expected that the more stable datatracker
+  static files will be migrated to be served via CDN also, over time.
+
+  This release also adds support for easy update of external javascript, font,
+  and css libraries by means of a new management command "bower_install" which
+  makes use of the "bower" package manager.  Use of this management command
+  requires that bower be installed on the development platform.  
+
+  When deploying this and following releases, a new action is needed in order
+  to make the appropriate static content available for serving via CDN:
+
+  After checking out the release, before creating the symlink to the new release
+  in the datatracker deployment directory, it is now also necessary to run
+  the "collectstatic" action::
+
+    $ ietf/manage.py collectstatic
+
+  A note about that has been added to the README file in the datatracker
+  deployment directory.
+
+ -- Henrik Levkowetz <henrik@levkowetz.com>  06 Aug 2015 18:34:36 +0000
+
+
+ietfdb (6.3.0) ietf; urgency=medium
+
+  **Active area, directorate, team, and area group pages**
+
+  This release provides new group overview pages for active areas, area
+  groups, teams, and directorates.  It also improves the error reporting when
+  drafts are submitted with invalid XML, providing line numbers and specifics
+  for the issues found.  Additionally, there are a few bug fixes.
+
+  * Merged in [9924] from rjsparks@nostrum.com:
+    Added views of active areas, area groups, teams, and directorates.  Added
+    navigation to those views to the base menus.  Unified the URL patterns
+    shared between group/urls and group/urls_info, exposing the same view at,
+    e.g., /group/stir and /wg/stir/.  Improved testing, primarily of
+    group/info.py 
+
+  * Merged in [9901] from rcross@amsl.com:
+    Fixed matching audio file names with rooms.   
+
+  * Provided a document's rfc number (if any) as part of the document fields 
+    exposed in the json api.
+
+  * Changed the code for meta-data extraction from xml files to not break 
+    if a sought-after element is missing.
+
+  * Updated the meta-data error message to say 'errors ... below' instead of
+    'errors ... above', to match the relative placement of text and error
+    indications.
+
+  * Improved the error reporting for invalid xml file submissions.
+
+  * Improved the handling of failed xml2rfc conversions when no txt document
+    is submitted.
+
+ -- Henrik Levkowetz <henrik@levkowetz.com>  01 Aug 2015 14:52:37 +0000
+
+
+ietfdb (6.2.0) ietf; urgency=medium
+
+  **XML-Only Draft Submission**
+
+  This release adds draft submission metadata extraction from xml files, if
+  they are made part of a draft submission, and it permits submission of only
+  draft XML files without an accompanying text file, as long as conversion of the
+  submitted XML to text format succeeds.  The release also contains numerous
+  style, text and bug fixes from Lars Eggert, and improvements to the ability to
+  accept draft replacement information at drafts submission time.
+
+  * Merged in [9875] from rjsparks@nostrum.com:
+    Improved the form validation for the submission replaces form. Commit
+    ready for merge.
+
+  * Merged in [9862] from rjsparks@nostrum.com:
+    Ignore suggestions that a draft replaces itself.  
+
+  * Merged in [9849] from lars@netapp.com:
+    Made nav title capitalization consistent with other text.  Consistently
+    add arrows for tabs that navigate away from the site. Shorten some text. 
+
+  * Merged in [9857] from lars@netapp.com:
+    Applied more of the styling from the current meta tables.  
+
+  * Merged in [9856] from lars@netapp.com:
+    Styled the metadata tables for groups, documents, etc. like Henrik 
+    prefers. 
+
+  * Merged in [9855] from lars@netapp.com:
+    Fixed bugs in adding/removing documents to personal ID list. 
+
+  * Merged in [9852] from lars@netapp.com:
+    Fixed display of AD and shepherd names, and also fix the respective 
+    mailto: links. 
+
+  * Merged in [9851] from lars@netapp.com:
+    Fixed the logic, so that if there are no matches and we don't want a warning
+    saying that, there is also no empty table being produced. 
+
+  * Merged in [9850] from lars@netapp.com:
+    Moved state length notification after RFC Editor status (looks better). 
+
+  * Merged in support of xml-source only drafts submissions from 
+    personal/henrik/submitxml/.
+
+  * Merged in [9843] from lars@netapp.com:
+    Converted two remaining protocol-relative URLs to https.  
+
+ -- Henrik Levkowetz <henrik@levkowetz.com>  25 Jul 2015 16:32:25 +0000
+
+
+ietfdb (6.1.0) ietf; urgency=medium
+
+  **IETF 93 Code Sprint**
+
+  This release contains the datatracker bugfixes and enhancements from the
+  IETF-93 Code Sprint.  It contains a lot of HTML validity fixes which
+  makes our HTML even cleaner, fixes a number of issues, and introduces
+  support for providing information about draft replacements at draft
+  submissions time.  Many thanks to everyone who contributed!
+
+  * Merged in Ole's submit-time draft replacement information work, as 
+    tested and updated by Robert and Adam.
+
+  * Added escaping of changelist content for the /release/ pages.
+
+  * Merged in [9821] from rcross@amsl.com:
+    Allow Secretariat to submit drafts during blackout period.  Fixes #1755.  
+
+  * Merged in [9813] from rjsparks@nostrum.com:
+    Added navigation to the new secretariat agenda tools. Changed the buttons 
+    at the top of the agenda.html page to links.
+
+  * Merged in [9812] from suresh.krishnan@ericsson.com:
+    Added code to inform ADs, chairs and delegates of WG personnel changes.
+    Fixes #1310.
+
+  * Merged in [9809] from lars@netapp.com:
+    Added some whitespace to make wrapping AD names in ballots a bit easier to
+    read. 
+
+  * Merged in [9806] from lars@netapp.com:
+    Fixed a longstanging formatting issue with the ballot popup.  
+
+  * Merged in [9803] from lars@netapp.com:
+    Converted a few more URLs from http to https.  
+
+  * Reverted some look-and-feel changes that came in with recent document
+    metadata html and python refactoring, which undid fixes related to issues
+    #1659 and #1663.
+
+  * Merged in [9802] from bartosz.balazinski@interdigital.com:
+    Fixed references (relative to absolute) in template
+    ietf/templates/group/active_areas.html, fixed build failure on unused
+    import in file 0006_auto_20150718_0509.py, 
+
+  * Merged in [9733], [9735], [9737], [9738], [9766], [9774], [9778], [9781],
+    [9783], [9784], [9789] and [9800] from lars@netapp.com: Fixed a bunch of
+    HTML validation issues identified by test-crawl --validator-nu. 
+
+  * Merged in [9796] from suresh.krishnan@ericsson.com:
+    Don't allow submission for drafts that have been replaced. Fixed #1619. 
+
+  * Merged in [9792] from jmh@joelhalpern.com:
+    Removed misleading back buttons from document metadata modification pages.
+    Fixes #1671.  
+
+  * Merged in [9788] from rcross@amsl.com:
+    Have RFC sync change the IESG state of draft to RFC Ed Queue when draft 
+    appears in queue.  Fixes #1750.   
+
+  * Merged in [9782] from lars@netapp.com:
+    Made title capitalization consistent with other pages.  
+
+  * Merged in [9779] from lars@netapp.com:
+    Removed the code that used to calculate table_rows, now that the HTML
+    doesn't use it anymore.  
+
+  * Merged in [9775] from rcross@amsl.com:
+    Added proposed groups to Blue Dot Report.  Fixes #1747.   
+
+  * Merged in [9765] from lars@netapp.com:
+    Added option to crawl as a logged-in user (--user).
+    Add --pedantic option for vnu crawl, which stops the crawl on (most) errors.
+    Randomized the order in which URLs are crawled, so that repeated crawls don't
+    hit the same URLs in the same order. 
+
+  * Merged in [9736] from lars@netapp.com:
+    Updated the README now that the facelift has happened, and removed the
+    outdated TODO.  
+
+  * Merged in [9726] from lars@netapp.com:
+    Added HTML5 validation based on validator.nu to test-crawl, with the
+    --validator-nu option.
+
+ -- Henrik Levkowetz <henrik@levkowetz.com>  21 Jul 2015 10:13:10 +0000
+
+
 ietfdb (6.0.4) ietf; urgency=medium
 
   This is a minor release which provides some style tweaks, the ability to
@@ -367,8 +786,8 @@ ietfdb (5.13.1) ietf; urgency=medium
   * Fixed style attributes which resulted in red text on red background for
     some error messages
 
-  * Buildbot changes: Separated out the schedulers for trunk, personal/ * and
-    branch/ *.  Corrected regex patterns which extract unittest details.  Added
+  * Buildbot changes: Separated out the schedulers for trunk, personal/\*and
+    branch/\*.  Corrected regex patterns which extract unittest details.  Added
     a first tentative email notifier.  Added ForceSchedulers, in order to be
     able to force builds.
 

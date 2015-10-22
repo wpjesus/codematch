@@ -124,6 +124,7 @@
 				            				<h4><strong>Mails</strong></h4>
 											{% for mail in mails %}
 												{{ mail.type }}: <a  href="#"> {{ mail.mail }} </a>
+												<a class="label label-info" href="{% url 'ietf.codematch.requests.views.remove_mail' projectcontainer.id mail.mail %}" >delete</a>
 												<br />
 											{% endfor %}
 										{% endif %}

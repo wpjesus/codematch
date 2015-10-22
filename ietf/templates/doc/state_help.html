@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {# Copyright The IETF Trust 2015, All Rights Reserved #}
 {% load origin %}
-
+{% load staticfiles %}
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
@@ -9,7 +9,7 @@
   <h1>{{ title }}</h1>
 
   {% if state_type.slug == "draft-iesg" %}
-    <p><a class="btn btn-default" href="/images/iesg-draft-state-diagram.png">View diagram</a></p>
+    <p><a class="btn btn-default" href="{% static 'ietf/images/iesg-draft-state-diagram.png' %}">View diagram</a></p>
   {% endif %}
 
   <table class="table table-condensed table-striped">
@@ -22,7 +22,7 @@
     </thead>
     <tbody>
       {% for state in states %}
-        <tr class="anchor-target" id="{{ state.slug }}">
+        <tr class="anchor-target" id="{{ state.slug|default:"idexists" }}">
           <th>{{ state.name }}</th>
           <td>{{ state.desc|safe|linebreaksbr }}</td>
           {% if has_next_states %}

@@ -6,6 +6,12 @@
 
 {% load submit_tags %}
 
+{% block pagehead %}
+  {{ block.super }}
+  <link rel="stylesheet" href="/css/lib/select2.css">
+  <link rel="stylesheet" href="/css/lib/select2-bootstrap.css">
+{% endblock %}
+
 {% block title %}Adjust meta-data of submitted {{ submission.name }}{% endblock %}
 
 {% block submit_content %}
@@ -62,13 +68,14 @@
     </div>
   {% endif %}
 
-  <form class="idsubmit" role="form" method="post">
+  <form class="idsubmit" method="post">
     {% csrf_token %}
 
     {% bootstrap_form edit_form %}
 
     <h3>Submitter</h3>
     {% include "submit/submitter_form.html" %}
+    {% include "submit/replaces_form.html" %}
 
     {% for form in author_forms %}
       <div {% if forloop.last %}id="cloner"{% endif %}>
@@ -87,4 +94,9 @@
   <p>
     {% include "submit/problem-reports-footer.html" %}
   </p>
+{% endblock %}
+
+{% block js %}
+  <script src="/js/lib/select2-3.5.2.min.js"></script>
+  <script src="/js/select2-field.js"></script>
 {% endblock %}

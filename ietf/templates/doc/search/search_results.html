@@ -1,10 +1,10 @@
 {# Copyright The IETF Trust 2015, All Rights Reserved #}{% load origin %}{% origin %}
 {% load ietf_filters %}
 
-{% if not docs and not skip_no_matches_warning %}
-  <div class="alert alert-info">
-    No documents match your query.
-  </div>
+{% if not docs %}
+  {% if not skip_no_matches_warning %}
+    <div class="alert alert-info">No documents match your query.</div>
+  {% endif %}
 {% else %}
 
   {% if meta.max %}
@@ -16,11 +16,7 @@
   <table class="table table-condensed table-striped">
     <thead>
       <tr>
-        <th>
-	  {% if show_add_to_list and user.is_authenticated %}
-	    <span class="fa fa-bookmark"></span>
-	  {% endif %}
-        </th>
+        <th></th>
 
         {% for h in meta.headers %}
           {% if h.title != "Title" %}

@@ -16,7 +16,7 @@
   <h1>Documents on future IESG telechat agendas</h1>
 
   {% if user|has_role:"Secretariat" %}
-    <form role="form" class="form-inline" method="post">
+    <form class="form-inline" method="post">
       {% csrf_token %}
   {% endif %}
 
@@ -45,12 +45,7 @@
         <table class="table table-condensed table-striped ietf">
           <thead>
             <tr>
-	      <th>
-	        {% if show_add_to_list and user.is_authenticated %}
-	          <span class="fa fa-bookmark"></span>
-	        {% endif %}
-	      </th>
-
+	      <th></th>
 	      <th>Document</th>
 	      <th>Date</th>
 	      <th>Status</th>

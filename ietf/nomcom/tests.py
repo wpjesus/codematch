@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 import debug                            # pyflakes:ignore
 
 from ietf.utils.test_utils import login_testing_unauthorized, TestCase
-from ietf.utils.mail import outbox
+from ietf.utils.mail import outbox, empty_outbox
 
 from ietf.person.models import Email, Person
 from ietf.group.models import Group
@@ -41,8 +41,6 @@ def get_cert_files():
 
 class NomcomViewsTest(TestCase):
     """Tests to create a new nomcom"""
-    # See ietf.utils.test_utils.TestCase for the use of perma_fixtures vs. fixtures
-    perma_fixtures = ['nomcom_templates']
 
     def check_url_status(self, url, status):
         response = self.client.get(url)
@@ -466,19 +464,60 @@ class NomcomViewsTest(TestCase):
 
     def test_public_nominate(self):
         login_testing_unauthorized(self, COMMUNITY_USER, self.public_nominate_url)
-        return self.nominate_view(public=True)
-        self.client.logout()
+
+        messages_before = len(outbox)
+
+        self.nominate_view(public=True,confirmation=True)
+
+        self.assertEqual(len(outbox), messages_before + 4)
+
+        self.assertTrue('New person' in outbox[-4]['Subject'])
+        self.assertTrue('nomcomchair' in outbox[-4]['To'])
+        self.assertTrue('secretariat' in outbox[-4]['To'])
+
+        self.assertEqual('IETF Nomination Information', outbox[-3]['Subject'])
+        self.assertTrue('nominee' in outbox[-3]['To'])
+
+        self.assertEqual('Nomination Information', outbox[-2]['Subject'])
+        self.assertTrue('nomcomchair' in outbox[-2]['To'])
+
+        self.assertEqual('Nomination receipt', outbox[-1]['Subject'])
+        self.assertTrue('plain' in outbox[-1]['To'])
+        self.assertTrue(u'Comments with accents äöå' in unicode(outbox[-1].get_payload(decode=True),"utf-8","replace"))
+
+        # Nominate the same person for the same position again without asking for confirmation 
+
+        messages_before = len(outbox)
+
+        self.nominate_view(public=True)
+        self.assertEqual(len(outbox), messages_before + 1)
+        self.assertEqual('Nomination Information', outbox[-1]['Subject'])
+        self.assertTrue('nomcomchair' in outbox[-1]['To'])
 
     def test_private_nominate(self):
         self.access_member_url(self.private_nominate_url)
         return self.nominate_view(public=False)
         self.client.logout()
 
+    def test_public_nominate_with_automatic_questionnaire(self):
+        nomcom = get_nomcom_by_year(self.year)
+        nomcom.send_questionnaire = True
+        nomcom.save()
+        login_testing_unauthorized(self, COMMUNITY_USER, self.public_nominate_url)
+        empty_outbox()
+        self.nominate_view(public=True)
+        self.assertEqual(len(outbox), 4)
+        # test_public_nominate checks the other messages
+        self.assertTrue('Questionnaire' in outbox[2]['Subject'])
+        self.assertTrue('nominee@' in outbox[2]['To'])
+
+
     def nominate_view(self, *args, **kwargs):
         public = kwargs.pop('public', True)
         nominee_email = kwargs.pop('nominee_email', u'nominee@example.com')
         nominator_email = kwargs.pop('nominator_email', "%s%s" % (COMMUNITY_USER, EMAIL_DOMAIN))
         position_name = kwargs.pop('position', 'IAOC')
+        confirmation = kwargs.pop('confirmation', False)
 
         if public:
             nominate_url = self.public_nominate_url
@@ -511,7 +550,8 @@ class NomcomViewsTest(TestCase):
                      'candidate_email': candidate_email,
                      'candidate_phone': candidate_phone,
                      'position': position.id,
-                     'comments': comments}
+                     'comments': comments,
+                     'confirmation': confirmation}
         if not public:
             test_data['nominator_email'] = nominator_email
 
@@ -599,8 +639,20 @@ class NomcomViewsTest(TestCase):
 
     def test_public_feedback(self):
         login_testing_unauthorized(self, COMMUNITY_USER, self.public_feedback_url)
-        return self.feedback_view(public=True)
-        self.client.logout()
+
+        empty_outbox()
+        self.feedback_view(public=True,confirmation=True)
+        # feedback_view does a nomination internally: there is a lot of email related to that - tested elsewhere
+        # We're interested in the confirmation receipt here
+        self.assertEqual(len(outbox),4)
+        self.assertEqual('NomCom comment confirmation', outbox[3]['Subject'])
+        self.assertTrue('plain' in outbox[3]['To'])
+        self.assertTrue(u'Comments with accents äöå' in unicode(outbox[3].get_payload(decode=True),"utf-8","replace"))
+
+        empty_outbox()
+        self.feedback_view(public=True)
+        self.assertEqual(len(outbox),1)
+        self.assertFalse('confirmation' in outbox[0]['Subject'])
 
     def test_private_feedback(self):
         self.access_member_url(self.private_feedback_url)
@@ -612,6 +664,7 @@ class NomcomViewsTest(TestCase):
         nominee_email = kwargs.pop('nominee_email', u'nominee@example.com')
         nominator_email = kwargs.pop('nominator_email', "%s%s" % (COMMUNITY_USER, EMAIL_DOMAIN))
         position_name = kwargs.pop('position', 'IAOC')
+        confirmation = kwargs.pop('confirmation', False)
 
         self.nominate_view(public=public,
                            nominee_email=nominee_email,
@@ -645,7 +698,8 @@ class NomcomViewsTest(TestCase):
         test_data = {'comments': comments,
                      'position_name': position.name,
                      'nominee_name': nominee.email.person.name,
-                     'nominee_email': nominee.email.address}
+                     'nominee_email': nominee.email.address,
+                     'confirmation': confirmation}
 
         if public:
             test_data['nominator_email'] = nominator_email
@@ -689,8 +743,6 @@ class NomcomViewsTest(TestCase):
 
 class NomineePositionStateSaveTest(TestCase):
     """Tests for the NomineePosition save override method"""
-    # See ietf.utils.test_utils.TestCase for the use of perma_fixtures vs. fixtures
-    perma_fixtures = ['nomcom_templates']
 
     def setUp(self):
         self.nomcom_public_keys_dir = os.path.abspath("tmp-nomcom-public-keys-dir")
@@ -730,7 +782,6 @@ class NomineePositionStateSaveTest(TestCase):
 
 
 class FeedbackTest(TestCase):
-    perma_fixtures = ['nomcom_templates']
 
     def setUp(self):
         self.nomcom_public_keys_dir = os.path.abspath("tmp-nomcom-public-keys-dir")
@@ -767,7 +818,6 @@ class FeedbackTest(TestCase):
         self.assertEqual(check_comments(feedback.comments, comments, self.privatekey_file), True)
 
 class ReminderTest(TestCase):
-    perma_fixtures = ['nomcom_templates']
 
     def setUp(self):
         self.nomcom_public_keys_dir = os.path.abspath("tmp-nomcom-public-keys-dir")
@@ -854,6 +904,8 @@ class ReminderTest(TestCase):
         response = self.client.post(url, test_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(outbox), messages_before + 2)
+        self.assertTrue('nominee1@' in outbox[-2]['To'])
+        self.assertTrue('nominee2@' in outbox[-1]['To'])
 
     def test_remind_questionnaire_view(self):
         url = reverse('nomcom_send_reminder_mail', kwargs={'year': NOMCOM_YEAR,'type':'questionnaire'})
@@ -863,4 +915,5 @@ class ReminderTest(TestCase):
         response = self.client.post(url, test_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(outbox), messages_before + 1)
+        self.assertTrue('nominee1@' in outbox[-1]['To'])
 

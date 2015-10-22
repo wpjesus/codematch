@@ -295,6 +295,17 @@
 },
 {
  "fields": {
+  "order": 0,
+  "revname": "Possibly Replaced By",
+  "used": true,
+  "name": "Possibly Replaces",
+  "desc": ""
+ },
+ "model": "name.docrelationshipname",
+ "pk": "possibly-replaces"
+},
+{
+ "fields": {
   "order": 3,
   "revname": "Possibly Referenced By",
   "used": true,
@@ -1483,6 +1494,96 @@
  "fields": {
   "order": 1,
   "used": true,
+  "name": "Submitted",
+  "desc": ""
+ },
+ "model": "name.liaisonstatementeventtypename",
+ "pk": "submitted"
+},
+{
+ "fields": {
+  "order": 2,
+  "used": true,
+  "name": "Modified",
+  "desc": ""
+ },
+ "model": "name.liaisonstatementeventtypename",
+ "pk": "modified"
+},
+{
+ "fields": {
+  "order": 3,
+  "used": true,
+  "name": "Approved",
+  "desc": ""
+ },
+ "model": "name.liaisonstatementeventtypename",
+ "pk": "approved"
+},
+{
+ "fields": {
+  "order": 4,
+  "used": true,
+  "name": "Posted",
+  "desc": ""
+ },
+ "model": "name.liaisonstatementeventtypename",
+ "pk": "posted"
+},
+{
+ "fields": {
+  "order": 5,
+  "used": true,
+  "name": "Killed",
+  "desc": ""
+ },
+ "model": "name.liaisonstatementeventtypename",
+ "pk": "killed"
+},
+{
+ "fields": {
+  "order": 6,
+  "used": true,
+  "name": "Resurrected",
+  "desc": ""
+ },
+ "model": "name.liaisonstatementeventtypename",
+ "pk": "resurrected"
+},
+{
+ "fields": {
+  "order": 7,
+  "used": true,
+  "name": "MsgIn",
+  "desc": ""
+ },
+ "model": "name.liaisonstatementeventtypename",
+ "pk": "msgin"
+},
+{
+ "fields": {
+  "order": 8,
+  "used": true,
+  "name": "MsgOut",
+  "desc": ""
+ },
+ "model": "name.liaisonstatementeventtypename",
+ "pk": "msgout"
+},
+{
+ "fields": {
+  "order": 9,
+  "used": true,
+  "name": "Comment",
+  "desc": ""
+ },
+ "model": "name.liaisonstatementeventtypename",
+ "pk": "comment"
+},
+{
+ "fields": {
+  "order": 1,
+  "used": true,
   "name": "For action",
   "desc": ""
  },
@@ -1518,6 +1619,66 @@
  },
  "model": "name.liaisonstatementpurposename",
  "pk": "response"
+},
+{
+ "fields": {
+  "order": 1,
+  "used": true,
+  "name": "Pending",
+  "desc": ""
+ },
+ "model": "name.liaisonstatementstate",
+ "pk": "pending"
+},
+{
+ "fields": {
+  "order": 2,
+  "used": true,
+  "name": "Approved",
+  "desc": ""
+ },
+ "model": "name.liaisonstatementstate",
+ "pk": "approved"
+},
+{
+ "fields": {
+  "order": 3,
+  "used": true,
+  "name": "Posted",
+  "desc": ""
+ },
+ "model": "name.liaisonstatementstate",
+ "pk": "posted"
+},
+{
+ "fields": {
+  "order": 4,
+  "used": true,
+  "name": "Dead",
+  "desc": ""
+ },
+ "model": "name.liaisonstatementstate",
+ "pk": "dead"
+},
+{
+ "fields": {
+  "order": 1,
+  "used": true,
+  "name": "Action Required",
+  "desc": ""
+ },
+ "model": "name.liaisonstatementtagname",
+ "pk": "required"
+},
+{
+ "fields": {
+  "order": 2,
+  "used": true,
+  "name": "Action Taken",
+  "desc": ""
+ },
+ "model": "name.liaisonstatementtagname",
+ "pk": "taken"
 },
 {
  "fields": {
@@ -4315,5 +4476,1453 @@
  },
  "model": "doc.ballottype",
  "pk": 3
+},
+{
+ "fields": {
+  "template": "{{commenter}}",
+  "desc": "The person providing a comment to nomcom"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "commenter"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The steering group (e.g. IRSG) of a document being reviewed for IETF stream conflicts"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "conflict_review_steering_group"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The stream manager of a document being reviewed for IETF stream conflicts"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "conflict_review_stream_manager"
+},
+{
+ "fields": {
+  "template": "{% if doc.ad %}<{{doc.ad.email_address}}>{% endif %}",
+  "desc": "The document's responsible Area Director"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "doc_ad"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The authors of the subject documents of a conflict-review or status-change"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "doc_affecteddoc_authors"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The chairs of groups of the subject documents of a conflict-review or status-change"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "doc_affecteddoc_group_chairs"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The notify field of the subject documents of a conflict-review or status-change"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "doc_affecteddoc_notify"
+},
+{
+ "fields": {
+  "template": "{% if doc.type_id == \"draft\" %}<{{doc.name}}@ietf.org>{% endif %}",
+  "desc": "The document's authors"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "doc_authors"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "Any ADs holding an active DISCUSS position on a given document"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "doc_discussing_ads"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The document's group chairs (if the document is assigned to a working or research group)"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "doc_group_chairs"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The document's group delegates (if the document is assigned to a working or research group)"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "doc_group_delegates"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The list address of the document's group"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "doc_group_mail_list"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The document's group's responsible AD(s) or IRTF chair"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "doc_group_responsible_directors"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "Leadership for a document that has a new IPR disclosure"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "doc_ipr_group_or_ad"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The document's stream manager if the document is not in the IETF stream"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "doc_non_ietf_stream_manager"
+},
+{
+ "fields": {
+  "template": "{{doc.notify}}",
+  "desc": "The addresses in the document's notify field"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "doc_notify"
+},
+{
+ "fields": {
+  "template": "{% if doc.shepherd %}<{{doc.shepherd.address}}>{% endif %}",
+  "desc": "The document's shepherd"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "doc_shepherd"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The manager of the document's stream"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "doc_stream_manager"
+},
+{
+ "fields": {
+  "template": "{% if group and group.acronym %}<{{group.acronym}}-chairs@ietf.org>{% endif %}",
+  "desc": "The group's chairs"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "group_chairs"
+},
+{
+ "fields": {
+  "template": "{{ changed_personnel | join:\", \" }}",
+  "desc": "Any personnel who were added or deleted when a group's personnel changes"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "group_changed_personnel"
+},
+{
+ "fields": {
+  "template": "{% if group.list_email %}<{{ group.list_email }}>{% endif %}",
+  "desc": "The group's mailing list"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "group_mail_list"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The group's responsible AD(s) or IRTF chair"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "group_responsible_directors"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The group's steering group (IESG or IRSG)"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "group_steering_group"
+},
+{
+ "fields": {
+  "template": "The IAB <iab@iab.org>",
+  "desc": "The IAB"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "iab"
+},
+{
+ "fields": {
+  "template": "<iana@iana.org>",
+  "desc": "IANA"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "iana"
+},
+{
+ "fields": {
+  "template": "IANA <drafts-approval@icann.org>",
+  "desc": "IANA's draft approval address"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "iana_approve"
+},
+{
+ "fields": {
+  "template": "IANA <drafts-eval@icann.org>",
+  "desc": "IANA's draft evaluation address"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "iana_eval"
+},
+{
+ "fields": {
+  "template": "IANA <drafts-lastcall@icann.org>",
+  "desc": "IANA's draft last call address"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "iana_last_call"
+},
+{
+ "fields": {
+  "template": "The IESG <iesg@ietf.org>",
+  "desc": "The IESG"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "iesg"
+},
+{
+ "fields": {
+  "template": "<iesg-secretary@ietf.org>",
+  "desc": "The Secretariat"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "iesg_secretary"
+},
+{
+ "fields": {
+  "template": "IETF-Announce <ietf-announce@ietf.org>",
+  "desc": "The IETF Announce list"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "ietf_announce"
+},
+{
+ "fields": {
+  "template": "<ietf-secretariat-reply@ietf.org>",
+  "desc": "The Secretariat"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "ietf_secretariat"
+},
+{
+ "fields": {
+  "template": "<internet-drafts@ietf.org>",
+  "desc": "The internet drafts ticketing system"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "internet_draft_requests"
+},
+{
+ "fields": {
+  "template": "ipr-announce@ietf.org",
+  "desc": "The IETF IPR announce list"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "ipr_announce"
+},
+{
+ "fields": {
+  "template": "<ietf-ipr@ietf.org>",
+  "desc": "The ipr disclosure handling system"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "ipr_requests"
+},
+{
+ "fields": {
+  "template": "{% if ipr.submitter_email %}{{ ipr.submitter_email }}{% endif %}",
+  "desc": "The submitter of an IPR disclosure"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "ipr_submitter"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The submitter (or ietf participant if the submitter is not available) of all IPR disclosures updated directly by this disclosure, without recursing to what the updated disclosures might have updated."
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "ipr_updatedipr_contacts"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The holders of all IPR disclosures updated by disclosure and disclosures updated by those and so on."
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "ipr_updatedipr_holders"
+},
+{
+ "fields": {
+  "template": "{{liaison.approver_emails|join:\", \"}}",
+  "desc": "The set of people who can approve this liasion statemetns"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "liaison_approvers"
+},
+{
+ "fields": {
+  "template": "{{liaison.cc_contacts}}",
+  "desc": "The addresses captured in the Cc field of the liaison statement form"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "liaison_cc"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The assigned liaison manager for an external group "
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "liaison_manager"
+},
+{
+ "fields": {
+  "template": "{{liaison.response_contacts}}",
+  "desc": "The addresses captured in the response contact field of the liaison statement form"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "liaison_response_contacts"
+},
+{
+ "fields": {
+  "template": "{{liaison.technical_contacts}}",
+  "desc": "The addresses captured in the technical contact field of the liaison statement form"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "liaison_technical_contacts"
+},
+{
+ "fields": {
+  "template": "{{liaison.to_contacts}}",
+  "desc": "The addresses captured in the To field of the liaison statement form"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "liaison_to_contacts"
+},
+{
+ "fields": {
+  "template": "{% if person and person.email_address %}<{{ person.email_address }}>{% endif %}",
+  "desc": "The person currently logged into the datatracker who initiated a given action"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "logged_in_person"
+},
+{
+ "fields": {
+  "template": "<new-work@ietf.org>",
+  "desc": "The IETF New Work list"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "new_work"
+},
+{
+ "fields": {
+  "template": "{{nomcom.group.get_chair.email.address}}",
+  "desc": "The chair of a given nomcom"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "nomcom_chair"
+},
+{
+ "fields": {
+  "template": "{{nominator}}",
+  "desc": "The person that submitted a nomination to nomcom"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "nominator"
+},
+{
+ "fields": {
+  "template": "{{nominee}}",
+  "desc": "The person nominated for a position"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "nominee"
+},
+{
+ "fields": {
+  "template": "<rfc-editor@rfc-editor.org>",
+  "desc": "The RFC Editor"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "rfc_editor"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The RFC Editor if a document is in the RFC Editor queue"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "rfc_editor_if_doc_in_queue"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The person that requested a meeting slot for a given group"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "session_requester"
+},
+{
+ "fields": {
+  "template": "<session-request@ietf.org>",
+  "desc": "The session request ticketing system"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "session_requests"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The managers of any related streams"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "stream_managers"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The authors of a submitted draft"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "submission_authors"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The people who can confirm a draft submission"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "submission_confirmers"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The chairs of a submitted draft belonging to a group"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "submission_group_chairs"
+},
+{
+ "fields": {
+  "template": null,
+  "desc": "The people who can confirm a draft submission"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "submission_group_mail_list"
+},
+{
+ "fields": {
+  "template": "{{submission.submitter}}",
+  "desc": "The person that submitted a draft"
+ },
+ "model": "mailtrigger.recipient",
+ "pk": "submission_submitter"
+},
+{
+ "fields": {
+  "cc": [
+   "doc_notify",
+   "group_chairs",
+   "group_mail_list",
+   "group_steering_group"
+  ],
+  "to": [
+   "ietf_announce"
+  ],
+  "desc": "Recipients when a charter is approved"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "ballot_approved_charter"
+},
+{
+ "fields": {
+  "cc": [
+   "iana",
+   "iesg",
+   "ietf_announce"
+  ],
+  "to": [
+   "conflict_review_steering_group",
+   "conflict_review_stream_manager",
+   "doc_affecteddoc_authors",
+   "doc_affecteddoc_group_chairs",
+   "doc_affecteddoc_notify",
+   "doc_notify"
+  ],
+  "desc": "Recipients when a conflict review ballot is approved"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "ballot_approved_conflrev"
+},
+{
+ "fields": {
+  "cc": [
+   "doc_ad",
+   "doc_authors",
+   "doc_group_chairs",
+   "doc_group_mail_list",
+   "doc_notify",
+   "doc_shepherd",
+   "iesg",
+   "rfc_editor"
+  ],
+  "to": [
+   "ietf_announce"
+  ],
+  "desc": "Recipients when an IETF stream document ballot is approved"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "ballot_approved_ietf_stream"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "iana_approve"
+  ],
+  "desc": "Recipients for IANA message when an IETF stream document ballot is approved"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "ballot_approved_ietf_stream_iana"
+},
+{
+ "fields": {
+  "cc": [
+   "doc_affecteddoc_authors",
+   "doc_affecteddoc_group_chairs",
+   "doc_affecteddoc_notify",
+   "doc_notify",
+   "iesg",
+   "rfc_editor"
+  ],
+  "to": [
+   "ietf_announce"
+  ],
+  "desc": "Recipients when a status change is approved"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "ballot_approved_status_change"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "conflict_review_stream_manager",
+   "doc_affecteddoc_authors",
+   "doc_affecteddoc_group_chairs",
+   "doc_affecteddoc_notify",
+   "doc_authors",
+   "doc_group_chairs",
+   "doc_notify",
+   "doc_shepherd",
+   "iesg",
+   "iesg_secretary"
+  ],
+  "desc": "Recipients when a ballot is deferred to or undeferred from a future telechat"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "ballot_deferred"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "iesg"
+  ],
+  "desc": "Recipients when a ballot is issued"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "ballot_issued"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "iana_eval"
+  ],
+  "desc": "Recipients for IANA message when a ballot is issued"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "ballot_issued_iana"
+},
+{
+ "fields": {
+  "cc": [
+   "conflict_review_stream_manager",
+   "doc_affecteddoc_authors",
+   "doc_affecteddoc_group_chairs",
+   "doc_affecteddoc_notify",
+   "doc_authors",
+   "doc_group_chairs",
+   "doc_group_mail_list",
+   "doc_notify",
+   "doc_shepherd"
+  ],
+  "to": [
+   "iesg"
+  ],
+  "desc": "Recipients when a new ballot position (with discusses, other blocking positions, or comments) is saved"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "ballot_saved"
+},
+{
+ "fields": {
+  "cc": [
+   "group_mail_list"
+  ],
+  "to": [
+   "ietf_announce"
+  ],
+  "desc": "Recipients for a charter external review"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "charter_external_review"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "new_work"
+  ],
+  "desc": "Recipients for a message to new-work about a charter review"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "charter_external_review_new_work"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "iab",
+   "iesg"
+  ],
+  "desc": "Recipients for message noting that internal review has started on a charter"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "charter_internal_review"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "iesg_secretary"
+  ],
+  "desc": "Recipients for message to adminstrators when a charter state edit needs followon administrative action"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "charter_state_edit_admin_needed"
+},
+{
+ "fields": {
+  "cc": [
+   "doc_affecteddoc_authors",
+   "doc_affecteddoc_group_chairs",
+   "doc_affecteddoc_notify",
+   "doc_notify",
+   "iesg"
+  ],
+  "to": [
+   "iesg_secretary"
+  ],
+  "desc": "Recipients for a stream manager's request for an IETF conflict review"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "conflrev_requested"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "iana_eval"
+  ],
+  "desc": "Recipients for IANA message when a stream manager requests an IETF conflict review"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "conflrev_requested_iana"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "doc_authors",
+   "doc_group_chairs",
+   "doc_group_responsible_directors",
+   "doc_non_ietf_stream_manager",
+   "doc_shepherd"
+  ],
+  "desc": "Recipients for a message when a new comment is manually entered into the document's history"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "doc_added_comment"
+},
+{
+ "fields": {
+  "cc": [
+   "doc_ad",
+   "doc_notify",
+   "doc_shepherd"
+  ],
+  "to": [
+   "doc_authors",
+   "doc_group_chairs",
+   "doc_group_mail_list"
+  ],
+  "desc": "Recipients for notification that a document has been adopted by a group"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "doc_adopted_by_group"
+},
+{
+ "fields": {
+  "cc": [
+   "doc_group_chairs",
+   "doc_group_responsible_directors",
+   "doc_notify",
+   "doc_shepherd"
+  ],
+  "to": [
+   "doc_authors"
+  ],
+  "desc": "Recipients for notification of a document's expiration"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "doc_expired"
+},
+{
+ "fields": {
+  "cc": [
+   "doc_group_chairs",
+   "doc_group_responsible_directors",
+   "doc_notify",
+   "doc_shepherd"
+  ],
+  "to": [
+   "doc_authors"
+  ],
+  "desc": "Recipients for notification of impending expiration of a document"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "doc_expires_soon"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "doc_ad",
+   "doc_affecteddoc_authors",
+   "doc_affecteddoc_group_chairs",
+   "doc_affecteddoc_notify",
+   "doc_authors",
+   "doc_group_chairs",
+   "doc_notify",
+   "doc_shepherd"
+  ],
+  "desc": "Recipients when IANA state information for a document changes "
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "doc_iana_state_changed"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "doc_ad",
+   "doc_authors",
+   "doc_group_chairs",
+   "doc_shepherd"
+  ],
+  "desc": "Recipients for a message when the IESG begins processing a document "
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "doc_iesg_processing_started"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "doc_authors",
+   "doc_group_chairs",
+   "doc_group_responsible_directors",
+   "doc_non_ietf_stream_manager",
+   "doc_shepherd"
+  ],
+  "desc": "Recipients for a message when a document's intended publication status changes"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "doc_intended_status_changed"
+},
+{
+ "fields": {
+  "cc": [
+   "doc_authors",
+   "doc_group_chairs",
+   "doc_notify",
+   "doc_shepherd",
+   "iesg",
+   "iesg_secretary"
+  ],
+  "to": [
+   "iana",
+   "rfc_editor"
+  ],
+  "desc": "Recipients when a document is taken out of the RFC's editor queue before publication"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "doc_pulled_from_rfc_queue"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "doc_authors",
+   "doc_group_chairs",
+   "doc_group_responsible_directors",
+   "doc_notify",
+   "doc_shepherd"
+  ],
+  "desc": "Recipients when what a document replaces or is replaced by changes"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "doc_replacement_changed"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "doc_group_chairs",
+   "doc_group_responsible_directors",
+   "doc_non_ietf_stream_manager",
+   "iesg_secretary"
+  ],
+  "desc": "Recipients for suggestions that this doc replaces or is replace by some other document"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "doc_replacement_suggested"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "doc_ad",
+   "doc_affecteddoc_authors",
+   "doc_affecteddoc_group_chairs",
+   "doc_affecteddoc_notify",
+   "doc_authors",
+   "doc_group_chairs",
+   "doc_group_responsible_directors",
+   "doc_notify",
+   "doc_shepherd"
+  ],
+  "desc": "Recipients when a document's state is manually edited"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "doc_state_edited"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "doc_authors",
+   "doc_notify",
+   "stream_managers"
+  ],
+  "desc": "Recipients for notification when a document's stream changes"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "doc_stream_changed"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "doc_authors",
+   "doc_group_chairs",
+   "doc_group_delegates",
+   "doc_shepherd"
+  ],
+  "desc": "Recipients when the stream state of a document is manually edited"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "doc_stream_state_edited"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "doc_affecteddoc_authors",
+   "doc_affecteddoc_group_chairs",
+   "doc_affecteddoc_notify",
+   "doc_authors",
+   "doc_group_chairs",
+   "doc_notify",
+   "doc_shepherd",
+   "iesg",
+   "iesg_secretary"
+  ],
+  "desc": "Recipients when a document's telechat date or other telechat specific details are changed"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "doc_telechat_details_changed"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "group_mail_list"
+  ],
+  "desc": "Recipients when the set of approved milestones for a group are edited"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "group_approved_milestones_edited"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "iesg_secretary"
+  ],
+  "desc": "Recipients for message requesting closure of a group"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "group_closure_requested"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "group_chairs",
+   "group_responsible_directors"
+  ],
+  "desc": "Recipients when any of a group's milestones are edited"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "group_milestones_edited"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "group_chairs",
+   "group_changed_personnel",
+   "group_responsible_directors",
+   "iesg_secretary"
+  ],
+  "desc": "Recipients for a message noting changes in a group's personnel"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "group_personnel_change"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "ipr_submitter"
+  ],
+  "desc": "Recipients when the secretary follows up on an IPR disclosure submission"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "ipr_disclosure_followup"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "ipr_requests"
+  ],
+  "desc": "Recipients when an IPR disclosure is submitted"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "ipr_disclosure_submitted"
+},
+{
+ "fields": {
+  "cc": [
+   "doc_ipr_group_or_ad",
+   "ipr_announce"
+  ],
+  "to": [
+   "doc_authors"
+  ],
+  "desc": "Recipients when an IPR disclosure calls out a given document"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "ipr_posted_on_doc"
+},
+{
+ "fields": {
+  "cc": [
+   "ipr_updatedipr_contacts",
+   "ipr_updatedipr_holders"
+  ],
+  "to": [
+   "ipr_submitter"
+  ],
+  "desc": "Recipients for a message confirming that a disclosure has been posted"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "ipr_posting_confirmation"
+},
+{
+ "fields": {
+  "cc": [
+   "iesg_secretary"
+  ],
+  "to": [
+   "doc_ad",
+   "doc_authors",
+   "doc_notify",
+   "doc_shepherd"
+  ],
+  "desc": "Recipients when a last call has expired"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "last_call_expired"
+},
+{
+ "fields": {
+  "cc": [
+   "doc_ad",
+   "doc_affecteddoc_authors",
+   "doc_affecteddoc_group_chairs",
+   "doc_affecteddoc_notify",
+   "doc_authors",
+   "doc_group_chairs",
+   "doc_group_mail_list",
+   "doc_notify",
+   "doc_shepherd"
+  ],
+  "to": [
+   "ietf_announce"
+  ],
+  "desc": "Recipients when a last call is issued"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "last_call_issued"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "iana_last_call"
+  ],
+  "desc": "Recipients for IANA message when a last call is issued"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "last_call_issued_iana"
+},
+{
+ "fields": {
+  "cc": [
+   "doc_ad",
+   "doc_notify",
+   "doc_shepherd"
+  ],
+  "to": [
+   "iesg_secretary"
+  ],
+  "desc": "Recipients when AD requests a last call"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "last_call_requested"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "liaison_approvers"
+  ],
+  "desc": "Recipients for a message that a pending liaison statement needs approval"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "liaison_approval_requested"
+},
+{
+ "fields": {
+  "cc": [
+   "liaison_cc",
+   "liaison_response_contacts",
+   "liaison_technical_contacts"
+  ],
+  "to": [
+   "liaison_to_contacts"
+  ],
+  "desc": "Recipients for a message about a liaison statement deadline that is approaching."
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "liaison_deadline_soon"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "liaison_manager"
+  ],
+  "desc": "Recipients for a message requesting an updated list of authorized individuals"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "liaison_manager_update_request"
+},
+{
+ "fields": {
+  "cc": [
+   "liaison_cc",
+   "liaison_response_contacts",
+   "liaison_technical_contacts"
+  ],
+  "to": [
+   "liaison_to_contacts"
+  ],
+  "desc": "Recipient for a message when a new liaison statement is posted"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "liaison_statement_posted"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "commenter"
+  ],
+  "desc": "Recipients for a message confirming a comment was made"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "nomcom_comment_receipt_requested"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "nominee"
+  ],
+  "desc": "Recipients for the questionairre that nominees should complete"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "nomcom_questionnaire"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "nominee"
+  ],
+  "desc": "Recipients for a message reminding a nominee to return a completed questionairre response"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "nomcom_questionnaire_reminder"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "nominee"
+  ],
+  "desc": "Recipeints of message reminding a nominee to accept or decline a nomination"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "nomination_accept_reminder"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "ietf_secretariat",
+   "nomcom_chair"
+  ],
+  "desc": "Recipients for a message noting that a nomination caused a new Person record to be created in the datatracker"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "nomination_created_person"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "nominee"
+  ],
+  "desc": "Recipients the first time a person is nominated for a position, asking them to accept or decline the nomination"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "nomination_new_nominee"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "nominator"
+  ],
+  "desc": "Recipients for a message confirming a nomination was made"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "nomination_receipt_requested"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "nomcom_chair"
+  ],
+  "desc": "Recipients for a message noting a new nomination has been received"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "nomination_received"
+},
+{
+ "fields": {
+  "cc": [
+   "doc_group_chairs",
+   "doc_notify",
+   "doc_shepherd",
+   "iesg_secretary"
+  ],
+  "to": [
+   "doc_ad"
+  ],
+  "desc": "Recipients when a draft is submitted to the IESG"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "pubreq_iesg"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "rfc_editor"
+  ],
+  "desc": "Recipients when a non-IETF stream manager requests publication"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "pubreq_rfced"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "iana_approve"
+  ],
+  "desc": "Recipients for IANA message when a non-IETF stream manager requests publication"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "pubreq_rfced_iana"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "doc_ad",
+   "iesg_secretary"
+  ],
+  "desc": "Recipients when a draft resurrection request has been completed"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "resurrection_completed"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "internet_draft_requests"
+  ],
+  "desc": "Recipients of a request to change the state of a draft away from 'Dead'"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "resurrection_requested"
+},
+{
+ "fields": {
+  "cc": [
+   "group_chairs",
+   "group_mail_list",
+   "group_responsible_directors",
+   "logged_in_person"
+  ],
+  "to": [
+   "session_requests"
+  ],
+  "desc": "Recipients for a normal meeting session request"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "session_requested"
+},
+{
+ "fields": {
+  "cc": [
+   "group_chairs",
+   "logged_in_person",
+   "session_requests"
+  ],
+  "to": [
+   "group_responsible_directors"
+  ],
+  "desc": "Recipients for a meeting session request for more than 2 sessions"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "session_requested_long"
+},
+{
+ "fields": {
+  "cc": [
+   "group_chairs",
+   "group_mail_list",
+   "group_responsible_directors",
+   "logged_in_person"
+  ],
+  "to": [
+   "session_requests"
+  ],
+  "desc": "Recipients for a message cancelling a session request"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "session_request_cancelled"
+},
+{
+ "fields": {
+  "cc": [
+   "group_chairs",
+   "group_mail_list",
+   "group_responsible_directors",
+   "logged_in_person"
+  ],
+  "to": [
+   "session_requests"
+  ],
+  "desc": "Recipients for a message noting a group plans to not meet"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "session_request_not_meeting"
+},
+{
+ "fields": {
+  "cc": [
+   "group_mail_list",
+   "group_responsible_directors"
+  ],
+  "to": [
+   "group_chairs",
+   "session_requester"
+  ],
+  "desc": "Recipients for details when a session has been scheduled"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "session_scheduled"
+},
+{
+ "fields": {
+  "cc": [
+   "submission_group_mail_list"
+  ],
+  "to": [
+   "ietf_announce"
+  ],
+  "desc": "Recipients for the announcement of a successfully submitted draft"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "sub_announced"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "submission_authors",
+   "submission_confirmers"
+  ],
+  "desc": "Recipients for the announcement to the authors of a successfully submitted draft"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "sub_announced_to_authors"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "submission_group_chairs"
+  ],
+  "desc": "Recipients for a message requesting group chair approval of a draft submission"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "sub_chair_approval_requested"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "submission_confirmers"
+  ],
+  "desc": "Recipients for a message requesting confirmation of a draft submission"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "sub_confirmation_requested"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "submission_confirmers"
+  ],
+  "desc": "Recipients for a message with the full URL for managing a draft submission"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "sub_management_url_requested"
+},
+{
+ "fields": {
+  "cc": [
+   "submission_authors",
+   "submission_group_chairs",
+   "submission_submitter"
+  ],
+  "to": [
+   "internet_draft_requests"
+  ],
+  "desc": "Recipients for a manual post request for a draft submission"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "sub_manual_post_requested"
+},
+{
+ "fields": {
+  "cc": [],
+  "to": [
+   "doc_ad",
+   "doc_discussing_ads",
+   "doc_non_ietf_stream_manager",
+   "doc_notify",
+   "rfc_editor_if_doc_in_queue"
+  ],
+  "desc": "Recipients for notification of a new version of an existing document"
+ },
+ "model": "mailtrigger.mailtrigger",
+ "pk": "sub_new_version"
 }
 ]

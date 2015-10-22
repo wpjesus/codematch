@@ -57,6 +57,7 @@ from ietf.group.utils import get_charter_text, can_manage_group_type, milestone_
 from ietf.group.utils import can_manage_materials, get_group_or_404
 from ietf.utils.pipe import pipe
 from ietf.settings import MAILING_LIST_INFO_URL
+from ietf.mailtrigger.utils import gather_relevant_expansions
 
 def roles(group, role_name):
     return Role.objects.filter(group=group, name=role_name).select_related("email", "person")
@@ -189,13 +190,46 @@ def wg_charters_by_acronym(request, group_type):
                   { 'groups': groups },
                   content_type='text/plain; charset=UTF-8')
 
-def active_groups(request, group_type):
-    if group_type == "wg":
+def active_groups(request, group_type=None):
+
+    if not group_type:
+        return active_group_types(request)
+    elif group_type == "wg":
         return active_wgs(request)
     elif group_type == "rg":
         return active_rgs(request)
+    elif group_type == "ag":
+        return active_ags(request)
+    elif group_type == "area":
+        return active_areas(request)
+    elif group_type == "team":
+        return active_teams(request)
+    elif group_type == "dir":
+        return active_dirs(request)
     else:
         raise Http404
+
+def active_group_types(request):
+    grouptypes = GroupTypeName.objects.filter(slug__in=['wg','rg','ag','team','dir','area'])
+    return render(request, 'group/active_groups.html', {'grouptypes':grouptypes})
+
+def active_dirs(request):
+    dirs = Group.objects.filter(type="dir", state="active").order_by("name")
+    for group in dirs:
+        group.chairs = sorted(roles(group, "chair"), key=extract_last_name)
+        group.ads = sorted(roles(group, "ad"), key=extract_last_name)
+        group.secretaries = sorted(roles(group, "secr"), key=extract_last_name)
+    return render(request, 'group/active_dirs.html', {'dirs' : dirs })
+
+def active_teams(request):
+    teams = Group.objects.filter(type="team", state="active").order_by("name")
+    for group in teams:
+        group.chairs = sorted(roles(group, "chair"), key=extract_last_name)
+    return render(request, 'group/active_teams.html', {'teams' : teams })
+
+def active_areas(request):
+	areas = Group.objects.filter(type="area", state="active").order_by("name")  
+	return render(request, 'group/active_areas.html', {'areas': areas })
 
 def active_wgs(request):
     areas = Group.objects.filter(type="area", state="active").order_by("name")
@@ -228,6 +262,15 @@ def active_rgs(request):
         group.chairs = sorted(roles(group, "chair"), key=extract_last_name)
 
     return render(request, 'group/active_rgs.html', { 'irtf': irtf, 'groups': groups })
+    
+def active_ags(request):
+
+    groups = Group.objects.filter(type="ag", state="active").order_by("acronym")
+    for group in groups:
+        group.chairs = sorted(roles(group, "chair"), key=extract_last_name)
+        group.ads = sorted(roles(group, "ad"), key=extract_last_name)
+
+    return render(request, 'group/active_ags.html', { 'groups': groups })
     
 def bofs(request, group_type):
     groups = Group.objects.filter(type=group_type, state="bof")
@@ -290,14 +333,15 @@ def construct_group_menu_context(request, group, selected, group_type, others):
         entries.append(("About", urlreverse("group_about", kwargs=kwargs)))
     if group.features.has_materials and get_group_materials(group).exists():
         entries.append(("Materials", urlreverse("ietf.group.info.materials", kwargs=kwargs)))
+    entries.append(("Email expansions", urlreverse("ietf.group.info.email", kwargs=kwargs)))
     entries.append(("History", urlreverse("ietf.group.info.history", kwargs=kwargs)))
     if group.features.has_documents:
-        entries.append(("Dependency Graph", urlreverse("ietf.group.info.dependencies_pdf", kwargs=kwargs)))
+        entries.append((mark_safe("Dependency graph &raquo;"), urlreverse("ietf.group.info.dependencies_pdf", kwargs=kwargs)))
 
     if group.list_archive.startswith("http:") or group.list_archive.startswith("https:") or group.list_archive.startswith("ftp:"):
-        entries.append((mark_safe("List Archive &raquo;"), group.list_archive))
+        entries.append((mark_safe("List archive &raquo;"), group.list_archive))
     if group.has_tools_page():
-        entries.append((mark_safe("Tools %s Page &raquo;" % group.type.name), "https://tools.ietf.org/%s/%s/" % (group.type_id, group.acronym)))
+        entries.append((mark_safe("Tools page &raquo;"), "https://tools.ietf.org/%s/%s/" % (group.type_id, group.acronym)))
 
 
     # actions
@@ -430,19 +474,42 @@ def group_about(request, acronym, group_type=None):
 
     can_manage = can_manage_group_type(request.user, group.type_id)
 
-    table_rows = dict(group=5, personnel=0, )
-    table_rows["group"] += 1 if group.groupurl_set.count() else 0
-    table_rows["personnel"] += len(group.personnel)
-
     return render(request, 'group/group_about.html',
                   construct_group_menu_context(request, group, "charter" if group.features.has_chartering_process else "about", group_type, {
                       "milestones_in_review": group.groupmilestone_set.filter(state="review"),
                       "milestone_reviewer": milestone_reviewer_for_group_type(group_type),
                       "requested_close": requested_close,
                       "can_manage": can_manage,
-                      "table_rows": table_rows,
                   }))
 
+def get_group_email_aliases(acronym, group_type):
+    if acronym:
+        pattern = re.compile('expand-(%s)(-\w+)@.*? +(.*)$'%acronym)
+    else:
+        pattern = re.compile('expand-(.*?)(-\w+)@.*? +(.*)$')
+
+    aliases = []
+    with open(settings.GROUP_VIRTUAL_PATH,"r") as virtual_file:
+        for line in virtual_file.readlines():
+            m = pattern.match(line)
+            if m:
+                if acronym or not group_type or Group.objects.filter(acronym=m.group(1),type__slug=group_type):
+                    aliases.append({'acronym':m.group(1),'alias_type':m.group(2),'expansion':m.group(3)})
+    return aliases
+
+def email(request, acronym, group_type=None):
+    group = get_group_or_404(acronym, group_type)
+
+    aliases = get_group_email_aliases(acronym, group_type)
+    expansions = gather_relevant_expansions(group=group)
+
+    return render(request, 'group/email.html',
+                  construct_group_menu_context(request, group, "email expansions", group_type, {
+                       'expansions':expansions,
+                       'aliases':aliases,
+                       'group':group,
+                       'ietf_domain':settings.IETF_DOMAIN,
+                  })) 
 
 def history(request, acronym, group_type=None):
     group = get_group_or_404(acronym, group_type)
@@ -637,22 +704,13 @@ def dependencies_pdf(request, acronym, group_type=None):
 def email_aliases(request, acronym=None, group_type=None):
     group = get_group_or_404(acronym,group_type) if acronym else None
 
-    if acronym:
-        pattern = re.compile('expand-(%s)(-\w+)@.*? +(.*)$'%acronym)
-    else:
+    if not acronym:
         # require login for the overview page, but not for the group-specific
-        # pages handled above
+        # pages 
         if not request.user.is_authenticated():
                 return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-        pattern = re.compile('expand-(.*?)(-\w+)@.*? +(.*)$')
 
-    aliases = []
-    with open(settings.GROUP_VIRTUAL_PATH,"r") as virtual_file:
-        for line in virtual_file.readlines():
-            m = pattern.match(line)
-            if m:
-                if acronym or not group_type or Group.objects.filter(acronym=m.group(1),type__slug=group_type):
-                    aliases.append({'acronym':m.group(1),'alias_type':m.group(2),'expansion':m.group(3)})
+    aliases = get_group_email_aliases(acronym, group_type)
 
     return render(request,'group/email_aliases.html',{'aliases':aliases,'ietf_domain':settings.IETF_DOMAIN,'group':group})
 

@@ -3,6 +3,7 @@ import datetime
 
 from django.db import models
 
+from ietf.doc.models import Document
 from ietf.person.models import Person
 from ietf.group.models import Group
 from ietf.name.models import DraftSubmissionStateName
@@ -33,7 +34,7 @@ class Submission(models.Model):
     pages = models.IntegerField(null=True, blank=True)
     authors = models.TextField(blank=True, help_text="List of author names and emails, one author per line, e.g. \"John Doe &lt;john@example.org&gt;\".")
     note = models.TextField(blank=True)
-    replaces = models.CharField(max_length=255, blank=True)
+    replaces = models.CharField(max_length=1000, blank=True)
 
     first_two_pages = models.TextField(blank=True)
     file_types = models.CharField(max_length=50, blank=True)
@@ -62,6 +63,8 @@ class Submission(models.Model):
     def access_token(self):
         return generate_access_token(self.access_key)
 
+    def existing_document(self):
+        return Document.objects.filter(name=self.name).first()
 
 class SubmissionEvent(models.Model):
     submission = models.ForeignKey(Submission)

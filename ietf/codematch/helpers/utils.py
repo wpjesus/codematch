@@ -60,22 +60,25 @@ def get_menu_arguments(request, dict):
 
 def clear_session(request):
 	
+	# All session variables
 	keys = [constants.ALL_PROJECTS, constants.PROJECT_INSTANCE, constants.REQUEST_INSTANCE, constants.MAIL_INSTANCE, constants.ACTUAL_PROJECT, 
 			constants.CODE_INSTANCE, constants.ADD_DOCS, constants.ADD_TAGS, constants.ADD_LINKS, constants.ADD_MAILS, 
-			constants.REM_DOCS, constants.REM_TAGS, constants.REM_LINKS]
+			constants.REM_MAILS, constants.REM_DOCS, constants.REM_TAGS, constants.REM_LINKS]
 	
-	if constants.MAINTAIN_STATE not in request.session:
+	# If MAINTAIN_STATE is true then session variables shouldn't be deleted
+	if constants.MAINTAIN_STATE in request.session and request.session[constants.MAINTAIN_STATE] == True:
+		del request.session[constants.MAINTAIN_STATE]
+	else: # Otherwise all session variables must be erased
 		for key in keys:
 			if key in request.session:
 				del request.session[key]
-	else:
-		del request.session[constants.MAINTAIN_STATE]
 
 def render_page(request, template, dict = {}):
 	""" Special method for rendering pages """
 	
 	clear_session(request)
 	
+	# if the template has changed then update actual and previous templates
 	if constants.ACTUAL_TEMPLATE in request.session:
 		actual_template = request.session[constants.ACTUAL_TEMPLATE]				
 		if actual_template != request.path:

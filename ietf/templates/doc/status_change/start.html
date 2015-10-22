@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {# Copyright The IETF Trust 2015, All Rights Reserved #}
 {% load origin %}
-
+{% load staticfiles %}
 {% load bootstrap3 %}
 
 {% block title %}Begin RFC status change review{% endblock %}
@@ -14,7 +14,7 @@
 
   <p><a class="btn btn-default" href="{% url "state_help" type="status-change"  %}">Help on states</a></p>
 
-  <form class="start-rfc-status-change-review" role="form" method="post">
+  <form class="start-rfc-status-change-review" method="post">
     {% csrf_token %}
 
     <label class="control-label">Affected RFCs</label>
@@ -36,5 +36,5 @@
 {% endblock %}
 
 {% block js %}
-  <script src="/js/status-change-edit-relations.js"></script>
+  <script src="{% static 'ietf/js/status-change-edit-relations.js' %}"></script>
 {% endblock %}

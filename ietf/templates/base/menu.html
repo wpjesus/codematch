@@ -1,5 +1,5 @@
 {# Copyright The IETF Trust 2015, All Rights Reserved #}{% load origin %}{% origin %}
-{% load ietf_filters community_tags wg_menu streams_menu %}
+{% load ietf_filters community_tags wg_menu streams_menu active_groups_menu %}
 
 {% if flavor != "top" %}
   {% include "base/menu_user.html" %}
@@ -16,6 +16,7 @@
 
 <li><a href="{% url "ietf.group.info.active_groups" group_type="wg" %}">Active WGs</a></li>
 <li><a href="{% url "ietf.group.info.active_groups" group_type="rg" %}">Active RGs</a></li>
+<li class="dropdown-submenu group-menu"><a href="{% url "ietf.group.info.active_groups" %}">Other</a>{% active_groups_menu %} </li>
 
   {% if flavor == "top" %}<li class="divider visible-lg-block"></li>{% endif %}
   <li {%if flavor == "top" %}class="dropdown-header visible-lg-block"{% else %}class="nav-header hidden-nojs"{% endif %}>By area/parent</li>
@@ -24,12 +25,12 @@
 
   {% if flavor == "top" %}<li class="divider hidden-xs"></li>{% endif %}
   <li {%if flavor == "top" %}class="dropdown-header hidden-xs"{% else %}class="nav-header"{% endif %}>New work</li>
-  <li><a href="{% url "ietf.group.info.chartering_groups" %}">Chartering WGs</a></li>
+  <li><a href="{% url "ietf.group.info.chartering_groups" %}">Chartering groups</a></li>
   <li><a href="{% url "ietf.group.info.bofs" group_type="wg" %}">BOFs</a></li>
 
   {% if flavor == "top" %}<li class="divider hidden-xs"></li>{% endif %}
   <li {%if flavor == "top" %}class="dropdown-header hidden-xs"{% else %}class="nav-header"{% endif %}>Other groups</li>
-  <li><a href="{% url "ietf.group.info.concluded_groups" %}">Concluded WGs</a></li>
+  <li><a href="{% url "ietf.group.info.concluded_groups" %}">Concluded groups</a></li>
   <li><a href="https://www.ietf.org/list/nonwg.html">Non-WG lists</a></li>
 
 {% if flavor == "top" %}</ul>{% endif %}
@@ -85,6 +86,7 @@
   <li><a href="/meeting/">Materials</a></li>
   <li><a href="https://www.ietf.org/meeting/proceedings.html">Past proceedings</a></li>
   <li><a href="https://www.ietf.org/meeting/upcoming.html">Upcoming</a></li>
+  <li><a href="/secr/sreq/">Request a session</a></li>
   <li><a href="/meeting/requests">Session requests</a></li>
 {% if flavor == "top" %}</ul>{% endif %}
 
@@ -100,6 +102,7 @@
   <li><a href="/ipr/">IPR disclosures</a></li>
   <li><a href="/liaison/">Liaison statements</a></li>
   <li><a href="/iesg/agenda/">IESG agenda</a></li>
+  <li><a href="https://tools.ietf.org/tools/ietfdb/newticket"><span class="fa fa-bug llarge"></span> Report a bug</a></li>
 {% if flavor == "top" %}</ul>{% endif %}
 
 {% if flavor == "top" %}

@@ -77,7 +77,6 @@ STATIC_URL = "/../"
 
 #Application that must be installed by Codematch
 CODEMATCH_APPS = (
-        'django.contrib.staticfiles', #Used to dynamically reference the static folder
         'ietf.codematch',
         'ietf.codematch.accounts',
         'ietf.codematch.matches',

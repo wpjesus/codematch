@@ -44,6 +44,8 @@ import socket
 import warnings
 import datetime
 import codecs
+import gzip
+
 from coverage.report import Reporter
 from coverage.results import Numbers
 from coverage.misc import NotPython
@@ -175,15 +177,15 @@ def save_test_results(failures, test_labels):
 
 class CoverageReporter(Reporter):
     def report(self):
-        self.find_code_units(None)
+        self.find_file_reporters(None)
 
         total = Numbers()
-        result = {"coverage": 0.0, "covered": {}}
-        for cu in self.code_units:
+        result = {"coverage": 0.0, "covered": {}, "format": 2, }
+        for fr in self.file_reporters:
             try:
-                analysis = self.coverage._analyze(cu)
+                analysis = self.coverage._analyze(fr)
                 nums = analysis.numbers
-                result["covered"][cu.name] = nums.pc_covered/100.0
+                result["covered"][fr.relative_filename()] = (nums.n_statements, nums.pc_covered/100.0)
                 total += nums
             except KeyboardInterrupt:                   # pragma: not covered
                 raise
@@ -191,7 +193,7 @@ class CoverageReporter(Reporter):
                 report_it = not self.config.ignore_errors
                 if report_it:
                     typ, msg = sys.exc_info()[:2]
-                    if typ is NotPython and not cu.should_be_python():
+                    if typ is NotPython and not fr.should_be_python():
                         report_it = False
                 if report_it:
                     raise
@@ -221,7 +223,7 @@ class CoverageTest(TestCase):
             if self.runner.run_full_test_suite:
                 # Permit 0.02% variation in results -- otherwise small code changes become a pain
                 fudge_factor = 0.0002   # 0.02% -- a small change in the last digit we show
-                self.assertGreaterEqual(test_coverage, master_coverage-fudge_factor,
+                self.assertGreaterEqual(test_coverage, master_coverage - fudge_factor,
                     msg = "The %s coverage percentage is now lower (%.2f%%) than for version %s (%.2f%%)" %
                         ( test, test_coverage*100, latest_coverage_version, master_coverage*100, ))
                 self.assertLessEqual(len(test_missing), len(master_missing),
@@ -285,7 +287,7 @@ class CoverageTest(TestCase):
             checker.stop()
             # Save to the .coverage file
             checker.save()
-            # Apply the confirured and requested omit and include data 
+            # Apply the configured and requested omit and include data 
             checker.config.from_args(ignore_errors=None, omit=settings.TEST_CODE_COVERAGE_EXCLUDE,
                 include=include, file=None)
             # Maybe output a html report
@@ -324,21 +326,28 @@ class IetfTestRunner(DiscoverRunner):
         ietf.utils.mail.SMTP_ADDR['port'] = 2025
         #
         if self.check_coverage:
-            with codecs.open(self.coverage_file, encoding='utf-8') as file:
-                self.coverage_master = json.load(file)
+            if self.coverage_file.endswith('.gz'):
+                with gzip.open(self.coverage_file, "rb") as file:
+                    self.coverage_master = json.load(file)
+            else:
+                with codecs.open(self.coverage_file, encoding='utf-8') as file:
+                    self.coverage_master = json.load(file)
             self.coverage_data = {
                 "time": datetime.datetime.now(pytz.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 "template": {
                     "coverage": 0.0, 
                     "covered": {},
+                    "format": 1,        # default format, coverage data in 'covered' are just fractions
                 },
                 "url": {
                     "coverage": 0.0, 
                     "covered": {},
+                    "format": 1,
                 },
                 "code": {
                     "coverage": 0.0, 
                     "covered": {},
+                    "format": 1,
                 },
             }
 
@@ -346,6 +355,11 @@ class IetfTestRunner(DiscoverRunner):
             settings.MIDDLEWARE_CLASSES = ('ietf.utils.test_runner.RecordUrlsMiddleware',) + settings.MIDDLEWARE_CLASSES
 
             self.code_coverage_checker = settings.TEST_CODE_COVERAGE_CHECKER
+            if not self.code_coverage_checker._started:
+                sys.stderr.write(" **  Warning: In %s: Expected the coverage checker to have\n"
+                                 "       been started already, but it wasn't. Doing so now.  Coverage numbers\n"
+                                 "       will be off, though.\n" % __name__)
+                self.code_coverage_checker.start()
 
         if settings.SITE_ID != 1:
             print "     Changing SITE_ID to '1' during testing."
@@ -378,16 +392,20 @@ class IetfTestRunner(DiscoverRunner):
         self.smtpd_driver.stop()
         if self.check_coverage:
             latest_coverage_file = os.path.join(self.root_dir, settings.TEST_COVERAGE_LATEST_FILE)
+            coverage_latest = {}
+            coverage_latest["version"] = "latest"
+            coverage_latest["latest"] = self.coverage_data
             with codecs.open(latest_coverage_file, "w", encoding='utf-8') as file:
-                coverage_latest = {}
-                coverage_latest["version"] = "latest"
-                coverage_latest["latest"] = self.coverage_data
                 json.dump(coverage_latest, file, indent=2, sort_keys=True)
             if self.save_version_coverage:
-                with codecs.open(self.coverage_file, "w", encoding="utf-8") as file:
-                    self.coverage_master["version"] = self.save_version_coverage
-                    self.coverage_master[self.save_version_coverage] = self.coverage_data
-                    json.dump(self.coverage_master, file, indent=2, sort_keys=True)
+                self.coverage_master["version"] = self.save_version_coverage
+                self.coverage_master[self.save_version_coverage] = self.coverage_data
+                if self.coverage_file.endswith('.gz'):
+                    with gzip.open(self.coverage_file, "wb") as file:
+                        json.dump(self.coverage_master, file, sort_keys=True)
+                else:
+                    with codecs.open(self.coverage_file, "w", encoding="utf-8") as file:
+                        json.dump(self.coverage_master, file, indent=2, sort_keys=True)
         super(IetfTestRunner, self).teardown_test_environment(**kwargs)
 
     def get_test_paths(self, test_labels):
@@ -423,7 +441,7 @@ class IetfTestRunner(DiscoverRunner):
         test_paths = [ os.path.join(*app.split('.')) for app in test_apps ]
         return test_apps, test_paths
 
-    def run_tests(self, test_labels, extra_tests=None, **kwargs):
+    def run_tests(self, test_labels, extra_tests=[], **kwargs):
         # Tests that involve switching back and forth between the real
         # database and the test database are way too dangerous to run
         # against the production database
@@ -444,13 +462,14 @@ class IetfTestRunner(DiscoverRunner):
 
         self.test_apps, self.test_paths = self.get_test_paths(test_labels)
 
-        extra_tests = [
-            CoverageTest(test_runner=self, methodName='url_coverage_test'),
-            CoverageTest(test_runner=self, methodName='template_coverage_test'),
-            CoverageTest(test_runner=self, methodName='code_coverage_test'),
-        ]
+        if self.check_coverage:
+            extra_tests += [
+                CoverageTest(test_runner=self, methodName='url_coverage_test'),
+                CoverageTest(test_runner=self, methodName='template_coverage_test'),
+                CoverageTest(test_runner=self, methodName='code_coverage_test'),
+            ]
 
-        self.reorder_by += (CoverageTest, ) # see to it that the coverage tests come last
+            self.reorder_by += (CoverageTest, ) # see to it that the coverage tests come last
 
         failures = super(IetfTestRunner, self).run_tests(test_labels, extra_tests=extra_tests, **kwargs)
 

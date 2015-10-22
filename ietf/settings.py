@@ -21,8 +21,15 @@ sys.path.append(os.path.abspath(BASE_DIR + "/.."))
 
 import datetime
 
+from ietf import __version__
+
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
+
+# Valid values:
+# 'production', 'test', 'development'
+# Override this in settings_local.py if it's not the desired setting:
+SERVER_MODE = 'production'
 
 # Domain name of the IETF
 IETF_DOMAIN = 'ietf.org'
@@ -89,10 +96,34 @@ USE_I18N = False
 
 USE_TZ = False
 
-MEDIA_URL = '//www.ietf.org/'
+MEDIA_URL = 'https://www.ietf.org/'
 
-STATIC_URL = "/"
-STATIC_ROOT = os.path.abspath(BASE_DIR + "/../static/")
+# Absolute path to the directory static files should be collected to.
+# Example: "/var/www/example.com/static/"
+
+
+
+SERVE_CDN_FILES_LOCALLY_IN_DEV_MODE = True
+
+# URL to use when referring to static files located in STATIC_ROOT.
+if SERVER_MODE != 'production' and SERVE_CDN_FILES_LOCALLY_IN_DEV_MODE:
+    STATIC_URL = "/static/"
+    STATIC_ROOT = os.path.abspath(BASE_DIR + "/../static/")
+else:
+    STATIC_URL = "https://www.ietf.org/lib/dt/%s/"%__version__
+    STATIC_ROOT = "/a/www/www6s/lib/dt/%s/"%__version__
+
+# Destination for components handled by djangobower
+COMPONENT_ROOT = BASE_DIR + "/externals/static/"
+COMPONENT_URL  = STATIC_URL
+
+# List of finder classes that know how to find static files in
+# various locations.
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'ietf.utils.bower_storage.BowerStorageFinder',
+)
 
 WSGI_APPLICATION = "ietf.wsgi.application"
 
@@ -187,23 +218,31 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'ietf.context_processors.server_mode',
     'ietf.context_processors.revision_info',
     'ietf.secr.context_processors.secr_revision_info',
-    'ietf.secr.context_processors.static',
     'ietf.context_processors.rfcdiff_base_url',
+)
+
+# Additional locations of static files (in addition to each app's static/ dir)
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'secr/static'),
+    os.path.join(BASE_DIR, 'externals/static'),
 )
 
 INSTALLED_APPS = (
     # Django apps
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.sitemaps',
     'django.contrib.admin',
     'django.contrib.admindocs',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
     'django.contrib.humanize',
     'django.contrib.messages',
+    'django.contrib.sessions',
+    'django.contrib.sitemaps',
+    'django.contrib.sites',
+    'django.contrib.staticfiles',
     # External apps 
     'bootstrap3',
+    'djangobwr',
     'form_utils',
     'tastypie',
     'widget_tweaks',
@@ -219,6 +258,7 @@ INSTALLED_APPS = (
     'ietf.ipr',
     'ietf.liaisons',
     'ietf.mailinglists',
+    'ietf.mailtrigger',
     'ietf.meeting',
     'ietf.message',
     'ietf.name',
@@ -278,16 +318,11 @@ INTERNAL_IPS = (
 IDTRACKER_BASE_URL = "https://datatracker.ietf.org"
 RFCDIFF_BASE_URL = "https://www.ietf.org/rfcdiff"
 
-# Valid values:
-# 'production', 'test', 'development'
-# Override this in settings_local.py if it's not true
-SERVER_MODE = 'production'
-
 # The name of the method to use to invoke the test suite
 TEST_RUNNER = 'ietf.utils.test_runner.IetfTestRunner'
 
 # Fixtures which will be loaded before testing starts
-GLOBAL_TEST_FIXTURES = [ 'names','ietf.utils.test_data.make_immutable_base_data' ]
+GLOBAL_TEST_FIXTURES = [ 'names','ietf.utils.test_data.make_immutable_base_data','nomcom_templates' ]
 
 TEST_DIFF_FAILURE_DIR = "/tmp/test/failure/"
 
@@ -311,19 +346,17 @@ TEST_CODE_COVERAGE_EXCLUDE = [
     "ietf/utils/test_runner.py",
 ]
 
-TEST_COVERAGE_MASTER_FILE = os.path.join(BASE_DIR, "../release-coverage.json")
+TEST_COVERAGE_MASTER_FILE = os.path.join(BASE_DIR, "../release-coverage.json.gz")
 TEST_COVERAGE_LATEST_FILE = os.path.join(BASE_DIR, "../latest-coverage.json")
 
 TEST_CODE_COVERAGE_CHECKER = None
 if SERVER_MODE != 'production':
     import coverage
-    TEST_CODE_COVERAGE_CHECKER = coverage.coverage(source=[ BASE_DIR ], cover_pylib=False, omit=TEST_CODE_COVERAGE_EXCLUDE)
-    if len(TEST_CODE_COVERAGE_CHECKER.collector._collectors) == 0:
-        TEST_CODE_COVERAGE_CHECKER.start()
+    TEST_CODE_COVERAGE_CHECKER = coverage.Coverage(source=[ BASE_DIR ], cover_pylib=False, omit=TEST_CODE_COVERAGE_EXCLUDE)
 
-TEST_CODE_COVERAGE_REPORT_PATH = "static/coverage/"
+TEST_CODE_COVERAGE_REPORT_PATH = "coverage/"
 TEST_CODE_COVERAGE_REPORT_URL = os.path.join(STATIC_URL, TEST_CODE_COVERAGE_REPORT_PATH, "index.html")
-TEST_CODE_COVERAGE_REPORT_DIR = os.path.join(STATIC_ROOT, TEST_CODE_COVERAGE_REPORT_PATH)
+TEST_CODE_COVERAGE_REPORT_DIR = os.path.join(BASE_DIR, "static", TEST_CODE_COVERAGE_REPORT_PATH)
 TEST_CODE_COVERAGE_REPORT_FILE = os.path.join(TEST_CODE_COVERAGE_REPORT_DIR, "index.html")
 
 # WG Chair configuration
@@ -347,11 +380,20 @@ IESG_TASK_FILE = '/a/www/www6/iesg/internal/task.txt'
 IESG_ROLL_CALL_FILE = '/a/www/www6/iesg/internal/rollcall.txt'
 IESG_MINUTES_FILE = '/a/www/www6/iesg/internal/minutes.txt'
 IESG_WG_EVALUATION_DIR = "/a/www/www6/iesg/evaluation"
+# Move drafts to this directory when they expire
 INTERNET_DRAFT_ARCHIVE_DIR = '/a/www/www6s/draft-archive'
+# The following directory contains linked copies of all drafts, but don't
+# write anything to this directory -- its content is maintained by ghostlinkd:
+INTERNET_ALL_DRAFTS_ARCHIVE_DIR = '/a/www/www6s/archive/id'
 MEETING_RECORDINGS_DIR = '/a/www/audio'
 
 # Mailing list info URL for lists hosted on the IETF servers
 MAILING_LIST_INFO_URL = "https://www.ietf.org/mailman/listinfo/%(list_addr)s"
+
+# Liaison Statement Tool settings (one is used in DOC_HREFS below)
+LIAISON_UNIVERSAL_FROM = 'Liaison Statement Management Tool <lsmt@' + IETF_DOMAIN + '>'
+LIAISON_ATTACH_PATH = '/a/www/ietf-datatracker/documents/LIAISON/' # should end in a slash
+LIAISON_ATTACH_URL = 'https://www.ietf.org/lib/dt/documents/LIAISON/' # should end in a slash, location should have a symlink to LIAISON_ATTACH_PATH
 
 # Ideally, more of these would be local -- but since we don't support
 # versions right now, we'll point to external websites
@@ -361,6 +403,8 @@ DOC_HREFS = {
     "slides": "https://www.ietf.org/slides/{doc.name}-{doc.rev}",
     "conflrev": "https://www.ietf.org/cr/{doc.name}-{doc.rev}.txt",
     "statchg": "https://www.ietf.org/sc/{doc.name}-{doc.rev}.txt",
+    "liaison": "%s{doc.external_url}" % LIAISON_ATTACH_URL,
+    "liai-att": "%s{doc.external_url}" % LIAISON_ATTACH_URL,
 }
 
 MEETING_DOC_HREFS = {
@@ -383,11 +427,9 @@ CACHES = {
     }
 }
 
-IPR_EMAIL_TO = 'ietf-ipr@ietf.org'
-DOC_APPROVAL_EMAIL_CC = ["RFC Editor <rfc-editor@rfc-editor.org>", ]
+IPR_EMAIL_FROM = 'ietf-ipr@ietf.org'
 
 IANA_EVAL_EMAIL = "drafts-eval@icann.org"
-IANA_APPROVE_EMAIL = "drafts-approval@icann.org"
 
 # Put real password in settings_local.py
 IANA_SYNC_PASSWORD = "secret"
@@ -401,16 +443,10 @@ RFC_EDITOR_SYNC_NOTIFICATION_URL = "https://www.rfc-editor.org/parser/parser.php
 RFC_EDITOR_QUEUE_URL = "https://www.rfc-editor.org/queue2.xml"
 RFC_EDITOR_INDEX_URL = "https://www.rfc-editor.org/rfc/rfc-index.xml"
 
-# Liaison Statement Tool settings
-LIAISON_UNIVERSAL_FROM = 'Liaison Statement Management Tool <lsmt@' + IETF_DOMAIN + '>'
-LIAISON_ATTACH_PATH = '/a/www/ietf-datatracker/documents/LIAISON/'
-LIAISON_ATTACH_URL = '/documents/LIAISON/'
-
 # NomCom Tool settings
 ROLODEX_URL = ""
 NOMCOM_PUBLIC_KEYS_DIR = '/a/www/nomcom/public_keys/'
 NOMCOM_FROM_EMAIL = 'nomcom-chair@ietf.org'
-NOMCOM_ADMIN_EMAIL = DEFAULT_FROM_EMAIL
 OPENSSL_COMMAND = '/usr/bin/openssl'
 DAYS_TO_EXPIRE_NOMINATION_LINK = ''
 DEFAULT_FEEDBACK_TYPE = 'offtopic'
@@ -418,7 +454,6 @@ NOMINEE_FEEDBACK_TYPES = ['comment', 'questio', 'nomina']
 
 # ID Submission Tool settings
 IDSUBMIT_FROM_EMAIL = 'IETF I-D Submission Tool <idsubmission@ietf.org>'
-IDSUBMIT_TO_EMAIL = 'internet-drafts@ietf.org'
 IDSUBMIT_ANNOUNCE_FROM_EMAIL = 'internet-drafts@ietf.org'
 IDSUBMIT_ANNOUNCE_LIST_EMAIL = 'i-d-announce@ietf.org'
 
@@ -428,18 +463,23 @@ IDSUBMIT_DEFAULT_CUTOFF_DAY_OFFSET_01 = 13
 IDSUBMIT_DEFAULT_CUTOFF_TIME_UTC = datetime.timedelta(hours=23, minutes=59, seconds=59)
 IDSUBMIT_DEFAULT_CUTOFF_WARNING_DAYS = datetime.timedelta(days=21)
 
-MEETING_MATERIALS_SUBMISSION_START_DAYS = -90
-MEETING_MATERIALS_SUBMISSION_CUTOFF_DAYS = 26
-MEETING_MATERIALS_SUBMISSION_CORRECTION_DAYS = 50
-
-INTERNET_DRAFT_DAYS_TO_EXPIRE = 185
-
 IDSUBMIT_REPOSITORY_PATH = INTERNET_DRAFT_PATH
 IDSUBMIT_STAGING_PATH = '/a/www/www6s/staging/'
 IDSUBMIT_STAGING_URL = '//www.ietf.org/staging/'
 IDSUBMIT_IDNITS_BINARY = '/a/www/ietf-datatracker/scripts/idnits'
 
-IDSUBMIT_MAX_PLAIN_DRAFT_SIZE = 6291456  # Max size of the txt draft in bytes
+IDSUBMIT_FILE_TYPES = (
+    'txt',
+    'xml',
+    'pdf',
+    'ps',
+)
+IDSUBMIT_MAX_DRAFT_SIZE =  {
+    'txt':  6*1024*1024,  # Max size of txt draft file in bytes
+    'xml': 10*1024*1024,  # Max size of xml draft file in bytes
+    'pdf': 10*1024*1024,
+    'ps' : 10*1024*1024,
+}
 
 IDSUBMIT_MAX_DAILY_SAME_DRAFT_NAME = 20
 IDSUBMIT_MAX_DAILY_SAME_DRAFT_NAME_SIZE = 50 # in MB
@@ -449,6 +489,14 @@ IDSUBMIT_MAX_DAILY_SAME_GROUP = 150
 IDSUBMIT_MAX_DAILY_SAME_GROUP_SIZE = 450 # in MB
 IDSUBMIT_MAX_DAILY_SUBMISSIONS = 1000
 IDSUBMIT_MAX_DAILY_SUBMISSIONS_SIZE = 2000 # in MB
+
+XML_LIBRARY = "/www/tools.ietf.org/tools/xml2rfc/web/public/rfc/"
+
+MEETING_MATERIALS_SUBMISSION_START_DAYS = -90
+MEETING_MATERIALS_SUBMISSION_CUTOFF_DAYS = 26
+MEETING_MATERIALS_SUBMISSION_CORRECTION_DAYS = 50
+
+INTERNET_DRAFT_DAYS_TO_EXPIRE = 185
 
 DOT_BINARY = '/usr/bin/dot'
 UNFLATTEN_BINARY= '/usr/bin/unflatten'
@@ -472,8 +520,7 @@ SECR_BLUE_SHEET_URL = '//datatracker.ietf.org/documents/blue_sheet.rtf'
 SECR_INTERIM_LISTING_DIR = '/a/www/www6/meeting/interim'
 SECR_MAX_UPLOAD_SIZE = 40960000
 SECR_PROCEEDINGS_DIR = '/a/www/www6s/proceedings/'
-SECR_STATIC_URL = '/secretariat/'
-SECR_PPT2PDF_COMMAND = ['/usr/bin/goffice','--headless','--convert-to','pdf','--outdir']
+SECR_PPT2PDF_COMMAND = ['/usr/bin/soffice','--headless','--convert-to','pdf','--outdir']
 
 USE_ETAGS=True
 
@@ -514,7 +561,7 @@ GROUP_ALIAS_DOMAIN = IETF_DOMAIN
 DRAFT_ALIASES_PATH = "/a/postfix/draft-aliases"
 DRAFT_VIRTUAL_PATH = "/a/postfix/draft-virtual"
 
-# Set zdebug apps in DEV_APPS settings_local
+# Set debug apps in DEV_APPS settings_local
 DEV_APPS = ()
 DRAFT_VIRTUAL_DOMAIN = "virtual.ietf.org"
 

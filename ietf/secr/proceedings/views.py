@@ -508,7 +508,7 @@ def main(request):
         meetings = Meeting.objects.filter(type='ietf').order_by('-number')
     else:
         # select meetings still within the cutoff period
-        meetings = Meeting.objects.filter(type='ietf',date__gt=datetime.datetime.today() - datetime.timedelta(days=settings.SUBMISSION_CORRECTION_DAYS)).order_by('number')
+        meetings = Meeting.objects.filter(type='ietf',date__gt=datetime.datetime.today() - datetime.timedelta(days=settings.MEETING_MATERIALS_SUBMISSION_CORRECTION_DAYS)).order_by('number')
 
     groups = get_my_groups(request.user)
     interim_meetings = Meeting.objects.filter(type='interim',session__group__in=groups).order_by('-date')
@@ -941,7 +941,6 @@ def upload_unified(request, meeting_num, acronym=None, session_id=None):
             DocAlias.objects.get_or_create(name=doc.name, document=doc)
 
             handle_upload_file(file,disk_filename,meeting,material_type.slug)
-            post_process(doc)
             
             # set Doc state
             if doc.type.slug=='slides':
@@ -967,7 +966,8 @@ def upload_unified(request, meeting_num, acronym=None, session_id=None):
                                        rev=doc.rev,
                                        desc='New revision available',
                                        time=now)
-
+            
+            post_process(doc)
             create_proceedings(meeting,group)
             messages.success(request,'File uploaded sucessfully')
 

@@ -20,6 +20,7 @@ from ietf.person.models import Email
 from ietf.person.fields import SearchableEmailField
 from ietf.utils.fields import MultiEmailField
 from ietf.utils.mail import send_mail
+from ietf.mailtrigger.utils import gather_address_lists
 
 
 ROLODEX_URL = getattr(settings, 'ROLODEX_URL', None)
@@ -328,7 +329,7 @@ class NominateForm(BaseNomcomForm, forms.ModelForm):
                                       help_text="If you want to get a confirmation mail containing your feedback in cleartext, please check the 'email comments back to me as confirmation'.",
                                       required=False)
 
-    fieldsets = [('Candidate Nomination', ('position', 'candidate_name',
+    fieldsets = [('Candidate Nomination', ('share_nominator','position', 'candidate_name',
                   'candidate_email', 'candidate_phone', 'comments', 'confirmation'))]
 
     def __init__(self, *args, **kwargs):
@@ -338,7 +339,8 @@ class NominateForm(BaseNomcomForm, forms.ModelForm):
 
         super(NominateForm, self).__init__(*args, **kwargs)
 
-        fieldset = ['position',
+        fieldset = ['share_nominator',
+                    'position',
                     'candidate_name',
                     'candidate_email', 'candidate_phone',
                     'comments']
@@ -357,6 +359,9 @@ class NominateForm(BaseNomcomForm, forms.ModelForm):
                                nomination wishes to be anonymous. The confirmation email will be sent to the address given here,
                                and the address will also be captured as part of the registered nomination.)"""
                 self.fields['nominator_email'].help_text = help_text
+                self.fields['share_nominator'].help_text = """(Nomcom Chair/Member: Check this box if the person providing this nomination
+                                                              has indicated they will allow NomCom to share their name as one of the people
+                                                              nominating this candidate."""
         else:
             fieldset.append('confirmation')
 
@@ -371,6 +376,7 @@ class NominateForm(BaseNomcomForm, forms.ModelForm):
         position = self.cleaned_data['position']
         comments = self.cleaned_data['comments']
         confirmation = self.cleaned_data['confirmation']
+        share_nominator = self.cleaned_data['share_nominator']
         nomcom_template_path = '/nomcom/%s/' % self.nomcom.group.acronym
 
         author = None
@@ -397,6 +403,7 @@ class NominateForm(BaseNomcomForm, forms.ModelForm):
 
         nomination.nominee = nominee
         nomination.comments = feedback
+        nomination.share_nominator = share_nominator
         nomination.user = self.user
 
         if commit:
@@ -407,18 +414,18 @@ class NominateForm(BaseNomcomForm, forms.ModelForm):
             if author:
                 subject = 'Nomination receipt'
                 from_email = settings.NOMCOM_FROM_EMAIL
-                to_email = author.address
+                (to_email, cc) = gather_address_lists('nomination_receipt_requested',nominator=author.address)
                 context = {'nominee': nominee.email.person.name,
                           'comments': comments,
                           'position': position.name}
                 path = nomcom_template_path + NOMINATION_RECEIPT_TEMPLATE
-                send_mail(None, to_email, from_email, subject, path, context)
+                send_mail(None, to_email, from_email, subject, path, context, cc=cc)
 
         return nomination
 
     class Meta:
         model = Nomination
-        fields = ('position', 'nominator_email', 'candidate_name',
+        fields = ('share_nominator', 'position', 'nominator_email', 'candidate_name',
                   'candidate_email', 'candidate_phone')
 
 
@@ -525,12 +532,12 @@ class FeedbackForm(BaseNomcomForm, forms.ModelForm):
             if author:
                 subject = "NomCom comment confirmation"
                 from_email = settings.NOMCOM_FROM_EMAIL
-                to_email = author.address
+                (to_email, cc) = gather_address_lists('nomcom_comment_receipt_requested',commenter=author.address)
                 context = {'nominee': self.nominee.email.person.name,
                            'comments': comments,
                            'position': self.position.name}
                 path = nomcom_template_path + FEEDBACK_RECEIPT_TEMPLATE
-                send_mail(None, to_email, from_email, subject, path, context)
+                send_mail(None, to_email, from_email, subject, path, context, cc=cc)
 
     class Meta:
         model = Feedback
@@ -585,8 +592,7 @@ class QuestionnaireForm(BaseNomcomForm, forms.ModelForm):
 
     class Meta:
         model = Feedback
-        fields = ('positions',
-                  'comments')
+        fields = ( 'comments', )
 
 class NomComTemplateForm(BaseNomcomForm, DBTemplateForm):
     content = forms.CharField(label="Text", widget=forms.Textarea(attrs={'cols': '120', 'rows':'40', }))

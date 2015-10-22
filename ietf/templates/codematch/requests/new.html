@@ -120,7 +120,8 @@
 										{% if mails %}
 				            				<h4><strong>Mails</strong></h4>
 											{% for mail in mails %}
-												{{ mail.type }}: <a  href="#"> {{ mail.name }} </a>
+												{{ mail.type }}: <a  href="#"> {{ mail.mail }} </a>
+												<a class="label label-info" href="{% url 'ietf.codematch.requests.views.remove_mail' 0 mail.mail %}" >delete</a>
 												<br />
 											{% endfor %}
 										{% endif %}
@@ -128,9 +129,7 @@
 									
 										</div>
 										{% if canaddmail %}
-											<label>New mail:</label>
-											{{ mailform.name }}
-											{{ mailform.type }}
+											{{ mailform }}
 											{% csrf_token %}
 											<input type="submit" value="Add mail" />
 										{% endif %}

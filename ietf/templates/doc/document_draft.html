@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 {# Copyright The IETF Trust 2015, All Rights Reserved #}
 {% load origin %}
-
+{% load staticfiles %}
 {% load ietf_filters %}
 
 {% block pagehead %}
   <link rel="alternate" type="application/atom+xml" title="Document changes" href="/feed/document-changes/{{ name }}/">
   <meta name="description" content="{{ doc.title }} {% if doc.get_state_slug == "rfc" %}(RFC {{ rfc_number }}{% if published %}, {{ published.time|date:"F Y" }}{% endif %}{% if obsoleted_by %}; obsoleted by {{ obsoleted_by|join:", " }}{% endif %}){% else %}(Internet-Draft, {{ doc.time|date:"Y" }}){% endif %}">
+{% endblock %}
+
+{% block morecss %}
+  .inline	{ display: inline; }
 {% endblock %}
 
 {% block title %}
@@ -27,16 +31,16 @@
     <thead id="message-row">
        <tr>
 	  {% if doc.rev != latest_rev %}
-	  <th colspan="4" class="alert-warning">&nbsp;The information below is for an old version of the document</th>
+	  <th colspan="4" class="alert-warning">The information below is for an old version of the document</th>
 	  {% else %}
-	  <th colspan="4">&nbsp;</th>
+	  <th colspan="4"></th>
 	  {% endif %}  
        </tr>
     </thead>
 
-    <tbody class="plain">
+    <tbody class="meta">
       <tr>
-	<th rowspan="{{table_rows.doc}}">Document</th>
+	<th>Document</th>
 	<th>Type</th>
 	<td class="edit"></td>
 	<td>
@@ -60,6 +64,7 @@
       </tr>
 
       <tr>
+      	<th></th>
 	<th>Last updated</th>
 	<td class="edit"></td>
 	<td>
@@ -72,6 +77,7 @@
 
       {% if replaces or can_edit_stream_info %}
 	<tr>
+	  <th></th>
 	  <th>Replaces</th>
 	  <td class="edit">
 	    {% if can_edit_stream_info %}
@@ -86,6 +92,7 @@
 
       {% if replaced_by %}
 	<tr>
+	  <th></th>
 	  <th>Replaced by</th>
 	  <td class="edit"></td>
 	  <td>
@@ -93,8 +100,39 @@
 	  </td>
 	</tr>
       {% endif %}
-      
+
+      {% if can_view_possibly_replaces %}
+          {% if possibly_replaces %}
+            <tr>
+              <th>Possibly Replaces</th>
+              <td class="edit">
+                {% if can_edit_replaces %}
+                  <a class="btn btn-default btn-xs" href="{% url "doc_review_possibly_replaces" name=doc.name %}">Edit</a>
+                {% endif %}
+              </td>
+              <td>
+                {{ possibly_replaces|join:", "|urlize_ietf_docs }}
+              </td>
+            </tr>
+          {% endif %}
+
+          {% if possibly_replaced_by %}
+            <tr>
+              <th>Possibly Replaced By</th>
+              <td class="edit">
+                {% if can_edit_replaces %}
+                  {% comment %}<a class="btn btn-default btn-xs" href="{% url "doc_review_possibly_replaces" name=doc.name %}">Edit</a>{% endcomment %}
+                {% endif %}
+              </td>
+              <td>
+                {{ possibly_replaced_by|join:", "|urlize_ietf_docs }}
+              </td>
+            </tr>
+          {% endif %}
+      {% endif %}
+
       <tr>
+        <th></th>
 	<th>Stream</th>
 	<td class="edit">
 	  {% if can_change_stream %}
@@ -108,6 +146,7 @@
 
       {% if doc.get_state_slug != "rfc" %}
 	<tr>
+	  <th></th>
 	  <th>Intended RFC status</th>
 	  <td class="edit">
 	    {% if can_edit or can_edit_stream_info %}
@@ -121,6 +160,7 @@
       {% endif %}
 
       <tr>
+        <th></th>
 	<th>Formats</th>
 	<td class="edit"></td>
 	<td>
@@ -139,6 +179,7 @@
 
       {% if conflict_reviews %}
 	<tr>
+          <th></th>
 	  <th>IETF conflict review</th>
 	  <td class="edit"></td>
 	  <td>{{ conflict_reviews|join:", "|urlize_ietf_docs }}</td>
@@ -146,9 +187,9 @@
       {% endif %}
 
     </tbody>
-    <tbody class="plain">
+    <tbody class="meta">
       <tr>
-	<th rowspan="{{table_rows.stream}}">Stream</th>
+	<th>Stream</th>
 	{% if doc.stream %}
 	  <th>
 	     {% if doc.stream.slug != "legacy" %}
@@ -184,6 +225,7 @@
 
       {% if consensus %}
 	<tr>
+	  <th></th>
 	  <th>Consensus</th>
 	  <td class="edit">
 	    {% if can_edit or can_edit_stream_info %}
@@ -197,6 +239,7 @@
       {% endif %}
 
       <tr>
+        <th></th>
 	<th>Document shepherd</th>
 	<td class="edit">
 	  {% if can_edit_stream_info %}
@@ -212,6 +255,7 @@
 
       {% if shepherd_writeup or can_edit_shepherd_writeup %}
 	<tr>
+	  <th></th>
 	  <th>Shepherd write-up</th>
 	  <td class="edit">
 	    {% if can_edit_shepherd_writeup %}
@@ -234,14 +278,15 @@
 
       {% if published and started_iesg_process and published.time < started_iesg_process.time %}
 	<tr>
+	  <th></th>
 	  <th colspan="3" class="warning">This information refers to IESG processing after the RFC was initially published:</th>
 	</tr>
       {% endif %}
 
     </tbody>
-    <tbody class="plain">
+    <tbody class="meta">
       <tr>
-	<th rowspan="{{table_rows.iesg}}">IESG</th>
+	<th>IESG</th>
 	<th><a href="{% url "ietf.help.views.state" doc=doc.type.slug type="iesg" %}">IESG state</a></th>
 	<td class="edit">
 	  {% if iesg_state and can_edit %}
@@ -254,6 +299,7 @@
       </tr>
 
       <tr>
+        <th></th>
 	<th>Telechat date</th>
 	<td class="edit">
 	  {% if can_edit %}
@@ -279,6 +325,7 @@
       </tr>
 
       <tr>
+        <th></th>
 	<th>Responsible AD</th>
 	<td class="edit">
 	  {% if can_edit %}
@@ -293,6 +340,7 @@
       {% if iesg_state %}
 	{% if doc.note or can_edit %}
 	  <tr>
+	    <th></th>
 	    <th>IESG note</th>
 	    <td class="edit">
 	      {% if can_edit %}
@@ -307,6 +355,7 @@
       {% endif %}
 
       <tr>
+        <th></th>
 	<th>Send notices to</th>
 	<td class="edit">
 	  {% if can_edit_notify %}
@@ -321,9 +370,9 @@
     </tbody>
 
     {% if iana_review_state %}
-    <tbody class="plain">
+    <tbody class="meta">
       <tr>
-	<th rowspan="{{table_rows.iana}}">IANA</th>
+	<th>IANA</th>
 	<th><a href="{% url "ietf.help.views.state" doc=doc.type.slug type="iana-review" %}">IANA review state</a></th>
 	<td class="edit">
 	  {% if can_edit_iana_state %}
@@ -336,6 +385,7 @@
       </tr>
 
       <tr>
+        <th></th>
 	<th>IANA action state</th>
 	<td class="edit">
 	  {% if can_edit_iana_state %}
@@ -349,11 +399,10 @@
     </tbody>
     {% endif %}
 
-    <tbody class="plain">
-
+    <tbody class="meta">
       {% if rfc_editor_state %}
 	<tr>
-	  <th rowspan="{{table_rows.rfced}}">RFC Editor</th>
+	  <th>RFC Editor</th>
 	  <th><a href="{% url "ietf.help.views.state" doc=doc.type.slug type="rfceditor" %}">RFC Editor state</a></th>
 	  <td class="edit"></td>
 	  <td><a href="https://www.rfc-editor.org/queue2.html#{{ doc.name }}">{{ rfc_editor_state }}</a></td>
@@ -364,12 +413,12 @@
   </table>
 
   <div class="buttonlist">
-    <a class="btn btn-default btn-xs" href="mailto:{{ doc.name }}@tools.ietf.org?subject=Mail%20regarding%20{{ doc.name }}"><span class="fa fa-envelope-o"></span> Email authors</a>
+    <a class="btn btn-default btn-xs" href="mailto:{{ doc.name }}@ietf.org?subject=Mail%20regarding%20{{ doc.name }}"><span class="fa fa-envelope-o"></span> Email authors</a>
     <a class="btn btn-default btn-xs" href="{% url "ipr_search" %}?submit=draft&amp;id={{ doc.name }}" rel="nofollow"><span class="fa fa-bolt"></span> IPR {% if doc.related_ipr %} <span class="badge">{{doc.related_ipr|length}}</span>{% endif %}</a>
     <a class="btn btn-default btn-xs" href="{% url "doc_references" doc.canonical_name %}" rel="nofollow"><span class="fa fa-long-arrow-left"></span> References</a>
     <a class="btn btn-default btn-xs" href="{% url "doc_referenced_by" doc.canonical_name %}" rel="nofollow"><span class="fa fa-long-arrow-right"></span> Referenced by</a>
     <a class="btn btn-default btn-xs" href="https://www.ietf.org/tools/idnits?url=https://www.ietf.org/archive/id/{{ doc.filename_with_rev }}" rel="nofollow" target="_blank"><span class="fa fa-exclamation"></span> Nits</a>
-    <span class="dropdown">
+    <div class="dropdown inline">
       <button class="btn btn-default btn-xs dropdown-toggle" type="button" id="ddSearchMenu" data-toggle="dropdown" aria-expanded="true">
           <span class="fa fa-search"></span> Search lists <span class="caret"></span>
       </button>
@@ -380,7 +429,7 @@
           <li role="presentation"><a role="menuitem" href="https://www.iesg.org/bin/c5i?mid=6&amp;rid=77&amp;target={{ doc.name }}" rel="nofollow" target="_blank">ARO</a> </li>
         {% endif %}
       </ul>
-    </span>
+    </div>
     {% if user.is_authenticated %}
       {% if tracking_document %}
         <a class="btn btn-default btn-xs community-list-add-remove-doc" href="{% url "community_remove_track_document" doc.name %}" title="Remove from your personal ID list"><span class="fa fa-bookmark-o"></span> Untrack</a>

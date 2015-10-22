@@ -228,7 +228,7 @@ def rfclink(string):
     URL for that RFC.
     """
     string = str(string);
-    return "//tools.ietf.org/html/rfc" + string;
+    return "https://tools.ietf.org/html/rfc" + string;
 
 @register.filter(name='urlize_ietf_docs', is_safe=True, needs_autoescape=True)
 def urlize_ietf_docs(string, autoescape=None):
@@ -401,7 +401,7 @@ def unescape(text):
 
 @register.filter(name='new_enough')
 def new_enough(x,request):
-    days = settings.USER_PREFERENCE_DEFAULTS["new_enough"]
+    days = int(settings.USER_PREFERENCE_DEFAULTS["new_enough"])
     value = request.COOKIES.get("new_enough", None)
     if value and value.isdigit():
         days = int(value)
@@ -409,7 +409,7 @@ def new_enough(x,request):
 
 @register.filter(name='expires_soon')
 def expires_soon(x,request):
-    days = settings.USER_PREFERENCE_DEFAULTS["expires_soon"]
+    days = int(settings.USER_PREFERENCE_DEFAULTS["expires_soon"])
     value = request.COOKIES.get("expires_soon", None)
     if value and value.isdigit():
         days = int(value)

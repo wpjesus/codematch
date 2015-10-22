@@ -12,7 +12,7 @@ from ietf.doc.models import Document, DocAlias, DocEvent, DeletedEvent, DocTagNa
 from ietf.doc.utils import add_state_change_event
 from ietf.person.models import Person
 from ietf.sync import iana, rfceditor
-from ietf.utils.mail import outbox
+from ietf.utils.mail import outbox, empty_outbox
 from ietf.utils.test_data import make_test_data
 from ietf.utils.test_utils import login_testing_unauthorized
 from ietf.utils.test_utils import TestCase
@@ -71,7 +71,7 @@ class IANASyncTests(TestCase):
         # check sorting
         self.assertEqual(changes[0]["time"], "2011-10-09 11:00:00")
 
-        mailbox_before = len(outbox)
+        empty_outbox()
         added_events, warnings = iana.update_history_with_changes(changes)
 
         self.assertEqual(len(added_events), 3)
@@ -81,7 +81,9 @@ class IANASyncTests(TestCase):
         e = draft.latest_event(StateDocEvent, type="changed_state", state_type="draft-iana-action")
         self.assertEqual(e.desc, "IANA Action state changed to <b>Waiting on RFC Editor</b> from In Progress")
 #        self.assertEqual(e.time, datetime.datetime(2011, 10, 9, 5, 0)) # check timezone handling
-        self.assertEqual(len(outbox), mailbox_before + 3 * 2)
+        self.assertEqual(len(outbox), 3 )
+        for m in outbox:
+            self.assertTrue('aread@' in m['To']) 
 
         # make sure it doesn't create duplicates
         added_events, warnings = iana.update_history_with_changes(changes)
@@ -402,9 +404,11 @@ class RFCSyncTests(TestCase):
         self.assertEqual(len(warnings), 0)
 
         self.assertEqual(draft.get_state_slug("draft-rfceditor"), "edit")
+        self.assertEqual(draft.get_state_slug("draft-iesg"), "rfcqueue")
         self.assertEqual(set(draft.tags.all()), set(DocTagName.objects.filter(slug__in=("iana", "ref"))))
-        self.assertEqual(draft.docevent_set.all()[0].type, "changed_state")
-        self.assertEqual(draft.docevent_set.all()[1].type, "rfc_editor_received_announcement")
+        self.assertEqual(draft.docevent_set.all()[0].type, "changed_state") # changed draft-iesg state
+        self.assertEqual(draft.docevent_set.all()[1].type, "changed_state") # changed draft-rfceditor state
+        self.assertEqual(draft.docevent_set.all()[2].type, "rfc_editor_received_announcement")
 
         self.assertEqual(len(outbox), mailbox_before + 1)
         self.assertTrue("RFC Editor queue" in outbox[-1]["Subject"])
