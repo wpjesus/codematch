@@ -27,14 +27,14 @@ class ProjectTag(models.Model):
     def __unicode__(self):
         return self.name
 
-class ProjectMail(models.Model):
+class ProjectContact(models.Model):
     """ """
     
-    mail = models.CharField(max_length=80)
+    contact = models.CharField(max_length=80)
     type = models.CharField(max_length=50, choices=constants.MAIL_TYPES)
     
     def __unicode__(self):
-        return self.mail
+        return self.contact
 
 class CodingProject (models.Model):
     """ an element in ProjectContainer can have several Coding Projects"""
@@ -87,7 +87,7 @@ class ProjectContainer (models.Model):
     
     tags          = models.ManyToManyField(ProjectTag, blank=True, null=True)
     
-    mails         = models.ManyToManyField(ProjectMail, blank=True, null=True)
+    contacts       = models.ManyToManyField(ProjectContact, blank=True, null=True)
 
     def __unicode__(self):              # __unicode__ on Python 2
         return self.title

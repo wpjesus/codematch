@@ -13,6 +13,7 @@
 - Back quando acabou de atualizar ou criar algum item
 - Ver como commitar settings_local.py sem dar conflitos ao dar pull
 - Rever base.html da versão 6.6.1 (reaproveitei o da versão que eu tinha modificado)
+- Tive que alterar os scripts generate na pasta bin
 
 ### DONE LIST ###
 - Adicionar documentos e tags dentro do formul·rio de novo coderequest
@@ -36,6 +37,9 @@
 - Existem diversos testes sendo feitos nos templates, deveriam ser passados para o cÛdigo?
 - Será que está correto criar constantes e centralizar as strings? (Botar num arquivo Constants)
 - Sera que deveria ser definido Mentor para o Codematch StandAlone
+
+### NOTES ###
+- Quando der problema no mysql da maquina virtual provavelmente é falta de espaço
 
 ### DOCUMENTATION ###
 Estrutura composta no momento de 4 pastas alÈm da raÌz (Accounts, Helpers, Matches e Requests).

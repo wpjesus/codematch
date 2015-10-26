@@ -101,7 +101,7 @@
 				            				<h4><strong>Documents</strong></h4>
 											{% for doc in docs %}
 												{{ doc.document.group }}: <a  href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
-												<a class="label label-info" href="{% url 'ietf.codematch.requests.views.remove_document' projectcontainer.id doc.name %}" >delete</a>
+												<a class="label label-info" href="{% url 'ietf.codematch.requests.views.remove_document' 0 doc.name %}" >delete</a>
 												<br />
 											{% endfor %}
 										{% endif %}
@@ -158,13 +158,14 @@
 					            				{% if not forloop.first %}
 			            						,
 			            						{% endif %}
-			            						<a>#{{ tag }}</a>
+			            						<a>{{ tag }}</a>
 			            					{% endfor %}
 			            					<br />	
 			            				{% endif %}
 			            				<div>
 										<br />
 										{% if user.is_authenticated and canaddtags %}
+											<label >*tags may be related to events, dates, protocols or other relative subject.</label><br />
 											<label class="control-label col-xs-2">Tag:</label>
 											{{ tagform.name }}
 											{% csrf_token %}

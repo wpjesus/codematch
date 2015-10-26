@@ -20,7 +20,8 @@ def is_user_allowed(user, permission):
 
 def get_user(request):
 	if request.user.is_authenticated():
-		return Person.objects.get(user=request.user)
+		user = Person.objects.get(user=request.user)
+		return user
 	else:
 		return None
 	
@@ -28,18 +29,18 @@ def get_menu_arguments(request, dict):
     
 	user = get_user(request)
 	
-	if user != None:
+	# Always setted
+	dict['from'] = request.GET.get('from', None)	
+	dict['codematch_version'] = constants.VERSION
+	dict['codematch_revision_date'] = constants.RELEASE_DATE
+	
+	if user != None: # Only when user is logged
 		
 		my_codings 			  = CodingProject.objects.filter( coder = user )
 		my_own_projects 	  = ProjectContainer.objects.filter( owner = user )
 		my_mentoring_projects = ProjectContainer.objects.filter( code_request__mentor = user )
 		
 		# Some tests are made on the templates, should be here in the code?
-		
-		dict['from'] = request.GET.get('from', None)
-		
-		dict['codematch_version'] = constants.VERSION
-		dict['codematch_revision_date'] = constants.RELEASE_DATE
 		
 		dict["mycodings"] 		  = my_codings
 		dict["projectsowner"] 	  = my_own_projects
@@ -61,9 +62,9 @@ def get_menu_arguments(request, dict):
 def clear_session(request):
 	
 	# All session variables
-	keys = [constants.ALL_PROJECTS, constants.PROJECT_INSTANCE, constants.REQUEST_INSTANCE, constants.MAIL_INSTANCE, constants.ACTUAL_PROJECT, 
-			constants.CODE_INSTANCE, constants.ADD_DOCS, constants.ADD_TAGS, constants.ADD_LINKS, constants.ADD_MAILS, 
-			constants.REM_MAILS, constants.REM_DOCS, constants.REM_TAGS, constants.REM_LINKS]
+	keys = [constants.ALL_PROJECTS, constants.PROJECT_INSTANCE, constants.REQUEST_INSTANCE, constants.CONTACT_INSTANCE, constants.ACTUAL_PROJECT, 
+			constants.CODE_INSTANCE, constants.ADD_DOCS, constants.ADD_TAGS, constants.ADD_LINKS, constants.ADD_CONTACTS, 
+			constants.REM_CONTACTS, constants.REM_DOCS, constants.REM_TAGS, constants.REM_LINKS]
 	
 	# If MAINTAIN_STATE is true then session variables shouldn't be deleted
 	if constants.MAINTAIN_STATE in request.session and request.session[constants.MAINTAIN_STATE] == True:

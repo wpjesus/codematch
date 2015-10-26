@@ -158,13 +158,14 @@
 				            				{% if not forloop.first %}
 		            						,
 		            						{% endif %}
-		            						<a >#{{ tag }}</a>
+		            						<a >{{ tag }}</a>
 		            					{% endfor %}
 		            					<br />	
 		            				{% endif %}
 		            				<div>
 									<br />
 									{% if user.is_authenticated and canaddtags %}
+										<label >*tags may be related to events, dates, protocols or other relative subject.</label><br />
 										<label class="control-label col-xs-2">Tag:</label>
 										{{ tagform.name }}
 										{% csrf_token %}

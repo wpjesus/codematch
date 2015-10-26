@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm, CharField
 
-from ietf.codematch.matches.models import ProjectContainer, CodingProject, Implementation, ProjectMail
+from ietf.codematch.matches.models import ProjectContainer, CodingProject, Implementation, ProjectContact
 
 class SearchForm(forms.Form):
     search       = forms.CharField(label="Search", max_length=255, required=False)
@@ -11,10 +11,10 @@ class LinkImplementationForm(ModelForm):
         model  = Implementation
         fields = [ "link" ] 
         
-class MailForm(ModelForm):
+class ContactForm(ModelForm):
     class Meta:
-        model  = ProjectMail
-        fields = [ "mail", "type" ] 
+        model  = ProjectContact
+        fields = [ "contact", "type" ] 
 
 class ProjectContainerForm(ModelForm):
     class Meta:

@@ -124,9 +124,9 @@
 		                    <h4><strong>Resources</strong></h4>
 		                    Mentor: <a href="#">{{ projectcontainer.code_request.mentor.name }}</a><br />
 		                    
-		                    {% for mail in projectcontainer.mails.all %}
-		                    	{{ mail.type }}: <a href="#">
-		                    		{{ mail.mail }}</a><br />
+		                    {% for m in projectcontainer.contacts.all %}
+		                    	{{ m.type }}: <a href="#">
+		                    		{{ m.contact }}</a><br />
 		                    {% endfor %}
 		                    
 		                    {% if projectcontainer.tags.all %}
@@ -135,7 +135,7 @@
 		            				{% if not forloop.first %}
 		            				,
 		            				{% endif %}
-		            				<a href="#">#{{ tag }}</a>
+		            				<a href="#">{{ tag }}</a>
 		            			{% endfor %}
 						        <br />
 		            		{% endif %}         	

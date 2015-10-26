@@ -7,9 +7,9 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('doc', '0004_auto_20150403_1235'),
+        ('requests', '__first__'),
+        ('doc', '0005_auto_20150721_0230'),
         ('person', '0004_auto_20150308_0440'),
-        ('requests', '0001_initial'),
     ]
 
     operations = [
@@ -38,15 +38,27 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
+            name='ProjectContact',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('contact', models.CharField(max_length=80)),
+                ('type', models.CharField(max_length=50, choices=[(b'Twitter', b'Twitter'), (b'Facebook', b'Facebook'), (b'Jabber', b'Jabber'), (b'Mail', b'Email')])),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
             name='ProjectContainer',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('title', models.CharField(max_length=80)),
                 ('creation_date', models.DateTimeField(auto_now_add=True)),
                 ('protocol', models.CharField(max_length=255)),
-                ('description', models.TextField(max_length=255)),
+                ('description', models.TextField()),
                 ('code_request', models.ForeignKey(blank=True, to='requests.CodeRequest', null=True)),
                 ('codings', models.ManyToManyField(to='matches.CodingProject')),
+                ('contacts', models.ManyToManyField(to='matches.ProjectContact', null=True, blank=True)),
                 ('docs', models.ManyToManyField(to='doc.DocAlias')),
                 ('owner', models.ForeignKey(blank=True, to='person.Person', null=True)),
             ],
@@ -73,7 +85,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='codingproject',
             name='links',
-            field=models.ManyToManyField(to='matches.Implementation', blank=True),
+            field=models.ManyToManyField(to='matches.Implementation', null=True, blank=True),
             preserve_default=True,
         ),
         migrations.AddField(

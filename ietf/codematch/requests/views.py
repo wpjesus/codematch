@@ -16,10 +16,10 @@ from ietf.group.models import Group
 from ietf.person.models import Person
 from ietf.doc.models import DocAlias, Document
 
-from ietf.codematch.matches.forms import SearchForm, ProjectContainerForm, MailForm
+from ietf.codematch.matches.forms import SearchForm, ProjectContainerForm, ContactForm
 from ietf.codematch.requests.forms import CodeRequestForm, DocNameForm, TagForm
 
-from ietf.codematch.matches.models import ProjectContainer, CodingProject, ProjectTag, ProjectMail
+from ietf.codematch.matches.models import ProjectContainer, CodingProject, ProjectTag, ProjectContact
 from ietf.codematch.requests.models import CodeRequest
 
 from ietf.codematch.helpers.utils import (render_page, is_user_allowed, clear_session, get_user)
@@ -189,18 +189,18 @@ def save_project(request, template, project_container=None):
     tag_form = modelform_factory(ProjectTag, form=TagForm)
     
 	# TODO: check permission
-    can_add_documents = is_user_allowed(user, "canadddocuments")
-    can_add_tags      = is_user_allowed(user, "canaddtags")
-    can_add_mail      = is_user_allowed(user, "canaddmail")
+    can_add_documents    = is_user_allowed(user, "canadddocuments")
+    can_add_tags         = is_user_allowed(user, "canaddtags")
+    can_add_contact      = is_user_allowed(user, "canaddcontact")
     
 	# If not there in the current session then should be setted a default
     proj_form = request.session[constants.PROJECT_INSTANCE] if constants.PROJECT_INSTANCE in request.session else ProjectContainerForm()
     req_form  = request.session[constants.REQUEST_INSTANCE] if constants.REQUEST_INSTANCE in request.session else CodeRequestForm()
-    mail_form = request.session[constants.MAIL_INSTANCE] if constants.MAIL_INSTANCE in request.session else MailForm()
+    contact_form = request.session[constants.CONTACT_INSTANCE] if constants.CONTACT_INSTANCE in request.session else ContactForm()
     
     docs  = request.session[constants.ADD_DOCS]
     tags  = request.session[constants.ADD_TAGS]
-    mails = request.session[constants.ADD_MAILS]
+    contacts = request.session[constants.ADD_CONTACTS]
     
     previous_template = "codematch/requests/show_list"
     
@@ -209,9 +209,9 @@ def save_project(request, template, project_container=None):
     
     if request.method == 'POST':
         
-        doc_name = request.POST.get("doc")
-        tag 	 = TagForm(request.POST)
-        new_mail = MailForm(request.POST)
+        doc_name    = request.POST.get("doc")
+        tag 	    = TagForm(request.POST)
+        new_contact = ContactForm(request.POST)
         
         if project_container != None:
             new_proj = ProjectContainerForm(request.POST, instance=project_container)
@@ -230,14 +230,15 @@ def save_project(request, template, project_container=None):
         # Adding new tag to the tags list to be saved in the project
         elif tag.is_valid():
             new_tag = tag.save(commit=False)
+            new_tag.name = "#" + new_tag.name
             tags.append(new_tag)  # Updating tags to appear after rendering
             
-        # Adding new mail to the mailing list to be saved in the project
-        elif new_mail.is_valid():
-            m = new_mail.save(commit=False)
+        # Adding new contact to the mailing list to be saved in the project
+        elif new_contact.is_valid():
+            m = new_contact.save(commit=False)
             if m.type.lower() == constants.STRING_TWITTER: # TODO: Padronize for all
-                m.mail = '@' + m.mail 
-            mails.append(m)
+                m.contact = '@' + m.contact 
+            contacts.append(m)
 		
 		# Saving project (new or not) in the database
         elif request.POST.get('save') and new_proj.is_valid() and new_req.is_valid():
@@ -253,7 +254,7 @@ def save_project(request, template, project_container=None):
             
             rem_docs  = request.session[constants.REM_DOCS]
             rem_tags  = request.session[constants.REM_TAGS]
-            rem_mails = request.session[constants.REM_MAILS]
+            rem_contacts = request.session[constants.REM_CONTACTS]
             
             for doc in rem_docs:
                 project.docs.remove(doc)
@@ -263,25 +264,24 @@ def save_project(request, template, project_container=None):
                 project.tags.remove(tags)
                 modified = True
                 
-            for m in rem_mails:
-                project.mails.remove(m)
+            for m in rem_contacts:
+                project.contacts.remove(m)
                 modified = True
             
             for doc in docs:
                 project.docs.add(doc)
                 modified = True
             
-            for m in mails:
+            for m in contacts:
                 try:
-					# Trying get an existing mail
-					# TODO: Rename fields 'mail'
-                    new_m = ProjectMail.objects.get(mail=m.mail, type=m.type)
+					# Trying get an existing contact
+                    new_m = ProjectContact.objects.get(contact=m.contact, type=m.type)
                 except:
-					# Otherwise you need to create a new mail
+					# Otherwise you need to create a new contact
                     m.save()
                     new_m = m
                     
-                project.mails.add(new_m)
+                project.contacts.add(new_m)
                 modified = True
             
             for tag in tags:
@@ -313,15 +313,15 @@ def save_project(request, template, project_container=None):
         'projectcontainer' : project_container,
         'projform'         : proj_form,
         'reqform'          : req_form,
-        'mailform'         : mail_form,
+        'contactform'      : contact_form,
         'docform'          : doc_form,
         'tagform'          : tag_form,
         'docs'             : docs,
         'tags'             : tags,
-        'mails'            : mails,
+        'contacts'         : contacts,
         'canadddocuments'  : can_add_documents,
         'canaddtags'       : can_add_tags,
-        'canaddmail'       : can_add_mail
+        'canaddcontact'    : can_add_contact
     })
 
 @login_required(login_url = settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
@@ -332,9 +332,9 @@ def edit(request, pk):
     
     if request.path != request.session[constants.ACTUAL_TEMPLATE]:
         clear_session(request)
-        request.session[constants.REM_DOCS]  = []
-        request.session[constants.REM_MAILS] = []
-        request.session[constants.REM_TAGS]  = []
+        request.session[constants.REM_DOCS]     = []
+        request.session[constants.REM_CONTACTS] = []
+        request.session[constants.REM_TAGS]     = []
     
     request.session[constants.MAINTAIN_STATE] = True
 	
@@ -348,15 +348,18 @@ def edit(request, pk):
         tags = project_container.tags.all()
         request.session[constants.ADD_TAGS] = list(tags)
         
-    if constants.ADD_MAILS not in request.session:
-        mails = project_container.mails.all()
-        request.session[constants.ADD_MAILS] = list(mails)
-        
-    user = get_user(request)
+    if constants.ADD_CONTACTS not in request.session:
+        contacts = project_container.contacts.all()
+        request.session[constants.ADD_CONTACTS] = list(contacts)
+
+    # TODO: Review this        
+    us = get_user(request)
+    user = us
+    
     # Project must have been created by the current user and
 	# User must have permission to add new CodeRequest
-    # if project_container.owner != user or is_user_allowed(user, "caneditrequest"):
-    #    raise Http404
+    if project_container.owner != user:
+        raise Http404
     
 	# Save project and code request in the cache to make 'update' and 'new' use the same code (save_project)
     request.session[constants.PROJECT_INSTANCE] = ProjectContainerForm(instance=project_container)
@@ -370,36 +373,45 @@ def new(request):
     
     if request.path != request.session[constants.ACTUAL_TEMPLATE]:
         clear_session(request)
-        request.session[constants.REM_DOCS]  = []
-        request.session[constants.REM_TAGS]  = []
-        request.session[constants.REM_MAILS] = []
-        request.session[constants.ADD_MAILS] = []
-        request.session[constants.ADD_DOCS]  = []
-        request.session[constants.ADD_TAGS]  = []
+        request.session[constants.REM_DOCS]     = []
+        request.session[constants.REM_TAGS]     = []
+        request.session[constants.REM_CONTACTS] = []
+        request.session[constants.ADD_CONTACTS] = []
+        request.session[constants.ADD_DOCS]     = []
+        request.session[constants.ADD_TAGS]     = []
     
     request.session[constants.MAINTAIN_STATE] = True
 
     return save_project(request, constants.TEMPLATE_REQUESTS_NEW)
 
 @login_required(login_url = settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
-def remove_mail(request, pk, mail_name):
+def remove_contact(request, pk, contact_name):
     ''' Adds the removal list, but will only be removed when saving changes
         pk (pk = 0 - new ProjectContainer / pk > 0 - edit ProjectContainer '''
     
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
     
-    mails = request.session[constants.ADD_MAILS]
-    mail = next(el for el in mails if el.mail == mail_name)
+    contacts = request.session[constants.ADD_CONTACTS]
+    contact  = next(el for el in contacts if el.contact == contact_name)
     
     if pk != "0":
         project_container = get_object_or_404(ProjectContainer, id=pk)
         
-        if project_container.mails.filter(mail=mail_name):
-            cache_list = request.session[constants.REM_MAILS]
-            cache_list.append(mail)
+        # TODO: Review this        
+        us = get_user(request)
+        user = us
+        
+        # Project must have been created by the current user and
+        # User must have permission to add new CodeRequest
+        if project_container.owner != user:
+            raise Http404
+        
+        if project_container.contacts.filter(contact=contact_name):
+            cache_list = request.session[constants.REM_CONTACTS]
+            cache_list.append(contact)
             
-    mails.remove(mail)
-    request.session[constants.ADD_MAILS] = mails
+    contacts.remove(contact)
+    request.session[constants.ADD_CONTACTS] = contacts
     
     # TODO: Centralize this?
     return HttpResponseRedirect(refresh_template)
@@ -416,6 +428,15 @@ def remove_document(request, pk, doc_name):
     
     if pk != "0":
         project_container = get_object_or_404(ProjectContainer, id=pk)
+        
+        # TODO: Review this        
+        us = get_user(request)
+        user = us
+        
+        # Project must have been created by the current user and
+        # User must have permission to add new CodeRequest
+        if project_container.owner != user:
+            raise Http404
         
         if project_container.docs.filter(name=doc_name):
             cache_list = request.session[constants.REM_DOCS]
@@ -439,6 +460,15 @@ def remove_tag(request, pk, tag_name):
     
     if pk != "0":
         project_container = get_object_or_404(ProjectContainer, id=pk)
+    
+        # TODO: Review this        
+        us = get_user(request)
+        user = us
+    
+        # Project must have been created by the current user and
+        # User must have permission to add new CodeRequest
+        if project_container.owner != user:
+            raise Http404
     
         if project_container.tags.filter(name=tag_name):
             cache_list = request.session[constants.REM_TAGS]

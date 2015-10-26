@@ -120,21 +120,21 @@
 										<br />
 										
 										<div>
-										{% if mails %}
-				            				<h4><strong>Mails</strong></h4>
-											{% for mail in mails %}
-												{{ mail.type }}: <a  href="#"> {{ mail.mail }} </a>
-												<a class="label label-info" href="{% url 'ietf.codematch.requests.views.remove_mail' projectcontainer.id mail.mail %}" >delete</a>
+										{% if contacts %}
+				            				<h4><strong>Contacts</strong></h4>
+											{% for c in contacts %}
+												{{ c.type }}: <a  href="#"> {{ c.contact }} </a>
+												<a class="label label-info" href="{% url 'ietf.codematch.requests.views.remove_contact' projectcontainer.id c.contact %}" >delete</a>
 												<br />
 											{% endfor %}
 										{% endif %}
 										<br />
 									
 										</div>
-										{% if canaddmail %}
-											{{ mailform }}
+										{% if canaddcontact %}
+											{{ contactform }}
 											{% csrf_token %}
-											<input type="submit" value="Add mail" />
+											<input type="submit" value="Add contact" />
 										{% endif %}
 										
 										<br />
@@ -147,13 +147,14 @@
 					            				{% if not forloop.first %}
 			            						,
 			            						{% endif %}
-			            						<a>#{{ tag }}</a>
+			            						<a>{{ tag }}</a>
 			            					{% endfor %}
 			            					<br />	
 			            				{% endif %}
 			            				<div>
 										<br />
 										{% if canaddtags %}
+											<label >*tags may be related to events, dates, protocols or other relative subject.</label><br />
 											<label>Tag:</label>
 											{{ tagform.name }}
 											{% csrf_token %}

@@ -215,19 +215,24 @@ def save_code(request, template, pk, ck="", coding=None ):
         new_project = None
         # If there wasn't associated Project Container, must create a new one. Functionality used to legacy RFC.
         if project_container == None:
-            new_project = ProjectContainerForm(request.POST) 
+            post = request.POST.copy()
+            post._mutable = True
+            post[constants.STRING_TITLE] = post.getlist(constants.STRING_TITLE)[0]  
+            new_project = ProjectContainerForm(post)
+            
             if new_project.is_valid():
-                project = new_project.save(commit=False) # Create new
+                project = new_project.save() # Create new
                 project.owner = Person.objects.get( user=request.user )
         elif project_container.code_request == None:
-            new_project = ProjectContainerForm(request.POST, instance=project_container)
-            new_title = request.POST.getlist(constants.STRING_TITLE)[0] # Exists two forms with same name 'title' and Django by default get last value (Coding title)
-            if new_project.is_valid() and new_title:
-                project = new_project.save(commit=False)
-                project.title = new_title
+            post = request.POST.copy()
+            post._mutable = True
+            post[constants.STRING_TITLE] = post.getlist(constants.STRING_TITLE)[0]  
+            new_project = ProjectContainerForm(post, instance=project_container)
+            if new_project.is_valid():
+                project = new_project.save()
         else:
             project = project_container # Update only
-            
+          
         if coding != None:
             new_code = CodingProjectForm(request.POST, instance=coding)
         else:
@@ -248,6 +253,7 @@ def save_code(request, template, pk, ck="", coding=None ):
         # Adding new tag to the tags list to be saved in the project
         elif request.POST.get(constants.STRING_TAG) and tag.is_valid():
             new_tag = tag.save(commit=False)
+            new_tag.name = "#" + new_tag.name
             tags.append(new_tag)  # Updating tags to appear after rendering
         
         # Saving project (new or not) in the database
@@ -307,16 +313,16 @@ def save_code(request, template, pk, ck="", coding=None ):
                 project.docs.add(doc)
                 modified = True 
             
-            if modify:
+            if modified:
                 coding_project.save()
                 project.save()
 
             return HttpResponseRedirect( settings.CODEMATCH_PREFIX + "/codematch/matches/" + str(project.id) + '/' + str(coding_project.id) )
-			
+        
         # Updating session variables
-        if new_project != None and project_container.code_request != None:
-            request.session[constants.PROJECT_INSTANCE] = new_project
-            proj_form = new_project
+        #if new_project != None and ( project_container == None or project_container.code_request != None ):
+        request.session[constants.PROJECT_INSTANCE] = new_project
+        proj_form = new_project
             
         request.session[constants.CODE_INSTANCE] = new_code
         code_form = new_code
@@ -367,12 +373,14 @@ def edit(request, pk, ck):
         docs = project_container.docs.all()
         request.session[constants.ADD_DOCS] = list(docs)
     
-	#user = get_user(request)
+    # TODO: Review this        
+    us = get_user(request)
+    user = us
     
     # Project must have been created by the current user and
     # User must have permission to add new CodeRequest
-    # if coding.coder != user or not is_user_allowed(request.user, "caneditmatch"):
-    #    raise Http404
+    if coding.coder != user:
+        raise Http404
      
     # Save project and code request in the cache to make 'update' and 'new' use the same code (save_project)
     if project_container.code_request == None:
@@ -420,6 +428,14 @@ def remove_link(request, ck, link_name):
     if ck != "0":
         coding = get_object_or_404(CodingProject, id=ck)
     
+        # TODO: Review this        
+        us = get_user(request)
+        user = us
+    
+        # Coding must have been created by the current user and
+        if coding.coder != user:
+            raise Http404
+    
         if coding.links.filter(link=link_name):
             cache_list = request.session[constants.REM_LINKS]
             cache_list.append(link)
@@ -442,6 +458,14 @@ def remove_tag(request, ck, tag_name):
     
     if ck != "0":
         coding = get_object_or_404(CodingProject, id=ck)
+
+        # TODO: Review this        
+        us = get_user(request)
+        user = us
+
+        # Coding must have been created by the current user and
+        if coding.coder != user:
+            raise Http404
     
         if coding.tags.filter(name=tag_name):
             cache_list = request.session[constants.REM_TAGS]
@@ -465,6 +489,14 @@ def remove_document(request, pk, doc_name):
     
     if pk != "0":
         project_container = get_object_or_404(ProjectContainer, id=pk)
+        
+        # TODO: Review this        
+        us = get_user(request)
+        user = us
+        
+        # Project must have been created by the current user and
+        if project_container.owner != user:
+            raise Http404
         
         if project_container.docs.filter(name=doc_name):
             cache_list = request.session[constants.REM_DOCS]

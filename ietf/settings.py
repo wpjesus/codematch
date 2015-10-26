@@ -106,12 +106,12 @@ MEDIA_URL = 'https://www.ietf.org/'
 SERVE_CDN_FILES_LOCALLY_IN_DEV_MODE = True
 
 # URL to use when referring to static files located in STATIC_ROOT.
-if SERVER_MODE != 'production' and SERVE_CDN_FILES_LOCALLY_IN_DEV_MODE:
-    STATIC_URL = "/static/"
-    STATIC_ROOT = os.path.abspath(BASE_DIR + "/../static/")
-else:
-    STATIC_URL = "https://www.ietf.org/lib/dt/%s/"%__version__
-    STATIC_ROOT = "/a/www/www6s/lib/dt/%s/"%__version__
+#if SERVER_MODE != 'production' and SERVE_CDN_FILES_LOCALLY_IN_DEV_MODE:
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.abspath(BASE_DIR + "/../static/")
+#else:
+#    STATIC_URL = "https://www.ietf.org/lib/dt/%s/"%__version__
+#    STATIC_ROOT = "/a/www/www6s/lib/dt/%s/"%__version__
 
 # Destination for components handled by djangobower
 COMPONENT_ROOT = BASE_DIR + "/externals/static/"
