@@ -134,6 +134,11 @@ def search(request, is_my_list="False"):
     
     search_type = request.GET.get("submit")
     if search_type:
+
+		# get query field
+		query = ''
+		if request.GET.get(search_type):
+			query = request.GET.get(search_type)
             
 		ids = []
 		
