@@ -10,16 +10,18 @@ from ietf.codematch.matches.models import CodingProject
 
 from ietf.codematch.helpers.utils import (render_page, is_user_allowed, clear_session, get_user)
 
+from django.conf import settings
+
 import debug
 
 def index(request):
     return render_to_response('codematch/index.html', context_instance=RequestContext(request))
 
 def register(request):
-    return HttpResponseRedirect('/accounts/create/')
+    return HttpResponseRedirect( settings.CODEMATCH_PREFIX + '/accounts/create/' )
 
 def profile(request):
-    return HttpResponseRedirect('/accounts/profile/')
+    return HttpResponseRedirect( settings.CODEMATCH_PREFIX + '/accounts/profile/' )
 
 def top_coders(request):
     codings = CodingProject.objects.annotate(count=Count('coder'))

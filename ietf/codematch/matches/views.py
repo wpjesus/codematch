@@ -48,15 +48,16 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
     else:
         all_projects = ProjectContainer.objects.all()
     
-    project_containers  = []
-    codings             = CodingProject.objects.order_by(att)[:20]
+    project_containers = []
+    codings_list       = []
+    codings            = CodingProject.objects.order_by(att)[:20]
     for coding in codings:
         for project in all_projects:
-            if project not in project_containers and coding in project.codings.all() and (is_my_list == "False" or user == coding.coder):
+            if coding in project.codings.all() and (is_my_list == "False" or user == coding.coder):
+                codings_list.append((coding, project))
                 project_containers.append(project)
     
     docs = []
-    
     areas_list, working_groups_list = ([] for i in range(2))
     
     for project_container in project_containers:
@@ -83,7 +84,7 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
     docs = list(set(docs))
     
     return render_page(request, constants.TEMPLATE_MATCHES_LIST, {
-        'projectcontainers'  : project_containers,
+        'codings'            : codings_list,
         'owner'              : user,
         'docs'               : docs,
         'areas_list'         : areas_list,
@@ -117,9 +118,9 @@ def show(request, pk, ck):
     tags += coding.tags.all()
     
     if not areas:
-        areas          = [constants.STRING_NONE]
+        areas = [constants.STRING_NONE]
     if not tags:
-        tags           = [constants.STRING_NONE]
+        tags  = [constants.STRING_NONE]
 		  
     return render_page(request, constants.TEMPLATE_MATCHES_SHOW, {
 		'projectcontainer': project_container,
@@ -134,39 +135,44 @@ def search(request, is_my_list="False"):
     
     search_type = request.GET.get("submit")
     if search_type:
+        
+        # get query field
+        query = ''
+        if request.GET.get(search_type):
+            query = request.GET.get(search_type)
 
-		# get query field
-		query = ''
-		if request.GET.get(search_type):
-			query = request.GET.get(search_type)
+	    # get query field
+	    query = ''
+        if request.GET.get(search_type):
+           query = request.GET.get(search_type)
             
-		ids = []
+        ids = []
 		
-		if request.GET.get(constants.STRING_TITLE):
+        if request.GET.get(constants.STRING_TITLE):
 			ids += ProjectContainer.objects.filter(codings__title__icontains=query).values_list('id', flat=True)
 						
-		if request.GET.get(constants.STRING_DESCRIPTION):
+        if request.GET.get(constants.STRING_DESCRIPTION):
 			ids += ProjectContainer.objects.filter(codings__additional_information__icontains=query).values_list('id', flat=True)
 			
-		if request.GET.get(constants.STRING_PROTOCOL):
+        if request.GET.get(constants.STRING_PROTOCOL):
 			ids += ProjectContainer.objects.filter(protocol__icontains=query).values_list('id', flat=True)
 		
-		if request.GET.get(constants.STRING_CODER):
+        if request.GET.get(constants.STRING_CODER):
 			ids += ProjectContainer.objects.filter(codings__coder__name__icontains=query).values_list('id', flat=True)
 			
-		if request.GET.get(constants.STRING_AREA):
+        if request.GET.get(constants.STRING_AREA):
 			ids += ProjectContainer.objects.filter(docs__document__group__parent__name__icontains=query).values_list('id', flat=True)
 					
-		if request.GET.get(constants.STRING_WORKINGGROUP):
+        if request.GET.get(constants.STRING_WORKINGGROUP):
 			ids += ProjectContainer.objects.filter(docs__document__group__name__icontains=query).values_list('id', flat=True)    
 		
-		project_containers = ProjectContainer.objects.filter(id__in=list(set(ids)))
+        project_containers = ProjectContainer.objects.filter(id__in=list(set(ids)))
 		
-		request.session[constants.ALL_PROJECTS] = project_containers
+        request.session[constants.ALL_PROJECTS] = project_containers
 		
-		request.session[constants.MAINTAIN_STATE] = True
+        request.session[constants.MAINTAIN_STATE] = True
 		
-		return HttpResponseRedirect(settings.CODEMATCH_PREFIX + '/codematch/matches/show_list/' + is_my_list + '/creation_date/' +'True')
+        return HttpResponseRedirect(settings.CODEMATCH_PREFIX + '/codematch/matches/show_list/' + is_my_list + '/creation_date/' +'True')
 
     else:
 		return render_page(request, constants.TEMPLATE_MATCHES_SEARCH, { 
@@ -219,27 +225,20 @@ def save_code(request, template, pk, ck="", coding=None ):
         project = None
         new_project = None
         # If there wasn't associated Project Container, must create a new one. Functionality used to legacy RFC.
-        if project_container == None:
+        if project_container == None or project_container.code_request == None:
             post = request.POST.copy()
             post._mutable = True
-            post[constants.STRING_TITLE] = post.getlist(constants.STRING_TITLE)[0]  
-            new_project = ProjectContainerForm(post)
-            
-            if new_project.is_valid():
-                project = new_project.save() # Create new
-                project.owner = Person.objects.get( user=request.user )
-        elif project_container.code_request == None:
-            post = request.POST.copy()
-            post._mutable = True
-            post[constants.STRING_TITLE] = post.getlist(constants.STRING_TITLE)[0]  
+            post[constants.STRING_TITLE] = post.getlist(constants.STRING_TITLE)[0]
             new_project = ProjectContainerForm(post, instance=project_container)
-            if new_project.is_valid():
-                project = new_project.save()
+            if request.POST.get(constants.STRING_SAVE) and new_project.is_valid():
+                project = new_project.save() # Create new
+                if project_container != None and project_container.code_request == None:
+                    project.owner = Person.objects.get( user=request.user )
         else:
             project = project_container # Update only
           
         if coding != None:
-            new_code = CodingProjectForm(request.POST, instance=coding)
+            new_code = CodingProjectForm(request.POST, instance=coding) 
         else:
             new_code = CodingProjectForm(request.POST)
 
@@ -266,7 +265,7 @@ def save_code(request, template, pk, ck="", coding=None ):
         
             coding_project       = new_code.save(commit=False)
             coding_project.coder = Person.objects.get( user=request.user )
-            coding_project.save()
+            coding_project.save()            
             project.codings.add(coding_project)
             project.save()
             
@@ -326,8 +325,9 @@ def save_code(request, template, pk, ck="", coding=None ):
         
         # Updating session variables
         #if new_project != None and ( project_container == None or project_container.code_request != None ):
-        request.session[constants.PROJECT_INSTANCE] = new_project
-        proj_form = new_project
+        if new_project != None:
+            request.session[constants.PROJECT_INSTANCE] = new_project
+            proj_form = new_project
             
         request.session[constants.CODE_INSTANCE] = new_code
         code_form = new_code

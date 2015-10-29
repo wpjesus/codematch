@@ -32,11 +32,20 @@
 ### BUGS ###
 - Login repetidas vezes
 - Quando a tela est· reduzida o menu desaparece
+- Search codematch vem todos do mesmo projeto
 
 ### QUESTION LIST ###
 - Existem diversos testes sendo feitos nos templates, deveriam ser passados para o cÛdigo?
-- Será que está correto criar constantes e centralizar as strings? (Botar num arquivo Constants)
 - Sera que deveria ser definido Mentor para o Codematch StandAlone
+
+### VERSION 1.1 ###
+* Ordenar por Coder
+* My Codematches está errado
+* Criando multiplas vezes o mesmo CodeMatch
+* Falta memória as vezes na máquina virtual (!)
+* Search pesquisa em ProjectContainers que não deveria
+* Search está sem a parte da Query :(
+* Register in está redirecionando errado 
 
 ### NOTES ###
 - Quando der problema no mysql da maquina virtual provavelmente é falta de espaço

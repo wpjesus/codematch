@@ -112,28 +112,33 @@ def search(request, type_list="all"):
 	if request.GET.get(search_type):
 		query = request.GET.get(search_type)
        
+        # get query field
+        query = ''
+        if request.GET.get(search_type):
+            query = request.GET.get(search_type)
+       
     	ids = []
        
     	if request.GET.get(constants.STRING_TITLE):
-    		ids += ProjectContainer.objects.filter(title__icontains=query).values_list('id', flat=True)
+    		ids += ProjectContainer.objects.exclude(code_request__isnull=True).filter(title__icontains=query).values_list('id', flat=True)
        
     	if request.GET.get(constants.STRING_DESCRIPTION):
-    		ids += ProjectContainer.objects.filter(description__icontains=query).values_list('id', flat=True)
+    		ids += ProjectContainer.objects.exclude(code_request__isnull=True).filter(description__icontains=query).values_list('id', flat=True)
     		
     	if request.GET.get(constants.STRING_PROTOCOL):
-    		ids += ProjectContainer.objects.filter(protocol__icontains=query).values_list('id', flat=True)
+    		ids += ProjectContainer.objects.exclude(code_request__isnull=True).filter(protocol__icontains=query).values_list('id', flat=True)
     	
     	if request.GET.get(constants.STRING_MENTOR):
-    		ids += ProjectContainer.objects.filter(code_request__mentor__name__icontains=query).values_list('id', flat=True)
+    		ids += ProjectContainer.objects.exclude(code_request__isnull=True).filter(code_request__mentor__name__icontains=query).values_list('id', flat=True)
     				
     	if request.GET.get(constants.STRING_DOCS):
-    		ids += ProjectContainer.objects.filter(docs__name__icontains=query).values_list('id', flat=True)
+    		ids += ProjectContainer.objects.exclude(code_request__isnull=True).filter(docs__name__icontains=query).values_list('id', flat=True)
     				
     	if request.GET.get(constants.STRING_AREA):
-    		ids += ProjectContainer.objects.filter(docs__document__group__parent__name__icontains=query).values_list('id', flat=True)
+    		ids += ProjectContainer.objects.exclude(code_request__isnull=True).filter(docs__document__group__parent__name__icontains=query).values_list('id', flat=True)
     				
     	if request.GET.get(constants.STRING_WORKINGGROUP):
-    		ids += ProjectContainer.objects.filter(docs__document__group__name__icontains=query).values_list('id', flat=True)         
+    		ids += ProjectContainer.objects.exclude(code_request__isnull=True).filter(docs__document__group__name__icontains=query).values_list('id', flat=True)         
     	
     	project_containers = ProjectContainer.objects.filter(id__in=list(set(ids)))
     				

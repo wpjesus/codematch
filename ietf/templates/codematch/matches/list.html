@@ -66,54 +66,52 @@
                             <!-- Widget content -->
                             <div class="padd">
                                 <ul class="latest-news">
-                            	{% if projectcontainers %}
-                                    {% for projectcontainer in projectcontainers %}
-                                    	{% for coding in projectcontainer.codings.all %}
-		                               		<li>
-		                                    	<!-- Title and date -->
-		                                    	<h5><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a>
-                		                      	{% if user.is_authenticated and coding.coder == owner %}
-						                   			<a class="label label-info" href="{% url 'ietf.codematch.matches.views.edit' projectcontainer.id coding.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a> 
-								               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
-												{% endif %}
-												</h5>
-		                                    	<!--<h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a></h6>-->
-		                                    	<p>{{ coding.additional_information|linebreaks }}</p>
-		                                    	<p>
-		                                    	{% if projectcontainer.code_request == None %}
-		                                    	CodeRequest: 	 <a href="#">None</a>
-		                                    	{% else %}
-		                                    	CodeRequest: 	 <a href="{% url 'ietf.codematch.requests.views.show' projectcontainer.id %}">{{ projectcontainer.title }}</a>
-		                                    	{% endif %} 
-		                                    	| Protocol:  	 <a href="#">{{ projectcontainer.protocol }}</a> 
-		                                    	| Area:    	 	 <a href="#">	    
-	                                    		{% for areas, proj in areas_list %}                 
-                                    				{% if proj == projectcontainer %}
-                                    					{% for a in areas %}		
-								            				{% if not forloop.first %}
-		            										-
-	            											{% endif %}	
-							            					<a href="#">{{ a }}</a>
-							            				{% endfor %}
-							            			{% endif %}
-					            				{% endfor %}
-					            				</a>
-		                                    	| Working Group: <a href="#">  
-	                                    		{% for workinggroups, proj in workinggroups_list %}                 
-                                    				{% if proj == projectcontainer %}
-                                    					{% for wg in workinggroups %}
-								            				{% if not forloop.first %}
-		            										-
-	            											{% endif %}		
-							            					<a href="#">{{ wg }}</a>
-							            				{% endfor %}
-							            			{% endif %}
-					            				{% endfor %}
-					            				</a>
-		                                    	</p>
-		                                	</li>
-                                    	{% endfor %}
-                                    {% endfor %}
+                            	{% if codings %}
+                                	{% for coding, projectcontainer in codings %}
+	                               		<li>
+	                                    	<!-- Title and date -->
+	                                    	<h5><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a>
+            		                      	{% if user.is_authenticated and coding.coder == owner %}
+					                   			<a class="label label-info" href="{% url 'ietf.codematch.matches.views.edit' projectcontainer.id coding.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a> 
+							               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
+											{% endif %}
+											</h5>
+	                                    	<!--<h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a></h6>-->
+	                                    	<p>{{ coding.additional_information|linebreaks }}</p>
+	                                    	<p>
+	                                    	{% if projectcontainer.code_request == None %}
+	                                    	CodeRequest: 	 <a href="#">None</a>
+	                                    	{% else %}
+	                                    	CodeRequest: 	 <a href="{% url 'ietf.codematch.requests.views.show' projectcontainer.id %}">{{ projectcontainer.title }}</a>
+	                                    	{% endif %} 
+	                                    	| Protocol:  	 <a href="#">{{ projectcontainer.protocol }}</a> 
+	                                    	| Area:    	 	 <a href="#">	    
+                                    		{% for areas, proj in areas_list %}                 
+                                				{% if proj == projectcontainer %}
+                                					{% for a in areas %}		
+							            				{% if not forloop.first %}
+	            										-
+            											{% endif %}	
+						            					<a href="#">{{ a }}</a>
+						            				{% endfor %}
+						            			{% endif %}
+				            				{% endfor %}
+				            				</a>
+	                                    	| Working Group: <a href="#">  
+                                    		{% for workinggroups, proj in workinggroups_list %}                 
+                                				{% if proj == projectcontainer %}
+                                					{% for wg in workinggroups %}
+							            				{% if not forloop.first %}
+	            										-
+            											{% endif %}		
+						            					<a href="#">{{ wg }}</a>
+						            				{% endfor %}
+						            			{% endif %}
+				            				{% endfor %}
+				            				</a>
+	                                    	</p>
+	                                	</li>
+                                	{% endfor %}
                                 {% else %}
 								<div class="alert alert-info" style="margin: 5px;">
 								    <p align="center">
@@ -128,7 +126,7 @@
                                 {% if user.is_authenticated %}
                                 	<a class="btn btn-default" href="{% url "ietf.codematch.matches.views.new" %}">New CodeMatch Project</a>
                                 {% endif %}
-                                {% if projectcontainers %}
+                                {% if codings %}
                                 	<a class="btn btn-default" href="{% url "ietf.codematch.matches.views.search" mylist %}">Search</a>
                                 {% endif %}
                              	{% if state != ""%}                          
