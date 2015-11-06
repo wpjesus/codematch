@@ -1,23 +1,14 @@
 ### CODEMATCH NOTES ###
 
-Version 1.1.0 - November 27, 2015
+Version 1.1.1 - November 30, 2015
 
 Whats new:
-+ Sort the list of Codematches
-+ Sort the list of CodeRequets
-+ In Addition to the sort, also displaying group item in the header
-+ Adding more fields to search
-+ Add contact to CodeRequest (Facebook, Twitter, Jabber and Mail)
-+ Add documentss to stand alone project (New Codematch project)
-+ Added message about events (eg. hackaton) in tags
-+ Added top coders screen
-+ Minor visual changes
-+ Bug fixes
++ Bug fixes:
+  - Sort by coder is wrong
+  - My codematches screen retrieve wrong information
+  - Search CodeRequests retrieve projects that shouldn't
+  - Add stand alone project creating several instances in the database
 
 Known bugs:
 - Sometimes if user made login an logout several times in a row doesn't save credentials
 - If reducing the screen size the top bar buttons disappear
-- Sort by coder is wrong
-- My codematches screen retrieve wrong information
-- Search CodeRequests retrieve projects that shouldn't
-- Add stand alone project creating several instances in the database

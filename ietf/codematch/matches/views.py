@@ -48,19 +48,20 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
     else:
         all_projects = ProjectContainer.objects.all()
     
-    project_containers = []
+    #project_containers = []
     codings_list       = []
     codings            = CodingProject.objects.order_by(att)[:20]
     for coding in codings:
         for project in all_projects:
             if coding in project.codings.all() and (is_my_list == "False" or user == coding.coder):
                 codings_list.append((coding, project))
-                project_containers.append(project)
+#		if not project in project_containers:
+#               	project_containers.append(project)
     
     docs = []
     areas_list, working_groups_list = ([] for i in range(2))
     
-    for project_container in project_containers:
+    for project_container in all_projects:
         areas, working_groups = ([] for i in range(2))
         # According to model areas and working groups should come from documents
         for doc in project_container.docs.all():
