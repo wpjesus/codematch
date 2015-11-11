@@ -9,7 +9,7 @@
 {% load bootstrap3 %}
 
 {% block content %}
-<!-- Main content starts -->  
+<!-- Main content starts -->
 
 <div class="content" >
 
@@ -33,7 +33,7 @@
             <div class="widget worange">
               <!-- Widget head -->
               <div class="widget-head">
-                <i class="fa fa-lock"></i> Login 
+                <i class="fa fa-lock"></i> Login
               </div>
 
               <div class="widget-content">
@@ -42,31 +42,31 @@
                   <form role="form" method="post">
 				    {% csrf_token %}
 				    {% bootstrap_form form %}
-				
+
 				    {% buttons %}
 				      <button type="submit" class="btn btn-primary">Sign in</button>
 				      <button type="reset" class="btn btn-default btn-sm">Reset</button>
 				    {% endbuttons %}
 				  </form>
                     <br />
-				  
+
 				</div>
                 </div>
-              
+
                 <div class="widget-foot">
                   Not Registred? <a href="{% url 'ietf.codematch.accounts.views.register' %}">Register here</a>
                 </div>
-            </div>  
+            </div>
       </div>
     </div>
-  </div> 
+  </div>
 </div>
-	
+
 </div>
-	
+
 	 <!-- Mainbar ends -->
 	<div class="clearfix"></div>
-	
+
 </div>
 <!-- Content ends -->
 

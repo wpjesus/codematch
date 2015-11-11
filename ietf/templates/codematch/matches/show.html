@@ -75,7 +75,7 @@
 													<br />
 													<strong>Protocol: </strong><a href="#">{{ projectcontainer.protocol }}</a>
 													<br />
-						                      		<strong>Area: </strong> 
+						                      		<strong>Area: </strong>
 						                      		{% for area in areas %}
 							            				{% if not forloop.first %}
 							            				-
@@ -83,7 +83,7 @@
 							            				<a href="#">{{ area }}</a>
 						            				{% endfor %}
 						                      		<a href="#">{{ area }}</a><br />
-								            		<strong>Tags: </strong> 
+								            		<strong>Tags: </strong>
 							            			{% for tag in tags %}
 							            				{% if not forloop.first %}
 							            				,
@@ -96,7 +96,7 @@
 							                      	<div>
 								                      	{% if user.is_authenticated %}
 								                   			{% if coding.coder == owner %}
-									                   			<a class="label label-info" href="{% url 'ietf.codematch.matches.views.edit' projectcontainer.id coding.id %}" ><i class="fa fa-pencil"></i> Edit</a> 
+									                   			<a class="label label-info" href="{% url 'ietf.codematch.matches.views.edit' projectcontainer.id coding.id %}" ><i class="fa fa-pencil"></i> Edit</a>
 											               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
 										               		{% endif %}
 														{% endif %}
@@ -117,7 +117,7 @@
 											<p>
 												{{ coding.additional_information }}
 											</p>
-											
+
 											{% if coding.links.all %}
 												<br />
 												<h4><strong>Implementations</strong></h4>
@@ -126,18 +126,18 @@
 												<br />
 												{% endfor %}
 											{% endif %}
-											
+
 											<br />
-											
+
 											{% if projectcontainer.docs.all and projectcontainer.code_request == None %}
 												<h4><strong>Documents</strong></h4>
 												{% for doc in projectcontainer.docs.all %}
 													{{ doc.document.group }}: <a href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
 													<br />
-												{% endfor %}        
+												{% endfor %}
 												<br />
 											{% endif %}
-											
+
 										</div>
 
 									</div>

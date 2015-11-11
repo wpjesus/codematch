@@ -3,11 +3,11 @@
 {% load staticfiles %}
 
 <div class="navbar navbar-fixed-top bs-docs-nav" role="banner">
-  
+
       <!-- Navigation starts -->
       <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
-      	
-      <div class="pull-left">         
+
+      <div class="pull-left">
       	<!-- Menu button for smallar screens -->
       <div class="navbar-header">
 		  <button class="navbar-toggle btn-navbar" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
@@ -16,14 +16,14 @@
 		  <!-- Site name for smallar screens -->
 		  <a href="#" class="navbar-brand" ><img src="{% static "images/ietflogo-small-transparent.png" %}" /></a>
 		</div>
-      <ul class="nav navbar-nav">	
+      <ul class="nav navbar-nav">
 	  	<li class="dropdown">
 			<a href="{% url "ietf.codematch.views.index" %}" role="button" > Code<b>Match</b></a>
 		</li>
       	<li class="dropdown">
 			<a href="#" role="button" > <i class="fa fa-home"></i> </a>
 		</li>
-		
+
 		<li class="dropdown">
 			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="icon ion-arrow-shrink" ></i> CodeMatches </a>
 			<ul class="dropdown-menu" role="menu">
@@ -37,7 +37,7 @@
 				{% endif %}
 			</ul>
 		</li>
-		
+
 		<li class="dropdown">
 			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-microphone" ></i> CodeRequests </a>
 			<ul class="dropdown-menu" role="menu">
@@ -56,23 +56,23 @@
 				{% endif %}
 			</ul>
 		</li>
-		
+
 		<li class="dropdown">
 			<a href="{% url "ietf.codematch.accounts.views.top_coders" %}">  <i class="fa fa-star" ></i>Top Coders</a>
 		</li>
 	  </ul>
 
     </div>
-    
+
     	{% if user.is_authenticated %}
-    
+
         <!-- Links -->
         <ul class="nav navbar-nav pull-right">
-          <li class="dropdown pull-right">            
+          <li class="dropdown pull-right">
             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-              <i class="fa fa-user"></i><b class="caret"></b>              
+              <i class="fa fa-user"></i><b class="caret"></b>
             </a>
-            
+
             <!-- Dropdown menu -->
             <ul class="dropdown-menu">
               <li><a href="{% url 'ietf.codematch.accounts.views.profile' %}"><i class="fa fa-user"></i> {{ username }} </a></li>
@@ -80,33 +80,33 @@
               <li><a rel="nofollow" href="{% url 'django.contrib.auth.views.logout' %}" >Logout</a></li>
             </ul>
           </li>
-          
+
         </ul>
         {% else %}
         <!-- Links -->
         <ul class="nav navbar-nav pull-right">
-          <li class="dropdown pull-right">            
+          <li class="dropdown pull-right">
             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-              <i class="fa fa-user"></i> Enter <b class="caret"></b>              
+              <i class="fa fa-user"></i> Enter <b class="caret"></b>
             </a>
-            
+
             <!-- Dropdown menu -->
             <ul class="dropdown-menu">
               <li><a rel="nofollow" href="{% url 'ietf.codematch.accounts.views.register' %}">Register Here</a></li>
-              <li><a rel="nofollow" href="{% url 'django.contrib.auth.views.login' %}?next={{request.get_full_path|urlencode}}">Sign in</a></li>
+              <li><a rel="nofollow" href="{% url 'django.contrib.auth.views.login' %}?next={% url 'ietf.codematch.views.index' %}">Sign in</a></li>
             </ul>
           </li>
-          
+
         </ul>
         {% endif %}
-        
+
         <!-- Search form -->
         <form class="navbar-form navbar-right" role="search">
 			<div class="form-group">
 				<input type="text" class="form-control" placeholder="Search">
 			</div>
 		</form>
-       
+
       </nav>
 
 </div>

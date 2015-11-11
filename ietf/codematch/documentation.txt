@@ -37,6 +37,7 @@
 ### QUESTION LIST ###
 - Existem diversos testes sendo feitos nos templates, deveriam ser passados para o cÛdigo?
 - Sera que deveria ser definido Mentor para o Codematch StandAlone
+- Bug da tela deve ser falado com Wanderson pq provavelmente não é minha culpa :D
 
 ### VERSION 1.1 ###
 * Ordenar por Coder
@@ -46,6 +47,9 @@
 * Search pesquisa em ProjectContainers que não deveria
 * Search está sem a parte da Query :(
 * Register in está redirecionando errado 
+
+### VERSION 1.2 ###
+* Corrigido o bug de login multiplas vezes
 
 ### NOTES ###
 - Quando der problema no mysql da maquina virtual provavelmente é falta de espaço

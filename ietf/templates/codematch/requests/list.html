@@ -16,15 +16,15 @@
 
   	  	<!-- Main bar -->
   	<div class="mainbar">
-      
+
 	    <!-- Page heading -->
 	    <div class="page-head">
 	      <h2 class="pull-left"><i class="fa fa-microphone"></i> CodeRequests</h2>
         <!-- Breadcrumb -->
         <div class="bread-crumb pull-right">
-          <a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a> 
+          <a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a>
           <!-- Divider -->
-          <span class="divider">/</span> 
+          <span class="divider">/</span>
           <a href="#" class="bread-current">Code Requests</a>
         </div>
 
@@ -44,36 +44,36 @@
               <div class="widget">
                 <div class="widget-head">
                   <div class="pull-left">
-					<i class="fa fa-sort"></i> <span style="font-weight: lighter">Order by: </span> 
-					<a 
+					<i class="fa fa-sort"></i> <span style="font-weight: lighter">Order by: </span>
+					<a
 					{% if attribute == "title" %} style="color: #A0A0A0"
 					{% else %} href="{% url template typelist 'title' state %}"
 					{% endif %}>Title</a> |
-					<a 
+					<a
 					{% if attribute == "creation_date" %} style="color: #A0A0A0"
 					{% else %} href="{% url template typelist 'creation_date' state %}"
 					{% endif %}>Release date</a> |
-					<a 
+					<a
 					{% if attribute == "code_request__estimated_lof" %} style="color: #A0A0A0"
 					{% else %} href="{% url template typelist 'code_request__estimated_lof' state %}"
 					{% endif %}>Estimated level of effort</a> |
-					<a 
+					<a
 					{% if attribute == "popularity" %} style="color: #A0A0A0"
 					{% else %} href="{% url template typelist 'popularity' state %}"
 					{% endif %}>Popularity</a> |
-					<a 
+					<a
 					{% if attribute == "protocol" %} style="color: #A0A0A0"
 					{% else %} href="{% url template typelist 'protocol' state %}"
 					{% endif %}>Protocol</a> |
-					<a 
+					<a
 					{% if attribute == "docs__document__group__name" %} style="color: #A0A0A0"
 					{% else %} href="{% url template typelist 'docs__document__group__name' state %}"
 					{% endif %}>Working Group</a> |
-					<a 
+					<a
 					{% if attribute == "docs__document__group__parent__name" %} style="color: #A0A0A0"
 					{% else %} href="{% url template typelist 'docs__document__group__parent__name' state %}"
 					{% endif %}>Area</a>
-					
+
 					<!--<a href="{% url "ietf.codematch.requests.views.show_list" 'title' %}">Area</a> | -->
 					<!--<a href="#">Popularity</a> | -->
 					<!-- <a href="#">Working Group</a> -->
@@ -81,8 +81,8 @@
                   <div class="clearfix"></div>
                 </div>
                 <div class="widget-content">
-		
-		
+
+
 		{% if projectcontainers %}
 			{% for list, prop in projectcontainers %}
 	          <div class="padd">
@@ -93,12 +93,12 @@
 	             			<h4><i class="fa fa-chevron-circle-right"> <a href="#">{{ prop }}</a></i></h4>
 	             		</div>
 	             	{% endif %}
-				{% for projectcontainer in list %}   
+				{% for projectcontainer in list %}
 						<h5><i> <a href="{% url 'ietf.codematch.requests.views.show' projectcontainer.id %}">{{ projectcontainer.title }}</a>
 		                   	</i> {{ projectcontainer.code_request.creation_date|date:"d M Y" }}
 	                      	{% if user.is_authenticated %}
 	                   			{% if projectcontainer.owner == owner %}
-		                   			<a class="label label-info" href="{% url 'ietf.codematch.requests.views.edit' projectcontainer.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a> 
+		                   			<a class="label label-info" href="{% url 'ietf.codematch.requests.views.edit' projectcontainer.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a>
 				               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
 			               		{% endif %}
 		               			<a href="{% url 'ietf.codematch.matches.views.new' projectcontainer.id %}" class="label label-info" ><i class="fa fa-check"></i>Associate my project</a>
@@ -118,16 +118,16 @@
 				{% endfor %}
 					   </div>
 	 	    		</div>
-	 	       </div>  
+	 	       </div>
 			{% endfor %}
 		{% else %}
 			<div class="alert alert-info" style="margin: 5px;">
 			    <p align="center">
-				No data to display  
+				No data to display
 			    </p>
 		    </div>
 		{% endif %}
-	
+
               <div class="widget-foot">
                  <p class="buttonlist">
                  	{% if user.is_authenticated and canaddrequest %}

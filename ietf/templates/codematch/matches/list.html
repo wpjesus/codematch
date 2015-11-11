@@ -7,17 +7,17 @@
 {% block bodyAttrs %}data-spy="scroll" data-target="#affix"{% endblock %}
 
 {% block content %}
-<!-- Main content starts -->  
+<!-- Main content starts -->
 
 <div class="content" style="padding:0">
-    
+
     <!-- Main bar -->
     <div class="mainbar">
-        
+
         <!-- Page heading -->
         <div class="page-head">
             <h2 class="pull-left"><i class="icon ion-arrow-shrink" style="font-size: 20px;"></i> CodeMatches</h2>
-            
+
             <!-- Breadcrumb -->
             <div class="bread-crumb pull-right">
                 <a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a>
@@ -25,33 +25,33 @@
                 <span class="divider">/</span>
                 <a href="#" class="bread-current">CodeMatches</a>
             </div>
-            
+
             <div class="clearfix"></div>
-            
+
         </div>
         <!-- Page heading ends -->
-        
+
         <!-- Matter -->
-        
+
         <div class="matter">
             <div class="container">
-            	
+
                 <!-- Recent News -->
                 <div class="col-md-12">
                     <div class="widget">
                         <!-- Widget title -->
                         <div class="widget-head">
                             <div class="pull-left">
-                                <i class="fa fa-sort"></i> <span style="font-weight: lighter">Order by: </span> 
-                                <a 
+                                <i class="fa fa-sort"></i> <span style="font-weight: lighter">Order by: </span>
+                                <a
 								{% if attribute == "title" %} style="color: #A0A0A0"
 								{% else %} href="{% url template mylist 'title' state %}"
 								{% endif %}>Title</a> |
-								<a 
+								<a
 								{% if attribute == "coder__name" %} style="color: #A0A0A0"
 								{% else %} href="{% url template mylist 'coder__name' state %}"
 								{% endif %}>Coder</a> |
-								<a 
+								<a
 								{% if attribute == "creation_date" %} style="color: #A0A0A0"
 								{% else %} href="{% url template mylist 'creation_date' state %}"
 								{% endif %}>Release date</a>
@@ -72,7 +72,7 @@
 	                                    	<!-- Title and date -->
 	                                    	<h5><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a>
             		                      	{% if user.is_authenticated and coding.coder == owner %}
-					                   			<a class="label label-info" href="{% url 'ietf.codematch.matches.views.edit' projectcontainer.id coding.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a> 
+					                   			<a class="label label-info" href="{% url 'ietf.codematch.matches.views.edit' projectcontainer.id coding.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a>
 							               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
 											{% endif %}
 											</h5>
@@ -83,27 +83,27 @@
 	                                    	CodeRequest: 	 <a href="#">None</a>
 	                                    	{% else %}
 	                                    	CodeRequest: 	 <a href="{% url 'ietf.codematch.requests.views.show' projectcontainer.id %}">{{ projectcontainer.title }}</a>
-	                                    	{% endif %} 
-	                                    	| Protocol:  	 <a href="#">{{ projectcontainer.protocol }}</a> 
-	                                    	| Area:    	 	 <a href="#">	    
-                                    		{% for areas, proj in areas_list %}                 
+	                                    	{% endif %}
+	                                    	| Protocol:  	 <a href="#">{{ projectcontainer.protocol }}</a>
+	                                    	| Area:    	 	 <a href="#">
+                                    		{% for areas, proj in areas_list %}
                                 				{% if proj == projectcontainer %}
-                                					{% for a in areas %}		
+                                					{% for a in areas %}
 							            				{% if not forloop.first %}
 	            										-
-            											{% endif %}	
+            											{% endif %}
 						            					<a href="#">{{ a }}</a>
 						            				{% endfor %}
 						            			{% endif %}
 				            				{% endfor %}
 				            				</a>
-	                                    	| Working Group: <a href="#">  
-                                    		{% for workinggroups, proj in workinggroups_list %}                 
+	                                    	| Working Group: <a href="#">
+                                    		{% for workinggroups, proj in workinggroups_list %}
                                 				{% if proj == projectcontainer %}
                                 					{% for wg in workinggroups %}
 							            				{% if not forloop.first %}
 	            										-
-            											{% endif %}		
+            											{% endif %}
 						            					<a href="#">{{ wg }}</a>
 						            				{% endfor %}
 						            			{% endif %}
@@ -115,11 +115,11 @@
                                 {% else %}
 								<div class="alert alert-info" style="margin: 5px;">
 								    <p align="center">
-									No data to display  
+									No data to display
 								    </p>
 							    </div>
 								{% endif %}
-                                </ul> 
+                                </ul>
                             </div>
                             <div class="widget-foot">
                                 <p class="buttonlist">
@@ -129,7 +129,7 @@
                                 {% if codings %}
                                 	<a class="btn btn-default" href="{% url "ietf.codematch.matches.views.search" mylist %}">Search</a>
                                 {% endif %}
-                             	{% if state != ""%}                          
+                             	{% if state != ""%}
                  					<a class="btn btn-default" href="{% url 'ietf.codematch.views.back' %}">Back</a>
                  				{% endif %}
                                 </p>
@@ -137,17 +137,17 @@
                         </div>
                     </div>
                 </div>
-                
+
             </div>
         </div>
-        
+
         <!-- Matter ends -->
-        
+
     </div>
-    
+
     <!-- Mainbar ends -->
     <div class="clearfix"></div>
-    
+
 </div>
 <!-- Content ends -->
 

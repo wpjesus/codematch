@@ -17,19 +17,19 @@
 
   	  	<!-- Main bar -->
   	<div class="mainbar">
-      
+
 	    <!-- Page heading -->
 	    <div class="page-head">
 	      <h2 class="pull-left"><i class="fa fa-microphone"></i> CodeRequests</h2>
 
         <!-- Breadcrumb -->
         <div class="bread-crumb pull-right">
-          <a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a> 
+          <a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a>
           <!-- Divider -->
-          <span class="divider">/</span> 
+          <span class="divider">/</span>
           <a href="{% url "ietf.codematch.requests.views.show_list" %}" class="bread-current">Coding Requests</a>
           <!-- Divider -->
-          <span class="divider">/</span> 
+          <span class="divider">/</span>
           <a href="#" class="bread-current">{{ projectcontainer.title }}</a>
         </div>
 
@@ -53,20 +53,20 @@
 				  </div>
                   <div class="clearfix"></div>
                 </div>
-                
+
                 <div class="widget-content">
                   <div class="padd">
-                  
-				
+
+
                     <div class="user">
 
                       <div class="user-details" style="margin-left: 0px; margin-bottom:20px;">
                       	<div style="margin-left: 15px">
-                      		
+
                       		<div class="row">
 		                      <div class="col-md-4">
 		                        <strong>Protocol:</strong> <a href="#">{{ projectcontainer.protocol }}</a><br />
-	                      		<strong>Area:</strong> 
+	                      		<strong>Area:</strong>
 	                      		{% for area in areas %}
 		            				{% if not forloop.first %}
 		            				-
@@ -79,17 +79,17 @@
 		            				{% if not forloop.first %}
 		            				-
 		            				{% endif %}
-		            				<a href="#">{{ group }}</a><br />		            				
+		            				<a href="#">{{ group }}</a><br />
 	            				{% endfor %}
 	            				<strong>Estimated Level of Effort: </strong>
 	            				<a href="#">{{ projectcontainer.code_request.estimated_lof }}</a> <a> months</a>
 		                      </div>
-		
+
 		                      <div class="col-md-4">
 		                      	<div>
 			                      	{% if user.is_authenticated %}
 			                   			{% if projectcontainer.owner == owner %}
-				                   			<a class="label label-info" href="{% url 'ietf.codematch.requests.views.edit' projectcontainer.id %}" ><i class="fa fa-pencil"></i> Edit</a> 
+				                   			<a class="label label-info" href="{% url 'ietf.codematch.requests.views.edit' projectcontainer.id %}" ><i class="fa fa-pencil"></i> Edit</a>
 						               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
 					               		{% endif %}
 				               			<a href="{% url 'ietf.codematch.matches.views.new' projectcontainer.id %}" class="label label-info" ><i class="fa fa-check"></i>Associate my project</a>
@@ -101,34 +101,34 @@
 		                        <a><i class="fa fa-twitter-square"></i></a>
 		                        <a><i class="fa fa-google-plus-square"></i></a>
 		                        </div>
-	                          </div>            
+	                          </div>
 
 		                    </div>
 
                       		<br />
-							
+
 							{% if projectcontainer.docs.all %}
 								<h4><strong>Documents</strong></h4>
 								{% for doc in projectcontainer.docs.all %}
 									{{ doc.document.group }}: <a href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
 									<br />
-								{% endfor %}        
+								{% endfor %}
 								<br />
 							{% endif %}
-							                     		
+
                       		<h4><strong>Description</strong></h4>
 		                    <p>{{ projectcontainer.description|linebreaks }}</p>
-		                    
+
 		                    <br />
-		                    
+
 		                    <h4><strong>Resources</strong></h4>
 		                    Mentor: <a href="#">{{ projectcontainer.code_request.mentor.name }}</a><br />
-		                    
+
 		                    {% for m in projectcontainer.contacts.all %}
 		                    	{{ m.type }}: <a href="#">
 		                    		{{ m.contact }}</a><br />
 		                    {% endfor %}
-		                    
+
 		                    {% if projectcontainer.tags.all %}
 		            		Tags:
 		            			{% for tag in projectcontainer.tags.all %}
@@ -138,9 +138,9 @@
 		            				<a href="#">{{ tag }}</a>
 		            			{% endfor %}
 						        <br />
-		            		{% endif %}         	
-	            			<br />  	
-		            		
+		            		{% endif %}
+	            			<br />
+
 		            		{% if projectcontainer.codings.all %}
 			            		<h4><strong>CodeMatches</strong></h4>
 			            		<ul>
@@ -154,7 +154,7 @@
                       </div>
                       <div class="clearfix"></div>
                     </div>
-                    
+
                   </div>
 					<div class="widget-foot">
 						<div class="pull-right">
@@ -163,7 +163,7 @@
 						<div class="clearfix"></div>
 					</div>
                 </div>
-              </div>  
+              </div>
 
             </div>
 

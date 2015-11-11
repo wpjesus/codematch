@@ -24,27 +24,27 @@
   <!-- Font awesome icon -->
   <link rel="stylesheet" href="{% static "css/font-awesome.min.css"%}">
   <!-- Ionicons icon -->
-  <link rel="stylesheet" href="{% static "css/ionicons.min.css"%}"> 
+  <link rel="stylesheet" href="{% static "css/ionicons.min.css"%}">
   <!-- jQuery UI -->
-  <link rel="stylesheet" href="{% static "css/jquery-ui.css"%}"> 
+  <link rel="stylesheet" href="{% static "css/jquery-ui.css"%}">
   <!-- Calendar -->
   <link rel="stylesheet" href="{% static "css/fullcalendar.css"%}">
   <!-- prettyPhoto -->
-  <link rel="stylesheet" href="{% static "css/prettyPhoto.css"%}">  
+  <link rel="stylesheet" href="{% static "css/prettyPhoto.css"%}">
   <!-- Star rating -->
   <link rel="stylesheet" href="{% static "css/rateit.css"%}">
   <!-- Date picker -->
   <link rel="stylesheet" href="{% static "css/bootstrap-datetimepicker.min.css"%}">
   <!-- CLEditor -->
-  <link rel="stylesheet" href="{% static "css/jquery.cleditor.css"%}"> 
+  <link rel="stylesheet" href="{% static "css/jquery.cleditor.css"%}">
   <!-- Data tables -->
-  <link rel="stylesheet" href="{% static "css/jquery.dataTables.css"%}"> 
+  <link rel="stylesheet" href="{% static "css/jquery.dataTables.css"%}">
   <!-- Bootstrap toggle -->
   <link rel="stylesheet" href="{% static "css/jquery.onoff.css"%}">
   <!-- Main stylesheet -->
   <link href="{% static "css/style.css"%}" rel="stylesheet">
   <!-- Widgets stylesheet -->
-  <link href="{% static "css/widgets.css"%}" rel="stylesheet">  
+  <link href="{% static "css/widgets.css"%}" rel="stylesheet">
     <style>
      {% block morecss %}{% endblock %}
     </style>
@@ -64,10 +64,10 @@
   </head>
 
   <body {% block bodyAttrs %}{%endblock%} data-group-menu-data-url="{% url "group_menu_data" %}">
-    
-    
+
+
     {% include "base/menu_codematch.html" %}
-    
+
 	{% block content %}{% endblock %}
 
 	  <div class="col-md-12">
@@ -84,7 +84,7 @@
 	        <a href="https://www.iana.org/" class="padded">IANA</a>
 	    </div>
 	  </div>
- 
+
       <footer class="row">
 	  <div class="col-md-12">
 	    <div class="text-center">
@@ -108,12 +108,12 @@
 	  </div>
       </footer>
 
-      
+
     <!-- Scroll to top -->
-	<span class="totop"><a href="#"><i class="fa fa-chevron-up"></i></a></span> 
-	
+	<span class="totop"><a href="#"><i class="fa fa-chevron-up"></i></a></span>
+
 	<!-- Certainly these js are not necessary to all pages, then, just like css, it must be filtered -->
-	
+
 	<!-- JS -->
 	<script src="{% static "js/jquery.js"%}"></script> <!-- jQuery -->
 	<script src="{% static "js/bootstrap.min.js"%}"></script> <!-- Bootstrap -->
@@ -130,7 +130,7 @@
 	<script src="{% static "js/jquery.flot.resize.js"%}"></script>
 	<script src="{% static "js/jquery.flot.pie.js"%}"></script>
 	<script src="{% static "js/jquery.flot.stack.js"%}"></script>
-	
+
 	<!-- jQuery Notification - Noty -->
 	<script src="{% static "js/jquery.noty.js"%}"></script> <!-- jQuery Notify -->
 	<script src="{% static "js/themes/default.js"%}"></script> <!-- jQuery Notify -->

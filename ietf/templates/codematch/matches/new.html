@@ -15,14 +15,14 @@
 
 {% block content %}
 <div class="content" style="padding:0">
-    
+
     <!-- Main bar -->
     <div class="mainbar">
-        
+
         <!-- Page heading -->
         <div class="page-head">
             <h2 class="pull-left"><i class="icon ion-arrow-shrink" style="font-size: 20px;"></i> CodeMatches</h2>
-            
+
             <!-- Breadcrumb -->
             <div class="bread-crumb pull-right">
                 <a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a>
@@ -32,17 +32,17 @@
                 <span class="divider">/</span>
                 <a href="#" class="bread-current">New</a>
             </div>
-             
+
             <div class="clearfix"></div>
-            
+
         </div>
         <!-- Page heading ends -->
-        
+
         <!-- Matter -->
-        
+
         <div class="matter">
             <div class="container">
-                
+
                 <!-- Recent News -->
                 <div class="col-md-12">
                     <div class="widget">
@@ -112,7 +112,7 @@
 										{% csrf_token %}
 										<input type="submit" value="Add related Document" />
 									{% endif %}
-										
+
 									<br />
 									<br />
 								{% endif %}
@@ -148,19 +148,19 @@
 	                                        <input type="submit" value="Add implementation" />
 	                                    {% endif %}
 									</div>
-									
+
 									<br />
-								
+
 									<div>
 										{% if tags %}
-			            					<h4><strong>Tags</strong></h4> 
+			            					<h4><strong>Tags</strong></h4>
 			            					{% for tag in tags %}
 					            				{% if not forloop.first %}
 			            						,
 			            						{% endif %}
 			            						<a>{{ tag }}</a>
 			            					{% endfor %}
-			            					<br />	
+			            					<br />
 			            				{% endif %}
 			            				<div>
 										<br />
@@ -175,9 +175,9 @@
 									</div>
 									</form>
 									{% endif %}
-									
+
 									<br />
-								
+
 							   		<div class="widget-foot">
 	                                <p class="buttonlist">
 	                                	<div class="col-xs-offset-1" style="margin-left: 0px">
@@ -191,17 +191,17 @@
                         </div>
                     </div>
                 </div>
-                
+
             </div>
         </div>
-        
+
         <!-- Matter ends -->
-        
+
     </div>
-    
+
     <!-- Mainbar ends -->
     <div class="clearfix"></div>
-    
+
 </div>
 <!-- Content ends -->
 {% endblock %}
