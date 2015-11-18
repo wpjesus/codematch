@@ -1,29 +1,28 @@
-import datetime
 from ietf.codematch import constants
 from django.shortcuts import get_object_or_404
-from django import forms
 from django.forms.models import modelform_factory
 from django.db.models import Count
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from ietf.group.models import Group
 from ietf.person.models import Person
-from ietf.doc.models import DocAlias, Document
+from ietf.doc.models import DocAlias
 from ietf.codematch.matches.forms import SearchForm, ProjectContainerForm, ContactForm
 from ietf.codematch.requests.forms import CodeRequestForm, DocNameForm, TagForm
-from ietf.codematch.matches.models import ProjectContainer, CodingProject, ProjectTag, ProjectContact
-from ietf.codematch.requests.models import CodeRequest
+from ietf.codematch.matches.models import ProjectContainer, ProjectTag, ProjectContact
 from ietf.codematch.helpers.utils import (render_page, is_user_allowed, clear_session, get_user)
-from django.core.urlresolvers import resolve
 from django.conf import settings
-import debug
 
 
 def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state=""):
-    """ List all CodeRequests 
-		type_list (all = All CodeRequests / mylist = CodeRequests I've Created / mentoring = CodeRequests i'm mentoring)
-		att = List will be sorted by this attribute (eg. if creation_date then ordered by date)
-		state = if the state is true then the project_containers has been previously loaded (eg. Loaded from the search) """
+    """ List all CodeRequests
+        type_list (all = All CodeRequests / mylist = CodeRequests I've Created / mentoring = CodeRequests i'm mentoring)
+        att = List will be sorted by this attribute (eg. if creation_date then ordered by date)
+        state = if the state is true then the project_containers has been previously loaded (eg. Loaded from the search)
+        :param state:
+        :param att:
+        :param type_list:
+        :param request:
+    """
 
     user = get_user(request)
 
@@ -54,16 +53,17 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
     list_of_lists = []
 
     # Attributes that should grouping
-    dict = {'protocol': constants.STRING_PROTOCOL, 'docs__document__group__name': constants.STRING_WORKINGGROUP,
-            'docs__document__group__parent__name': constants.STRING_AREA}
+    map_attributes = {'protocol': constants.STRING_PROTOCOL,
+                      'docs__document__group__name': constants.STRING_WORKINGGROUP,
+                      'docs__document__group__parent__name': constants.STRING_AREA}
 
     # If the attribute is in the dictionary then should do the sorting and grouping for this attribute
-    if att in dict:
-        select = list(set(project_containers.values_list(att,
-                                                         flat=True)))  # Get all values for this attribute (eg. protocol: OSPF, RIP, NewProtocol)
+    if att in map_attributes:
+        # Get all values for this attribute (eg. protocol: OSPF, RIP, NewProtocol)
+        select = list(set(project_containers.values_list(att, flat=True)))
         for s in select:
-            newlist = []
-            val = dict[att]
+            new_projs = []
+            val = map_attributes[att]
             for p in project_containers:
                 if att == constants.STRING_PROTOCOL:
                     prop = getattr(p, val)  # Get Protocol name
@@ -74,15 +74,14 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
                             prop = d.document.group.name  # Get working group name
                         else:
                             prop = d.document.group.parent.name  # Get area name
-                if prop is not None and p not in newlist and prop == s:
-                    newlist.append(p)
-            if len(newlist) > 0:
-                list_of_lists.append((newlist, s))
+                if prop is not None and p not in new_projs and prop == s:
+                    new_projs.append(p)
+            if len(new_projs) > 0:
+                list_of_lists.append((new_projs, s))
     else:  # Just show all CodeRequests in order
         for p in project_containers:
-            newlist = []
-            newlist.append(p)
-            list_of_lists.append((newlist, ""))
+            new_projs = [p]
+            list_of_lists.append((new_projs, ""))
 
     return render_page(request, constants.TEMPLATE_REQUESTS_LIST, {
         'projectcontainers': list_of_lists,
@@ -95,7 +94,10 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
 
 
 def search(request, type_list="all"):
-    """ Shows the list of CodeProjects, filtering according to the selected checkboxes """
+    """ Shows the list of CodeProjects, filtering according to the selected checkboxes
+        :param type_list:
+        :param request:
+    """
 
     search_type = request.GET.get("submit")
     if search_type:
@@ -135,10 +137,7 @@ def search(request, type_list="all"):
             ids += ProjectContainer.objects.exclude(code_request__isnull=True).filter(
                 docs__document__group__name__icontains=query).values_list('id', flat=True)
 
-
         project_containers = ProjectContainer.objects.filter(id__in=list(set(ids)))
-
-        user = get_user(request)
 
         request.session[constants.ALL_PROJECTS] = project_containers
 
@@ -153,21 +152,25 @@ def search(request, type_list="all"):
 
 
 def show(request, pk):
-    """ Show individual Codematch Project """
+    """ Show individual Codematch Project
+        :param pk:
+        :param request:
+    """
 
     project_container = get_object_or_404(ProjectContainer, id=pk)
 
-    areas, working_groups, tags = ([] for i in range(3))
+    areas = []
+    working_groups = []
 
     user = get_user(request)
 
     # According to model areas and working groups should come from documents
     for doc in project_container.docs.all():
         group = doc.document.group
-        if not group.name in working_groups:
+        if group.name not in working_groups:
             working_groups.append(group.name)
         if group.parent:
-            if not group.parent.name in areas:
+            if group.parent.name not in areas:
                 areas.append(group.parent.name)  # use acronym?
         else:
             areas.append(group.name)
@@ -186,9 +189,13 @@ def show(request, pk):
 
 
 def save_project(request, template, project_container=None):
-    ''' Used to create or update a CodeRequest.
-		When project container is null then a new 
-		instance is created in the database '''
+    """ Used to create or update a CodeRequest.
+        When project container is null then a new
+        instance is created in the database
+        :param project_container:
+        :param template:
+        :param request:
+    """
 
     # NOTE: Is slow 'cause of the mentors list (?)
 
@@ -273,7 +280,7 @@ def save_project(request, template, project_container=None):
                 modified = True
 
             for tag in rem_tags:
-                project.tags.remove(tags)
+                project.tags.remove(tag)
                 modified = True
 
             for m in rem_contacts:
@@ -339,7 +346,10 @@ def save_project(request, template, project_container=None):
 
 @login_required(login_url=settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def edit(request, pk):
-    """ Edit CodeRequest Entry """
+    """ Edit CodeRequest Entry
+        :param pk:
+        :param request:
+    """
 
     project_container = get_object_or_404(ProjectContainer, id=pk)
 
@@ -383,7 +393,9 @@ def edit(request, pk):
 
 @login_required(login_url=settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def new(request):
-    """ New CodeRequest Entry """
+    """ New CodeRequest Entry
+        :param request:
+    """
 
     if request.path != request.session[constants.ACTUAL_TEMPLATE]:
         clear_session(request)
@@ -401,8 +413,12 @@ def new(request):
 
 @login_required(login_url=settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def remove_contact(request, pk, contact_name):
-    ''' Adds the removal list, but will only be removed when saving changes
-        pk (pk = 0 - new ProjectContainer / pk > 0 - edit ProjectContainer '''
+    """ Adds the removal list, but will only be removed when saving changes
+        pk (pk = 0 - new ProjectContainer / pk > 0 - edit ProjectContainer
+        :param contact_name:
+        :param pk:
+        :param request:
+    """
 
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
 
@@ -434,8 +450,12 @@ def remove_contact(request, pk, contact_name):
 
 @login_required(login_url=settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def remove_document(request, pk, doc_name):
-    ''' Adds the removal list, but will only be removed when saving changes
-    	pk (pk = 0 - new ProjectContainer / pk > 0 - edit ProjectContainer '''
+    """ Adds the removal list, but will only be removed when saving changes
+        pk (pk = 0 - new ProjectContainer / pk > 0 - edit ProjectContainer
+        :param doc_name:
+        :param pk:
+        :param request:
+    """
 
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
 
@@ -467,8 +487,12 @@ def remove_document(request, pk, doc_name):
 
 @login_required(login_url=settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def remove_tag(request, pk, tag_name):
-    ''' Adds the removal list, but will only be removed when saving changes
-    	pk (0 = new ProjectContainer / 0 >= edit ProjectContainer '''
+    """ Adds the removal list, but will only be removed when saving changes
+        pk (0 = new ProjectContainer / 0 >= edit ProjectContainer :param tag_name:
+        :param tag_name:
+        :param pk:
+        :param request:
+    """
 
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
 

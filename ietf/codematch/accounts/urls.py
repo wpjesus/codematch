@@ -1,8 +1,5 @@
 from django.conf.urls import patterns, url, include
-from django.views.generic import RedirectView
-from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.views import login, logout
-from ietf.codematch import views
 
 urlpatterns = patterns('ietf.codematch.accounts.views',
                        url(r'^$', 'index', name='index'),

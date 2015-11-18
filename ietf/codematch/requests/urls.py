@@ -1,6 +1,4 @@
-from django.conf.urls import patterns, url, include
-from django.views.generic import RedirectView
-from django.core.urlresolvers import reverse_lazy
+from django.conf.urls import patterns, url
 from ietf.codematch.requests import views
 
 urlpatterns = patterns('ietf.codematch.requests.views',

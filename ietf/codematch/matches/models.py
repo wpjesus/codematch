@@ -1,8 +1,5 @@
 from django.db import models
-import debug
-import datetime
 from ietf.codematch import constants
-from ietf.group.models import Group
 from ietf.person.models import Person
 from ietf.doc.models import DocAlias
 from ietf.codematch.requests.models import CodeRequest

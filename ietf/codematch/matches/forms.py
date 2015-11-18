@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import ModelForm, CharField
+from django.forms import ModelForm
 from ietf.codematch.matches.models import ProjectContainer, CodingProject, Implementation, ProjectContact
 
 

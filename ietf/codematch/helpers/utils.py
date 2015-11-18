@@ -1,19 +1,18 @@
 from ietf.codematch import constants
 from django.shortcuts import render
-from django.template import RequestContext
 from ietf.person.models import Person, Alias
 from ietf.codematch.matches.models import ProjectContainer, CodingProject
-from ietf.codematch.requests.models import CodeRequest
-from django.conf import settings
-import debug
 
 
 # ----------------------------------------------------------------
 # Helper Functions
 # ----------------------------------------------------------------
 def is_user_allowed(user, permission):
-    """ Check if the user has permission """
-
+    """ Check if the user has permission
+        :param permission:
+        :param user:
+    """
+    print user, permission
     return True
 
 
@@ -25,13 +24,13 @@ def get_user(request):
         return None
 
 
-def get_menu_arguments(request, dict):
+def get_menu_arguments(request, keys):
     user = get_user(request)
 
     # Always setted
-    dict['from'] = request.GET.get('from', None)
-    dict['codematch_version'] = constants.VERSION
-    dict['codematch_revision_date'] = constants.RELEASE_DATE
+    keys['from'] = request.GET.get('from', None)
+    keys['codematch_version'] = constants.VERSION
+    keys['codematch_revision_date'] = constants.RELEASE_DATE
 
     if user is not None:  # Only when user is logged
 
@@ -41,22 +40,22 @@ def get_menu_arguments(request, dict):
 
         # Some tests are made on the templates, should be here in the code?
 
-        dict["mycodings"] = my_codings
-        dict["projectsowner"] = my_own_projects
-        dict["projectsmentoring"] = my_mentoring_projects
+        keys["mycodings"] = my_codings
+        keys["projectsowner"] = my_own_projects
+        keys["projectsmentoring"] = my_mentoring_projects
 
-        dict["canaddcoding"] = is_user_allowed(user, "canaddcoding")
-        dict["canaddrequest"] = is_user_allowed(user, "canaddrequest")
-        dict["ismentor"] = is_user_allowed(user, "ismentor")
+        keys["canaddcoding"] = is_user_allowed(user, "canaddcoding")
+        keys["canaddrequest"] = is_user_allowed(user, "canaddrequest")
+        keys["ismentor"] = is_user_allowed(user, "ismentor")
 
         # Try get pretty name user (otherwise, email will be used)
         alias = Alias.objects.filter(person=user)
 
         alias_name = alias[0].name if alias else user.name
 
-        dict["username"] = alias_name
+        keys["username"] = alias_name
 
-    return dict
+    return keys
 
 
 def clear_session(request):
@@ -76,8 +75,14 @@ def clear_session(request):
                 del request.session[key]
 
 
-def render_page(request, template, dict={}):
-    """ Special method for rendering pages """
+def render_page(request, template, keys=None):
+    """ Special method for rendering pages
+        :param keys:
+        :param template:
+        :param request:
+    """
+    if not keys:
+        keys = {}
 
     clear_session(request)
 
@@ -89,4 +94,4 @@ def render_page(request, template, dict={}):
 
     request.session[constants.ACTUAL_TEMPLATE] = request.path
 
-    return render(request, template, get_menu_arguments(request, dict))
+    return render(request, template, get_menu_arguments(request, keys))

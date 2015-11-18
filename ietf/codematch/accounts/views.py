@@ -1,39 +1,34 @@
-from django.shortcuts import get_object_or_404, render
 from ietf.codematch import constants
 from django.db.models import Count
 from django.http import HttpResponseRedirect
 from ietf.codematch.matches.models import CodingProject
-from ietf.codematch.helpers.utils import (render_page, is_user_allowed, clear_session, get_user)
+from ietf.codematch.helpers.utils import (render_page)
 from django.conf import settings
-import debug
 
 
 def index(request):
-    return render_to_response('codematch/index.html', context_instance=RequestContext(request))
-
+    return render_page(request, 'codematch/index.html')
 
 def register(request):
     return HttpResponseRedirect(settings.CODEMATCH_PREFIX + '/accounts/create/')
 
-
 def profile(request):
     return HttpResponseRedirect(settings.CODEMATCH_PREFIX + '/accounts/profile/')
-
 
 def top_coders(request):
     codings = CodingProject.objects.annotate(count=Count('coder'))
     codes = []
     coders = []
-    dict = {}
+    dict_code = {}
     for code in codings:
         if code.coder.name not in coders:
             coders.append(code.coder.name)
             codes.append(code)
-            dict[code.coder.name] = code
+            dict_code[code.coder.name] = code
         else:
-            c = dict[code.coder.name]
+            c = dict_code[code.coder.name]
             c.count += 1
-    codes = sorted(codes, key=lambda code: code.count, reverse=True)
+    codes = sorted(codes, key=lambda c: c.count, reverse=True)
     return render_page(request, constants.TEMPLATE_TOPCODERS, {
         'codes': codes,
     })

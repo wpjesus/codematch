@@ -1,36 +1,29 @@
-import datetime
 from ietf.codematch import constants
 from django.shortcuts import get_object_or_404
-from django import forms
-from django.forms import CharField
-from django.forms import ModelForm
-from django.forms.models import modelform_factory, inlineformset_factory
-from django.db.models import Count
-from django.core.exceptions import ObjectDoesNotExist
+from django.forms.models import modelform_factory
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from ietf.group.models import Group
 from ietf.person.models import Person
-from ietf.doc.models import DocAlias, Document
+from ietf.doc.models import DocAlias
 from ietf.codematch.matches.forms import SearchForm, ProjectContainerForm, CodingProjectForm, LinkImplementationForm
 from ietf.codematch.requests.forms import TagForm, DocNameForm
 from ietf.codematch.matches.models import ProjectContainer, CodingProject, Implementation, ProjectTag
-from ietf.codematch.requests.models import CodeRequest
 from ietf.codematch.helpers.utils import (render_page, is_user_allowed, clear_session, get_user)
-from django.core.urlresolvers import resolve
 from django.conf import settings
-import debug
 
 
 def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, state=""):
-    """ List all Codematches 
-		type_list (all = All CodeRequests / mylist = CodeRequests I've Created / mentoring = CodeRequests i'm mentoring)
-		att = List will be sorted by this attribute (eg. if creation_date then ordered by date)
-		state = if the state is true then the project_containers has been previously loaded (eg. Loaded from the search) """
+    """ List all Codematches type_list (all = All CodeRequests / mylist = CodeRequests I've Created /
+        mentoring = CodeRequests i'm mentoring)
+        att = List will be sorted by this attribute (eg. if creation_date then ordered by date)
+        state = if the state is true then the project_containers has been previously loaded (eg. Loaded from the search)
+        :param state:
+        :param att:
+        :param is_my_list:
+        :param request:
+    """
 
     user = get_user(request)
-
-    all_projects = []
 
     if state == "True" and constants.ALL_PROJECTS in request.session:
         all_projects = request.session[constants.ALL_PROJECTS]
@@ -38,28 +31,30 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
     else:
         all_projects = ProjectContainer.objects.all()
 
-    codings_list = []
-    codings = CodingProject.objects.order_by(att)[:20]
-    for coding in codings:
+    selected_codings = []
+    all_codings = CodingProject.objects.order_by(att)[:20]
+    for coding in all_codings:
         for project in all_projects:
             if coding in project.codings.all() and (is_my_list == "False" or user == coding.coder):
-                codings_list.append((coding, project))
+                selected_codings.append((coding, project))
 
     docs = []
-    areas_list, working_groups_list = ([] for i in range(2))
+    areas_list = []
+    working_groups_list = []
 
     for project_container in all_projects:
-        areas, working_groups = ([] for i in range(2))
+        areas = []
+        working_groups = []
         # According to model areas and working groups should come from documents
         for doc in project_container.docs.all():
             group = doc.document.group
-            if not group.name in working_groups:
+            if group.name not in working_groups:
                 working_groups.append(group.name)
             if group.parent:
-                if not group.parent.name in areas:
+                if group.parent.name not in areas:
                     areas.append(group.parent.name)
             else:
-                if not group.name in areas:
+                if group.name not in areas:
                     areas.append(group.name)
         if not areas:
             areas = [constants.STRING_NONE]
@@ -72,7 +67,7 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
     docs = list(set(docs))
 
     return render_page(request, constants.TEMPLATE_MATCHES_LIST, {
-        'codings': codings_list,
+        'codings': selected_codings,
         'owner': user,
         'docs': docs,
         'areas_list': areas_list,
@@ -85,12 +80,17 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
 
 
 def show(request, pk, ck):
-    """ Show individual Codematch Project and Add Implementation """
+    """ Show individual Codematch Project and Add Implementation
+        :param ck:
+        :param pk:
+        :param request:
+    """
 
     project_container = get_object_or_404(ProjectContainer, id=pk)
     coding = get_object_or_404(CodingProject, id=ck)
 
-    areas, tags = ([] for i in range(2))
+    areas = []
+    tags = []
 
     user = get_user(request)
 
@@ -98,10 +98,10 @@ def show(request, pk, ck):
     for doc in project_container.docs.all():
         group = doc.document.group
         if group.parent:
-            if not group.parent.name in areas:
+            if group.parent.name not in areas:
                 areas.append(group.parent.name)  # use acronym?
         else:
-            if not group.name in areas:
+            if group.name not in areas:
                 areas.append(group.name)
 
     tags += coding.tags.all()
@@ -121,7 +121,10 @@ def show(request, pk, ck):
 
 
 def search(request, is_my_list="False"):
-    """ Shows the list of CodeMatches, filtering according to the selected checkboxes """
+    """ Shows the list of CodeMatches, filtering according to the selected checkboxes
+        :param is_my_list:
+        :param request:
+    """
 
     search_type = request.GET.get("submit")
     if search_type:
@@ -137,8 +140,8 @@ def search(request, is_my_list="False"):
             ids += ProjectContainer.objects.filter(codings__title__icontains=query).values_list('id', flat=True)
 
         if request.GET.get(constants.STRING_DESCRIPTION):
-            ids += ProjectContainer.objects.filter(codings__additional_information__icontains=query).values_list('id',
-                                                                                                                 flat=True)
+            projs = ProjectContainer.objects.filter(codings__additional_information__icontains=query)
+            ids += projs.values_list('id', flat=True)
 
         if request.GET.get(constants.STRING_PROTOCOL):
             ids += ProjectContainer.objects.filter(protocol__icontains=query).values_list('id', flat=True)
@@ -170,9 +173,15 @@ def search(request, is_my_list="False"):
 
 
 def save_code(request, template, pk, ck="", coding=None):
-    ''' Used to create or update a CodeRequest.
-    When project container is null then a new 
-    instance is created in the database'''
+    """ Used to create or update a CodeRequest.
+        When project container is null then a new
+        instance is created in the database
+        :param coding:
+        :param ck:
+        :param pk:
+        :param template:
+        :param request:
+    """
 
     # User must have permission to add new CodeRequest
     if not is_user_allowed(request.user, "canaddcode"):
@@ -272,7 +281,7 @@ def save_code(request, template, pk, ck="", coding=None):
                 modified = True
 
             for tag in rem_tags:
-                coding_project.tags.remove(tags)
+                coding_project.tags.remove(tag)
                 modified = True
 
             for doc in rem_docs:
@@ -345,7 +354,11 @@ def save_code(request, template, pk, ck="", coding=None):
 
 @login_required(login_url=settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def edit(request, pk, ck):
-    """ Edit CodeRequest Entry """
+    """ Edit CodeRequest Entry
+        :param ck:
+        :param pk:
+        :param request:
+    """
 
     project_container = get_object_or_404(ProjectContainer, id=pk)
     coding = get_object_or_404(CodingProject, id=ck)
@@ -392,9 +405,12 @@ def edit(request, pk, ck):
 
 @login_required(login_url=settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def new(request, pk=""):
-    ''' New CodeMatch Entry
-    When user presses 'Associate new project' there is a Project Container
-    associated, then you need reuse this information in the form '''
+    """ New CodeMatch Entry
+        When user presses 'Associate new project' there is a Project Container
+        associated, then you need reuse this information in the form
+        :param pk:
+        :param request:
+    """
 
     if request.path != request.session[constants.ACTUAL_TEMPLATE]:
         clear_session(request)
@@ -419,8 +435,12 @@ def new(request, pk=""):
 
 @login_required(login_url=settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def remove_link(request, ck, link_name):
-    ''' Adds the removal list, but will only be removed when saving changes
-    ck (ck = 0 - new CodeMatch / ck > 0 edit CodeMatch '''
+    """ Adds the removal list, but will only be removed when saving changes
+        ck (ck = 0 - new CodeMatch / ck > 0 edit CodeMatch
+        :param link_name:
+        :param ck:
+        :param request:
+    """
 
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
 
@@ -450,8 +470,12 @@ def remove_link(request, ck, link_name):
 
 @login_required(login_url=settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def remove_tag(request, ck, tag_name):
-    ''' Adds the removal list, but will only be removed when saving changes
-    	ck (ck = 0 - new CodeMatch / ck > 0 edit CodeMatch '''
+    """ Adds the removal list, but will only be removed when saving changes
+        ck (ck = 0 - new CodeMatch / ck > 0 edit CodeMatch
+        :param request:
+        :param ck:
+        :param tag_name:
+    """
 
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
 
@@ -482,8 +506,12 @@ def remove_tag(request, ck, tag_name):
 
 @login_required(login_url=settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def remove_document(request, pk, doc_name):
-    ''' Adds the removal list, but will only be removed when saving changes
-        pk (pk = 0 - new ProjectContainer / pk > 0 - edit ProjectContainer '''
+    """ Adds the removal list, but will only be removed when saving changes
+        pk (pk = 0 - new ProjectContainer / pk > 0 - edit ProjectContainer
+        :param request:
+        :param pk
+        :param doc_name
+    """
 
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
 

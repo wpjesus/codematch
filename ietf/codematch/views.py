@@ -1,9 +1,6 @@
-from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from ietf.codematch.helpers.utils import (render_page)
-from django.conf import settings
 from ietf.codematch import constants
-import debug
 
 
 def index(request):
