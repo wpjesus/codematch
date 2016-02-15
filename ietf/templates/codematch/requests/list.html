@@ -97,7 +97,7 @@
 						<h5><i> <a href="{% url 'ietf.codematch.requests.views.show' projectcontainer.id %}">{{ projectcontainer.title }}</a>
 		                   	</i> {{ projectcontainer.code_request.creation_date|date:"d M Y" }}
 	                      	{% if user.is_authenticated %}
-	                   			{% if projectcontainer.owner == owner %}
+	                   			{% if projectcontainer.owner == owner.id %}
 		                   			<a class="label label-info" href="{% url 'ietf.codematch.requests.views.edit' projectcontainer.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a>
 				               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
 			               		{% endif %}

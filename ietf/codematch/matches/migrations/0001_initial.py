@@ -7,9 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('doc', '0005_auto_20150721_0230'),
-        ('person', '0004_auto_20150308_0440'),
-        ('requests', '0001_initial'),
+        ('requests', '__first__'),
     ]
 
     operations = [
@@ -19,9 +17,9 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('title', models.CharField(max_length=80)),
                 ('additional_information', models.CharField(max_length=255)),
+                ('coder', models.IntegerField(null=True, blank=True)),
                 ('creation_date', models.DateTimeField(auto_now_add=True)),
                 ('reputation', models.IntegerField(null=True, blank=True)),
-                ('coder', models.ForeignKey(blank=True, to='person.Person', null=True)),
             ],
             options={
             },
@@ -52,15 +50,15 @@ class Migration(migrations.Migration):
             name='ProjectContainer',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('owner', models.IntegerField(null=True, blank=True)),
                 ('title', models.CharField(max_length=80)),
                 ('creation_date', models.DateTimeField(auto_now_add=True)),
                 ('protocol', models.CharField(max_length=255)),
                 ('description', models.TextField()),
+                ('docs', models.CommaSeparatedIntegerField(max_length=200, null=True, blank=True)),
                 ('code_request', models.ForeignKey(blank=True, to='requests.CodeRequest', null=True)),
                 ('codings', models.ManyToManyField(to='matches.CodingProject')),
                 ('contacts', models.ManyToManyField(to='matches.ProjectContact', null=True, blank=True)),
-                ('docs', models.ManyToManyField(to='doc.DocAlias')),
-                ('owner', models.ForeignKey(blank=True, to='person.Person', null=True)),
             ],
             options={
             },

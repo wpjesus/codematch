@@ -44,10 +44,10 @@
                             <!-- Widget content -->
                             <div class="padd">
                                 <ul class="latest-news">
-                                    {% for code in codes %}
+                                    {% for count, coder in topcoders %}
 	                               		<li>
 	                                    	<!-- Title and date -->
-	                                    	<h5><a href="#">{{ code.coder.name }}</a> - {{ code.count }} Codings</h5>
+	                                    	<h5><a href="#">{{ coder.name }}</a> - {{ count }} Codings</h5>
 	                                	</li>
                                     {% endfor %}
                                 </ul>

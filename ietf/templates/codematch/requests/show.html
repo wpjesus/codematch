@@ -88,7 +88,7 @@
 		                      <div class="col-md-4">
 		                      	<div>
 			                      	{% if user.is_authenticated %}
-			                   			{% if projectcontainer.owner == owner %}
+			                   			{% if projectcontainer.owner == owner.id %}
 				                   			<a class="label label-info" href="{% url 'ietf.codematch.requests.views.edit' projectcontainer.id %}" ><i class="fa fa-pencil"></i> Edit</a>
 						               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
 					               		{% endif %}
@@ -107,9 +107,9 @@
 
                       		<br />
 
-							{% if projectcontainer.docs.all %}
+							{% if docs %}
 								<h4><strong>Documents</strong></h4>
-								{% for doc in projectcontainer.docs.all %}
+								{% for doc in docs %}
 									{{ doc.document.group }}: <a href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
 									<br />
 								{% endfor %}
@@ -122,7 +122,7 @@
 		                    <br />
 
 		                    <h4><strong>Resources</strong></h4>
-		                    Mentor: <a href="#">{{ projectcontainer.code_request.mentor.name }}</a><br />
+		                    Mentor: <a href="#">{{ mentor.name }}</a><br />
 
 		                    {% for m in projectcontainer.contacts.all %}
 		                    	{{ m.type }}: <a href="#">

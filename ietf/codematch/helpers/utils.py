@@ -18,7 +18,7 @@ def is_user_allowed(user, permission):
 
 def get_user(request):
     if request.user.is_authenticated():
-        user = Person.objects.get(user=request.user)
+        user = Person.objects.using('datatracker').get(user=request.user)
         return user
     else:
         return None
@@ -34,9 +34,9 @@ def get_menu_arguments(request, keys):
 
     if user is not None:  # Only when user is logged
 
-        my_codings = CodingProject.objects.filter(coder=user)
-        my_own_projects = ProjectContainer.objects.filter(owner=user)
-        my_mentoring_projects = ProjectContainer.objects.filter(code_request__mentor=user)
+        my_codings = CodingProject.objects.filter(coder=user.id)
+        my_own_projects = ProjectContainer.objects.filter(owner=user.id)
+        my_mentoring_projects = ProjectContainer.objects.filter(code_request__mentor=user.id)
 
         # Some tests are made on the templates, should be here in the code?
 
@@ -49,7 +49,7 @@ def get_menu_arguments(request, keys):
         keys["ismentor"] = is_user_allowed(user, "ismentor")
 
         # Try get pretty name user (otherwise, email will be used)
-        alias = Alias.objects.filter(person=user)
+        alias = Alias.objects.using('datatracker').filter(person=user)
 
         alias_name = alias[0].name if alias else user.name
 

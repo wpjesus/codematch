@@ -3,6 +3,7 @@ from django.db.models import Count
 from django.http import HttpResponseRedirect
 from ietf.codematch.matches.models import CodingProject
 from ietf.codematch.helpers.utils import (render_page)
+from ietf.person.models import Person
 from django.conf import settings
 
 
@@ -19,16 +20,19 @@ def top_coders(request):
     codings = CodingProject.objects.annotate(count=Count('coder'))
     codes = []
     coders = []
+    topcoders = []
     dict_code = {}
     for code in codings:
-        if code.coder.name not in coders:
-            coders.append(code.coder.name)
+        if code.coder not in coders:
+            coders.append(code.coder)
             codes.append(code)
-            dict_code[code.coder.name] = code
+            dict_code[code.coder] = code
         else:
-            c = dict_code[code.coder.name]
+            c = dict_code[code.coder]
             c.count += 1
     codes = sorted(codes, key=lambda c: c.count, reverse=True)
+    for cd in codes:
+        topcoders.append((cd.count, Person.objects.using('datatracker').get(id=cd.coder)))
     return render_page(request, constants.TEMPLATE_TOPCODERS, {
-        'codes': codes,
+        'topcoders': topcoders,
     })

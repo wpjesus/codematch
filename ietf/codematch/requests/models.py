@@ -8,7 +8,8 @@ class CodeRequest(models.Model):
     """ because they're Past projects or may haven't been formaly """
     """ requested by an author """
 
-    mentor = models.ForeignKey(Person, null=True, blank=True)
+    # mentor = models.ForeignKey(Person, null=True, blank=True)
+    mentor = models.IntegerField(blank=True, null=True)
 
     # Estimated Level of Effort
     estimated_lof = models.FloatField(null=True, blank=True)

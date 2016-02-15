@@ -7,21 +7,19 @@ from django.contrib.auth.decorators import login_required
 from ietf.person.models import Person
 from ietf.doc.models import DocAlias
 from ietf.codematch.matches.forms import SearchForm, ProjectContainerForm, ContactForm
-from ietf.codematch.requests.forms import CodeRequestForm, DocNameForm, TagForm
+from ietf.codematch.requests.forms import CodeRequestForm, DocNameForm, TagForm, MentorForm
 from ietf.codematch.matches.models import ProjectContainer, ProjectTag, ProjectContact
 from ietf.codematch.helpers.utils import (render_page, is_user_allowed, clear_session, get_user)
 from django.conf import settings
 
-
 def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state=""):
     """ List all CodeRequests
-        type_list (all = All CodeRequests / mylist = CodeRequests I've Created / mentoring = CodeRequests i'm mentoring)
-        att = List will be sorted by this attribute (eg. if creation_date then ordered by date)
-        state = if the state is true then the project_containers has been previously loaded (eg. Loaded from the search)
-        :param state:
-        :param att:
-        :param type_list:
-        :param request:
+        :param state: string - if the state is true then the project_containers
+                               has been previously loaded (eg. Loaded from the search)
+        :param att: string - List will be sorted by this attribute (eg. if creation_date then ordered by date)
+        :param type_list: string - (all = All CodeRequests / mylist = CodeRequests I've Created /
+                                    mentoring = CodeRequests i'm mentoring)
+        :param request: HttpResponse
     """
 
     user = get_user(request)
@@ -34,7 +32,8 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
             # Project must have been created by the current user and user must have permission mentor
             if not is_user_allowed(user, "iscreator"):
                 raise Http404
-            project_containers = ProjectContainer.objects.exclude(code_request__isnull=True).filter(owner=user)
+            project_containers = ProjectContainer.objects.exclude(code_request__isnull=True).filter(
+                owner=user)
         elif type_list == "mentoring":
             # Project must have been mentored by the current user and user must have permission mentor
             if not is_user_allowed(user, "ismentor"):
@@ -95,8 +94,8 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
 
 def search(request, type_list="all"):
     """ Shows the list of CodeProjects, filtering according to the selected checkboxes
-        :param type_list:
-        :param request:
+        :param request: HttpResponse
+        :param type_list: string - Which template is selected (eg. all or mymatches)
     """
 
     search_type = request.GET.get("submit")
@@ -122,8 +121,15 @@ def search(request, type_list="all"):
                 protocol__icontains=query).values_list('id', flat=True)
 
         if request.GET.get(constants.STRING_MENTOR):
-            ids += ProjectContainer.objects.exclude(code_request__isnull=True).filter(
-                code_request__mentor__name__icontains=query).values_list('id', flat=True)
+            projects = ProjectContainer.objects.exclude(code_request__isnull=True)
+            for pr in projects:
+                # TODO: Review this
+                try:
+                    user = Person.objects.using('datatracker').get(id=pr.code_request.mentor)
+                except:
+                    user = None
+                if user and query in user.name:
+                    ids += pr.id
 
         if request.GET.get(constants.STRING_DOCS):
             ids += ProjectContainer.objects.exclude(code_request__isnull=True).filter(
@@ -153,19 +159,27 @@ def search(request, type_list="all"):
 
 def show(request, pk):
     """ Show individual Codematch Project
-        :param pk:
-        :param request:
+        :param request: HttpResponse
+        :param pk: int - Indicates which project must be loaded
     """
 
     project_container = get_object_or_404(ProjectContainer, id=pk)
 
     areas = []
     working_groups = []
+    docs = []
 
     user = get_user(request)
-
+    mentor = Person.objects.using('datatracker').get(id=project_container.code_request.mentor)
+    
     # According to model areas and working groups should come from documents
-    for doc in project_container.docs.all():
+    keys = []
+    if project_container.docs:
+        keys = filter(None, project_container.docs.split(';'))
+    for key in keys:
+        # group = doc.document.group
+        doc = DocAlias.objects.using('datatracker').get(name=key)
+        docs.append(doc)
         group = doc.document.group
         if group.name not in working_groups:
             working_groups.append(group.name)
@@ -184,7 +198,9 @@ def show(request, pk):
         'projectcontainer': project_container,
         'areas': areas,
         'workinggroups': working_groups,
-        'owner': user
+        'docs': docs,
+        'owner': user,
+        'mentor': mentor
     })
 
 
@@ -192,9 +208,9 @@ def save_project(request, template, project_container=None):
     """ Used to create or update a CodeRequest.
         When project container is null then a new
         instance is created in the database
-        :param project_container:
-        :param template:
-        :param request:
+        :param request: HttpResponse
+        :param template: string
+        :param project_container: ProjectContainer
     """
 
     # NOTE: Is slow 'cause of the mentors list (?)
@@ -203,6 +219,7 @@ def save_project(request, template, project_container=None):
 
     doc_form = DocNameForm()
     tag_form = modelform_factory(ProjectTag, form=TagForm)
+    mentor_form = MentorForm()
 
     # TODO: check permission
     can_add_documents = is_user_allowed(user, "canadddocuments")
@@ -229,6 +246,7 @@ def save_project(request, template, project_container=None):
     if request.method == 'POST':
 
         doc_name = request.POST.get("doc")
+        mentor_id = request.POST.get("mentor")
         tag = TagForm(request.POST)
         new_contact = ContactForm(request.POST)
 
@@ -241,7 +259,7 @@ def save_project(request, template, project_container=None):
 
         # Adding document to the documents list to be saved in the project
         if doc_name:
-            selected_document = DocAlias.objects.filter(name=doc_name)
+            selected_document = DocAlias.objects.using('datatracker').filter(name=doc_name)
             if selected_document:
                 new_doc = selected_document[0]
                 docs.append(new_doc)  # Updating documents to appear after rendering
@@ -255,7 +273,7 @@ def save_project(request, template, project_container=None):
         # Adding new contact to the mailing list to be saved in the project
         elif new_contact.is_valid():
             m = new_contact.save(commit=False)
-            if m.type.lower() == constants.STRING_TWITTER:  # TODO: Padronize for all
+            if m.type.lower() == constants.STRING_TWITTER:  # TODO: Standardize for all
                 m.contact = '@' + m.contact
             contacts.append(m)
 
@@ -265,8 +283,11 @@ def save_project(request, template, project_container=None):
             code_request = new_req.save()
             # Creating new (or update) instance of the project container in the database
             project = new_proj.save(commit=False)
-            project.owner = Person.objects.get(user=request.user)  # Set creator
+            project.owner = Person.objects.using('datatracker').get(user=request.user).id  # Set creator
             project.code_request = code_request  # Linking CodeRequest to Project
+            print mentor_id
+            if mentor_id:
+                project.code_request.mentor = Person.objects.using('datatracker').get(id=mentor_id)
             project.save()
 
             modified = False
@@ -276,7 +297,7 @@ def save_project(request, template, project_container=None):
             rem_contacts = request.session[constants.REM_CONTACTS]
 
             for doc in rem_docs:
-                project.docs.remove(doc)
+                project.docs.replace(doc.name, '', 1)
                 modified = True
 
             for tag in rem_tags:
@@ -288,7 +309,11 @@ def save_project(request, template, project_container=None):
                 modified = True
 
             for doc in docs:
-                project.docs.add(doc)
+                keys = project.docs
+                if keys is None:
+                    project.docs = '{};'.format(doc.name)
+                else:
+                    project.docs += '{};'.format(doc.name)
                 modified = True
 
             for m in contacts:
@@ -335,6 +360,7 @@ def save_project(request, template, project_container=None):
         'contactform': contact_form,
         'docform': doc_form,
         'tagform': tag_form,
+        'mentorform': mentor_form,
         'docs': docs,
         'tags': tags,
         'contacts': contacts,
@@ -343,12 +369,14 @@ def save_project(request, template, project_container=None):
         'canaddcontact': can_add_contact
     })
 
+''' TODO: UNIFICAR CODIGO MATCHES E REQUESTS '''
+
 
 @login_required(login_url=settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def edit(request, pk):
     """ Edit CodeRequest Entry
-        :param pk:
-        :param request:
+        :param request: HttpResponse
+        :param pk: int - indicates which project must be loaded
     """
 
     project_container = get_object_or_404(ProjectContainer, id=pk)
@@ -364,7 +392,10 @@ def edit(request, pk):
     # Fills session variables with project values already saved
 
     if constants.ADD_DOCS not in request.session:
-        docs = project_container.docs.all()
+        keys = filter(None, project_container.docs.split(';'))
+        docs = []
+        for key in keys:
+            docs.append(DocAlias.objects.using('datatracker').get(name=key))
         request.session[constants.ADD_DOCS] = list(docs)
 
     if constants.ADD_TAGS not in request.session:
@@ -394,7 +425,7 @@ def edit(request, pk):
 @login_required(login_url=settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def new(request):
     """ New CodeRequest Entry
-        :param request:
+        :param request: HttpResponse
     """
 
     if request.path != request.session[constants.ACTUAL_TEMPLATE]:
@@ -415,9 +446,9 @@ def new(request):
 def remove_contact(request, pk, contact_name):
     """ Adds the removal list, but will only be removed when saving changes
         pk (pk = 0 - new ProjectContainer / pk > 0 - edit ProjectContainer
-        :param contact_name:
-        :param pk:
-        :param request:
+        :param request: HttpResponse
+        :param pk: int - Indicates which project must be loaded
+        :param contact_name: string - Indicates which contact must be loaded
     """
 
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
@@ -452,9 +483,9 @@ def remove_contact(request, pk, contact_name):
 def remove_document(request, pk, doc_name):
     """ Adds the removal list, but will only be removed when saving changes
         pk (pk = 0 - new ProjectContainer / pk > 0 - edit ProjectContainer
-        :param doc_name:
-        :param pk:
-        :param request:
+        :param request: HttpResponse
+        :param pk: int - Indicates which project must be loaded
+        :param doc_name: string - Indicates which doc must be removed
     """
 
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
@@ -488,10 +519,10 @@ def remove_document(request, pk, doc_name):
 @login_required(login_url=settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def remove_tag(request, pk, tag_name):
     """ Adds the removal list, but will only be removed when saving changes
-        pk (0 = new ProjectContainer / 0 >= edit ProjectContainer :param tag_name:
-        :param tag_name:
-        :param pk:
-        :param request:
+        pk (0 = new ProjectContainer / 0 >= edit ProjectContainer
+        :param request: HttpResponse
+        :param pk: int - Indicates which project must be loaded
+        :param tag_name: string - Indicates which tag must be removed
     """
 
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]

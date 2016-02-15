@@ -1,7 +1,5 @@
 from django.db import models
 from ietf.codematch import constants
-from ietf.person.models import Person
-from ietf.doc.models import DocAlias
 from ietf.codematch.requests.models import CodeRequest
 
 
@@ -47,7 +45,8 @@ class CodingProject(models.Model):
     additional_information = models.CharField(max_length=255)
 
     # The coder must have a user account in datatracker (as a person)
-    coder = models.ForeignKey(Person, null=True, blank=True)
+    #coder = models.ForeignKey(Person, null=True, blank=True)
+    coder = models.IntegerField(null=True, blank=True)
 
     # When the coding project was added
     creation_date = models.DateTimeField(auto_now_add=True)
@@ -63,11 +62,11 @@ class CodingProject(models.Model):
     def __unicode__(self):  # __unicode__ on Python 2
         return self.title
 
-
 class ProjectContainer(models.Model):
     """ The ProjectContainer associates the Documents to the projects  """
 
-    owner = models.ForeignKey(Person, null=True, blank=True)
+    # owner = models.ForeignKey(Person, null=True, blank=True)
+    owner = models.IntegerField(null=True, blank=True)
 
     title = models.CharField(max_length=80)
     creation_date = models.DateTimeField(auto_now_add=True)
@@ -79,8 +78,11 @@ class ProjectContainer(models.Model):
 
     # Some elements will not have a CodeRequest
     code_request = models.ForeignKey(CodeRequest, blank=True, null=True)
-    docs = models.ManyToManyField(DocAlias)
-
+    
+    # docs = models.ManyToManyField(DocAlias)
+    # TODO: Thinks about use the CommaSeparatedIntegerField
+    docs = models.CharField(max_length=300, blank=True, null=True)
+    
     codings = models.ManyToManyField(CodingProject)
 
     tags = models.ManyToManyField(ProjectTag, blank=True, null=True)

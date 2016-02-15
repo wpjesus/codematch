@@ -15,12 +15,11 @@ from django.conf import settings
 def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, state=""):
     """ List all Codematches type_list (all = All CodeRequests / mylist = CodeRequests I've Created /
         mentoring = CodeRequests i'm mentoring)
-        att = List will be sorted by this attribute (eg. if creation_date then ordered by date)
-        state = if the state is true then the project_containers has been previously loaded (eg. Loaded from the search)
-        :param state:
-        :param att:
+        :param request: HttpResponse
+        :param state: string - if the state is true then the project_containers
+                      has been previously loaded (eg. Loaded from the search)
+        :param att: string - List will be sorted by this attribute (eg. if creation_date then ordered by date)
         :param is_my_list:
-        :param request:
     """
 
     user = get_user(request)
@@ -32,11 +31,15 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
         all_projects = ProjectContainer.objects.all()
 
     selected_codings = []
-    all_codings = CodingProject.objects.order_by(att)[:20]
+    if att == constants.STRING_CODER:
+        all_codings = sorted(CodingProject.objects.all(), key=lambda p: Person.objects.get(id=p.coder))
+    else:
+        all_codings = CodingProject.objects.order_by(att)[:20]
     for coding in all_codings:
         for project in all_projects:
-            if coding in project.codings.all() and (is_my_list == "False" or user == coding.coder):
-                selected_codings.append((coding, project))
+            if coding in project.codings.all() and (is_my_list == "False" or user.id == coding.coder):
+                coder = Person.objects.using('datatracker').get(id=coding.coder)
+                selected_codings.append((coding, project, coder))
 
     docs = []
     areas_list = []
@@ -46,8 +49,12 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
         areas = []
         working_groups = []
         # According to model areas and working groups should come from documents
-        for doc in project_container.docs.all():
-            group = doc.document.group
+        keys = []
+        if project_container.docs:
+            keys = filter(None, project_container.docs.split(';'))
+        for key in keys:
+            # group = doc.document.group
+            group = DocAlias.objects.using('datatracker').get(name=key).document.group
             if group.name not in working_groups:
                 working_groups.append(group.name)
             if group.parent:
@@ -60,7 +67,6 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
             areas = [constants.STRING_NONE]
         if not working_groups:
             working_groups = [constants.STRING_NONE]
-
         areas_list.append((areas, project_container))
         working_groups_list.append((working_groups, project_container))
 
@@ -81,9 +87,9 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
 
 def show(request, pk, ck):
     """ Show individual Codematch Project and Add Implementation
-        :param ck:
-        :param pk:
-        :param request:
+        :param request: HttpResponse
+        :param ck: int - Indicates which coding must be loaded
+        :param pk: int - Indicates which project must be loaded
     """
 
     project_container = get_object_or_404(ProjectContainer, id=pk)
@@ -91,11 +97,23 @@ def show(request, pk, ck):
 
     areas = []
     tags = []
+    docs = []
 
     user = get_user(request)
+    coder = Person.objects.using('datatracker').get(id=coding.coder)
+    if project_container.code_request is None:
+        mentor = coder
+    else:
+        mentor = Person.objects.using('datatracker').get(id=project_container.code_request.mentor)
 
     # According to model areas and working groups should come from documents
-    for doc in project_container.docs.all():
+    keys = []
+    if project_container.docs:
+        keys = filter(None, project_container.docs.split(';'))
+    for key in keys:
+        # group = doc.document.group
+        doc = DocAlias.objects.using('datatracker').get(name=key)
+        docs.append(doc)
         group = doc.document.group
         if group.parent:
             if group.parent.name not in areas:
@@ -103,7 +121,6 @@ def show(request, pk, ck):
         else:
             if group.name not in areas:
                 areas.append(group.name)
-
     tags += coding.tags.all()
 
     if not areas:
@@ -116,14 +133,17 @@ def show(request, pk, ck):
         'coding': coding,
         'areas': areas,
         'tags': tags,
+        'docs': docs,
+        'coder': coder,
+        'mentor': mentor,
         'owner': user
     })
 
 
 def search(request, is_my_list="False"):
     """ Shows the list of CodeMatches, filtering according to the selected checkboxes
-        :param is_my_list:
-        :param request:
+        :param request: HttpResponse
+        :param is_my_list: string - if true then must be show only my codings
     """
 
     search_type = request.GET.get("submit")
@@ -147,7 +167,13 @@ def search(request, is_my_list="False"):
             ids += ProjectContainer.objects.filter(protocol__icontains=query).values_list('id', flat=True)
 
         if request.GET.get(constants.STRING_CODER):
-            ids += ProjectContainer.objects.filter(codings__coder__name__icontains=query).values_list('id', flat=True)
+            for pr in ProjectContainer.objects.all():
+                for cd in pr.codings.all():
+                    if query in Person.objects.using('datatracker').get(id=cd.coder).name:
+                        # TODO: Review this
+                        ids.append(pr.id)
+                        break
+            # ids += ProjectContainer.objects.filter(codings__coder__name__icontains=query).values_list('id', flat=True)
 
         if request.GET.get(constants.STRING_AREA):
             ids += ProjectContainer.objects.filter(docs__document__group__parent__name__icontains=query).values_list(
@@ -176,11 +202,11 @@ def save_code(request, template, pk, ck="", coding=None):
     """ Used to create or update a CodeRequest.
         When project container is null then a new
         instance is created in the database
-        :param coding:
-        :param ck:
-        :param pk:
-        :param template:
-        :param request:
+        :param request: HttpResponse
+        :param coding: CodingProject
+        :param ck: int - Indicates which coding must be loaded
+        :param pk: int - Indicates which project must be loaded
+        :param template: string
     """
 
     # User must have permission to add new CodeRequest
@@ -233,8 +259,6 @@ def save_code(request, template, pk, ck="", coding=None):
             new_project = ProjectContainerForm(post, instance=project_container)
             if request.POST.get(constants.STRING_SAVE) and new_project.is_valid():
                 project = new_project.save()  # Create new
-                if project_container is not None and project_container.code_request is None:
-                    project.owner = Person.objects.get(user=request.user)
         else:
             project = project_container  # Update only
 
@@ -250,7 +274,7 @@ def save_code(request, template, pk, ck="", coding=None):
 
         # Adding document to the documents list to be saved in the project
         elif doc_name:
-            selected_document = DocAlias.objects.filter(name=doc_name)
+            selected_document = DocAlias.objects.using('datatracker').filter(name=doc_name)
             if selected_document:
                 new_doc = selected_document[0]
                 docs.append(new_doc)  # Updating documents to appear after rendering
@@ -265,9 +289,11 @@ def save_code(request, template, pk, ck="", coding=None):
         elif request.POST.get(constants.STRING_SAVE) and project is not None and new_code.is_valid():
 
             coding_project = new_code.save(commit=False)
-            coding_project.coder = Person.objects.get(user=request.user)
+            coding_project.coder = Person.objects.using('datatracker').get(user=request.user).id
             coding_project.save()
             project.codings.add(coding_project)
+            if not project.owner:
+                project.owner = Person.objects.using('datatracker').get(user=request.user).id
             project.save()
 
             modified = False
@@ -285,7 +311,7 @@ def save_code(request, template, pk, ck="", coding=None):
                 modified = True
 
             for doc in rem_docs:
-                project.docs.remove(doc)
+                project.docs.replace(doc.name, '', 1)
                 modified = True
 
             for link in links:
@@ -315,7 +341,11 @@ def save_code(request, template, pk, ck="", coding=None):
                 modified = True
 
             for doc in docs:
-                project.docs.add(doc)
+                keys = project.docs
+                if keys is None:
+                    project.docs = '{};'.format(doc.name)
+                else:
+                    project.docs += '{};'.format(doc.name)
                 modified = True
 
             if modified:
@@ -355,9 +385,9 @@ def save_code(request, template, pk, ck="", coding=None):
 @login_required(login_url=settings.CODEMATCH_PREFIX + constants.TEMPLATE_LOGIN)
 def edit(request, pk, ck):
     """ Edit CodeRequest Entry
-        :param ck:
-        :param pk:
-        :param request:
+        :param request: HttpResponse
+        :param pk: int - Indicates which project must be loaded
+        :param ck: int - Indicates which coding must be loaded
     """
 
     project_container = get_object_or_404(ProjectContainer, id=pk)
@@ -382,7 +412,10 @@ def edit(request, pk, ck):
         request.session[constants.ADD_TAGS] = list(tags)
 
     if constants.ADD_DOCS not in request.session:
-        docs = project_container.docs.all()
+        keys = filter(None, project_container.docs.split(';'))
+        docs = []
+        for key in keys:
+            docs.append(DocAlias.objects.using('datatracker').get(name=key))
         request.session[constants.ADD_DOCS] = list(docs)
 
     # TODO: Review this        
@@ -391,7 +424,7 @@ def edit(request, pk, ck):
 
     # Project must have been created by the current user and
     # User must have permission to add new CodeRequest
-    if coding.coder != user:
+    if coding.coder != user.id:
         raise Http404
 
     # Save project and code request in the cache to make 'update' and 'new' use the same code (save_project)
@@ -408,8 +441,8 @@ def new(request, pk=""):
     """ New CodeMatch Entry
         When user presses 'Associate new project' there is a Project Container
         associated, then you need reuse this information in the form
-        :param pk:
-        :param request:
+        :param request: HttpResponse
+        :param pk: int - Indicates which project must be loaded
     """
 
     if request.path != request.session[constants.ACTUAL_TEMPLATE]:
@@ -437,9 +470,9 @@ def new(request, pk=""):
 def remove_link(request, ck, link_name):
     """ Adds the removal list, but will only be removed when saving changes
         ck (ck = 0 - new CodeMatch / ck > 0 edit CodeMatch
-        :param link_name:
-        :param ck:
-        :param request:
+        :param request: HttpResponse
+        :param ck: int - Indicates which coding must be loaded
+        :param link_name: string - Indicates which link must be removed
     """
 
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
@@ -454,7 +487,7 @@ def remove_link(request, ck, link_name):
         user = us
 
         # Coding must have been created by the current user and
-        if coding.coder != user:
+        if coding.coder != user.id:
             raise Http404
 
         if coding.links.filter(link=link_name):
@@ -472,9 +505,9 @@ def remove_link(request, ck, link_name):
 def remove_tag(request, ck, tag_name):
     """ Adds the removal list, but will only be removed when saving changes
         ck (ck = 0 - new CodeMatch / ck > 0 edit CodeMatch
-        :param request:
-        :param ck:
-        :param tag_name:
+        :param request: HttpResponse
+        :param ck: int - Indicates which coding must be loaded
+        :param tag_name: string - Indicates which tag must be removed
     """
 
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
@@ -490,7 +523,7 @@ def remove_tag(request, ck, tag_name):
         user = us
 
         # Coding must have been created by the current user and
-        if coding.coder != user:
+        if coding.coder != user.id:
             raise Http404
 
         if coding.tags.filter(name=tag_name):
@@ -508,9 +541,9 @@ def remove_tag(request, ck, tag_name):
 def remove_document(request, pk, doc_name):
     """ Adds the removal list, but will only be removed when saving changes
         pk (pk = 0 - new ProjectContainer / pk > 0 - edit ProjectContainer
-        :param request:
-        :param pk
-        :param doc_name
+        :param request: HttpResponse
+        :param pk: int - Indicates which project must be loaded
+        :param doc_name: string  - Indicates which document must be removed
     """
 
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
@@ -526,7 +559,7 @@ def remove_document(request, pk, doc_name):
         user = us
 
         # Project must have been created by the current user and
-        if project_container.owner != user:
+        if project_container.owner != user.id:
             raise Http404
 
         if project_container.docs.filter(name=doc_name):

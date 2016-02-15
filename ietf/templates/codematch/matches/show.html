@@ -61,14 +61,10 @@
 
 											<div class="row">
 												<div class="col-md-4">
-													<strong>By: </strong><a href="#">{{ coding.coder.name }}</a>
+													<strong>By: </strong><a href="#">{{ coder.name }}</a>
 													<!--<strong>By:</strong><a href="#">{{ coding.coder.name }}</a>-->
 													<br />
-													{% if projectcontainer.code_request != None %}
-													<strong>Mentor: </strong><a href="#">{{ projectcontainer.code_request.mentor.name }}</a>
-													{% else %}
-													<strong>Mentor: </strong><a href="#">{{ coding.coder.name }}</a>
-													{% endif %}
+													<strong>Mentor: </strong><a href="#">{{ mentor.name }}</a>
 													<!--<strong>Mentor:</strong><a href="#">{{ projectcontainer.code_request.mentor.name }}</a>-->
 													<br />
 													<strong>CodeRequest: </strong><a href="{% url "ietf.codematch.requests.views.show" projectcontainer.id %}"> {{ projectcontainer.title }}</a>
@@ -95,7 +91,7 @@
 												<div class="col-md-4">
 							                      	<div>
 								                      	{% if user.is_authenticated %}
-								                   			{% if coding.coder == owner %}
+								                   			{% if coder == owner %}
 									                   			<a class="label label-info" href="{% url 'ietf.codematch.matches.views.edit' projectcontainer.id coding.id %}" ><i class="fa fa-pencil"></i> Edit</a>
 											               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
 										               		{% endif %}
@@ -129,9 +125,9 @@
 
 											<br />
 
-											{% if projectcontainer.docs.all and projectcontainer.code_request == None %}
+											{% if docs and projectcontainer.code_request == None %}
 												<h4><strong>Documents</strong></h4>
-												{% for doc in projectcontainer.docs.all %}
+												{% for doc in docs %}
 													{{ doc.document.group }}: <a href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
 													<br />
 												{% endfor %}

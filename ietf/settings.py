@@ -131,7 +131,7 @@ AUTHENTICATION_BACKENDS = ( 'django.contrib.auth.backends.ModelBackend', )
 
 #DATABASE_ROUTERS = ["ietf.legacy_router.LegacyRouter"]
 
-# ------------------------------------------------------------------------
+# -------------------------------sh -----------------------------------------
 # Django/Python Logging Framework Modifications
 
 # enable HTML error emails

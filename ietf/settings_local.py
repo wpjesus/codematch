@@ -6,7 +6,16 @@ DATABASES = {
         'PASSWORD': 'ietf', # Contact henrik@levkowetz.com to get the password
         'HOST': '127.0.0.1'
     },
+    'datatracker': {
+        'NAME': 'ietf_utf8',
+        'ENGINE': 'django.db.backends.mysql',
+        'USER': 'django_readonly',
+        'PASSWORD': 'f$xdv#vzwi',
+        'HOST': 'zinfandel.tools.ietf.org',
+    }
 }
+
+DATABASE_ROUTERS = ["ietf.new_router.DatatrackerRouter"]
 
 # Since the zinfandel database above is read-only, you also need to have a
 # different session backend in order to avoid exceptions due to attempts
@@ -26,12 +35,12 @@ CACHES = {
 }
 
 # If you are using a remote database, you may want to enable memcached instead:
-#CACHES = {
+# CACHES = {
 #    'default': {
 #        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
 #        'LOCATION': '127.0.0.1:11211',
 #    }
-#}
+# }
 
 SERVER_MODE	  = 'development'
 DEBUG             = True
@@ -77,9 +86,10 @@ STATIC_URL = "/../"
 
 #Application that must be installed by Codematch
 CODEMATCH_APPS = (
+        'dal',
+        'dal_select2',
         'ietf.codematch',
         'ietf.codematch.accounts',
         'ietf.codematch.matches',
         'ietf.codematch.requests'
     )
-
