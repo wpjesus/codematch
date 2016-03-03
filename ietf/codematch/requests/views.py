@@ -285,7 +285,6 @@ def save_project(request, template, project_container=None):
             project = new_proj.save(commit=False)
             project.owner = Person.objects.using('datatracker').get(user=request.user).id  # Set creator
             project.code_request = code_request  # Linking CodeRequest to Project
-            print mentor_id
             if mentor_id:
                 project.code_request.mentor = Person.objects.using('datatracker').get(id=mentor_id)
             project.save()

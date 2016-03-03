@@ -11,8 +11,7 @@ class DocNameForm(forms.Form):
 
 
 class MentorForm(forms.Form):    
-    # mentor = forms.ModelChoiceField(Person.objects.all(), widget=autocomplete.ModelSelect2(url='personcomplete'))
-    mentor = forms.ModelChoiceField(Person.objects.all())
+    mentor = forms.ModelChoiceField(queryset=Person.objects.all())
 
 
 class TagForm(ModelForm):

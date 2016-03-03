@@ -5,7 +5,6 @@ urlpatterns = patterns('',
                        url(r'^$', views.index, name="index"),
                        url(r'^about/$', views.about, name="about"),
                        url(r'^back/$', views.back, name="back"),
-                       url('personcomplete/$', views.PersonAutocomplete.as_view(), name='personcomplete'),
                        # Accounts
                        url(r'^accounts/$', include('ietf.codematch.accounts.urls')),
 

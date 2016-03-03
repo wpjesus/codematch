@@ -86,8 +86,6 @@ STATIC_URL = "/../"
 
 #Application that must be installed by Codematch
 CODEMATCH_APPS = (
-        'dal',
-        'dal_select2',
         'ietf.codematch',
         'ietf.codematch.accounts',
         'ietf.codematch.matches',
