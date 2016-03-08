@@ -3,7 +3,6 @@ from django.forms import ModelForm
 from ietf.codematch.requests.models import CodeRequest
 from ietf.codematch.matches.models import ProjectTag
 from ietf.person.models import Person
-from dal import autocomplete
 
 
 class DocNameForm(forms.Form):
@@ -11,8 +10,11 @@ class DocNameForm(forms.Form):
 
 
 class MentorForm(forms.Form):    
-    mentor = forms.ModelChoiceField(queryset=Person.objects.all())
+    mentor = forms.ModelChoiceField(Person.objects.using('datatracker').all())
 
+    def __init__(self,*args,**kwargs):
+        super(MentorForm, self).__init__(*args,**kwargs)
+        self.fields['mentor'].queryset = Person.objects.using('datatracker').all()
 
 class TagForm(ModelForm):
     class Meta:

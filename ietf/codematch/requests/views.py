@@ -33,13 +33,13 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
             if not is_user_allowed(user, "iscreator"):
                 raise Http404
             project_containers = ProjectContainer.objects.exclude(code_request__isnull=True).filter(
-                owner=user)
+                owner=user.id)
         elif type_list == "mentoring":
             # Project must have been mentored by the current user and user must have permission mentor
             if not is_user_allowed(user, "ismentor"):
                 raise Http404
             project_containers = ProjectContainer.objects.exclude(code_request__isnull=True).filter(
-                code_request__mentor=user)
+                code_request__mentor=user.id)
         else:
             # Exclude ProjectContainers that don't have an associated CodeRequest (TODO: Centralize this?)
             project_containers = ProjectContainer.objects.exclude(code_request__isnull=True)

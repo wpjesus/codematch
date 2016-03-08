@@ -230,6 +230,8 @@ STATICFILES_DIRS = (
 
 INSTALLED_APPS = (
     # Django apps
+    'dal',
+    'dal_select2',
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.auth',
