@@ -7,7 +7,8 @@ from django.core.urlresolvers import reverse as urlreverse
 from ietf.ipr.models import IprDisclosureBase
 
 def select2_id_ipr_title_json(value):
-    return json.dumps([{ "id": o.pk, "text": escape(u"%s <%s>" % (o.title, o.time.date().isoformat())) } for o in value])
+    # return json.dumps([{ "id": o.pk, "text": escape(u"%s <%s>" % (o.title, o.time.date().isoformat())) } for o in value])
+    return json.dumps([{ "id": o.pk, "text": "Matheus :)" } for o in value])
 
 class SearchableIprDisclosuresField(forms.CharField):
     """Server-based multi-select field for choosing documents using

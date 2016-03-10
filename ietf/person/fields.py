@@ -77,9 +77,7 @@ class SearchablePersonsField(forms.CharField):
                 value = self.model.objects.filter(pk__in=pks).select_related("person")
         if isinstance(value, self.model):
             value = [value]
-
         self.widget.attrs["data-pre"] = select2_id_name_json(value)
-
         # doing this in the constructor is difficult because the URL
         # patterns may not have been fully constructed there yet
         self.widget.attrs["data-ajax-url"] = urlreverse("ajax_select2_search_person_email", kwargs={ "model_name": self.model.__name__.lower() })

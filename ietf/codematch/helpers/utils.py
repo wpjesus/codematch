@@ -61,7 +61,7 @@ def get_menu_arguments(request, keys):
 def clear_session(request):
     # All session variables
     keys = [constants.ALL_PROJECTS, constants.PROJECT_INSTANCE, constants.REQUEST_INSTANCE, constants.CONTACT_INSTANCE,
-            constants.ACTUAL_PROJECT,
+            constants.ACTUAL_PROJECT, constants.MENTOR_INSTANCE,
             constants.CODE_INSTANCE, constants.ADD_DOCS, constants.ADD_TAGS, constants.ADD_LINKS,
             constants.ADD_CONTACTS,
             constants.REM_CONTACTS, constants.REM_DOCS, constants.REM_TAGS, constants.REM_LINKS]

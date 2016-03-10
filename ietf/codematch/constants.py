@@ -12,6 +12,7 @@ RELEASE_DATE = "2015-10-30"
 ALL_PROJECTS = 'all_projects'
 PROJECT_INSTANCE = 'project_instance'
 REQUEST_INSTANCE = 'request_instance'
+MENTOR_INSTANCE = 'mentor_instance'
 CODE_INSTANCE = 'code_instance'
 CONTACT_INSTANCE = 'contact_instance'
 ACTUAL_PROJECT = 'actual_project'

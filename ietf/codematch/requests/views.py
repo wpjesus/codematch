@@ -2,7 +2,7 @@ from ietf.codematch import constants
 from django.shortcuts import get_object_or_404
 from django.forms.models import modelform_factory
 from django.db.models import Count
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from ietf.person.models import Person
 from ietf.doc.models import DocAlias
@@ -11,6 +11,28 @@ from ietf.codematch.requests.forms import CodeRequestForm, DocNameForm, TagForm,
 from ietf.codematch.matches.models import ProjectContainer, ProjectTag, ProjectContact
 from ietf.codematch.helpers.utils import (render_page, is_user_allowed, clear_session, get_user)
 from django.conf import settings
+import json
+
+
+def get_mentors(request):
+    if request.is_ajax():
+        q = request.GET.get('term', '')
+        persons = Person.objects.using('datatracker').filter(name__icontains=q)
+        results = []
+        for pers in persons:
+            person_json = {}
+            person_json['id'] = pers.id
+            person_json['label'] = pers.name
+            person_json['value'] = pers.name
+            results.append(person_json)
+            data = json.dumps(results)
+    else:
+        data = 'fail'
+    mimetype = 'application/json'
+    response = HttpResponse(data, mimetype)
+    print response
+    return response
+
 
 def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state=""):
     """ List all CodeRequests
@@ -171,7 +193,7 @@ def show(request, pk):
 
     user = get_user(request)
     mentor = Person.objects.using('datatracker').get(id=project_container.code_request.mentor)
-    
+
     # According to model areas and working groups should come from documents
     keys = []
     if project_container.docs:
@@ -219,7 +241,6 @@ def save_project(request, template, project_container=None):
 
     doc_form = DocNameForm()
     tag_form = modelform_factory(ProjectTag, form=TagForm)
-    mentor_form = MentorForm()
 
     # TODO: check permission
     can_add_documents = is_user_allowed(user, "canadddocuments")
@@ -233,7 +254,9 @@ def save_project(request, template, project_container=None):
         constants.REQUEST_INSTANCE] if constants.REQUEST_INSTANCE in request.session else CodeRequestForm()
     contact_form = request.session[
         constants.CONTACT_INSTANCE] if constants.CONTACT_INSTANCE in request.session else ContactForm()
-
+    mentor_form = request.session[
+        constants.MENTOR_INSTANCE] if constants.MENTOR_INSTANCE in request.session else MentorForm()
+    
     docs = request.session[constants.ADD_DOCS]
     tags = request.session[constants.ADD_TAGS]
     contacts = request.session[constants.ADD_CONTACTS]
@@ -286,7 +309,7 @@ def save_project(request, template, project_container=None):
             project.owner = Person.objects.using('datatracker').get(user=request.user).id  # Set creator
             project.code_request = code_request  # Linking CodeRequest to Project
             if mentor_id:
-                project.code_request.mentor = Person.objects.using('datatracker').get(id=mentor_id)
+                project.code_request.mentor = mentor_id
             project.save()
 
             modified = False
@@ -348,10 +371,11 @@ def save_project(request, template, project_container=None):
         # Updating session variables
         request.session[constants.PROJECT_INSTANCE] = new_proj
         request.session[constants.REQUEST_INSTANCE] = new_req
+        request.session[constants.MENTOR_INSTANCE] = mentor_form
 
         proj_form = new_proj
         req_form = new_req
-
+    
     return render_page(request, template, {
         'projectcontainer': project_container,
         'projform': proj_form,
@@ -367,6 +391,7 @@ def save_project(request, template, project_container=None):
         'canaddtags': can_add_tags,
         'canaddcontact': can_add_contact
     })
+
 
 ''' TODO: UNIFICAR CODIGO MATCHES E REQUESTS '''
 
@@ -391,10 +416,11 @@ def edit(request, pk):
     # Fills session variables with project values already saved
 
     if constants.ADD_DOCS not in request.session:
-        keys = filter(None, project_container.docs.split(';'))
         docs = []
-        for key in keys:
-            docs.append(DocAlias.objects.using('datatracker').get(name=key))
+        if project_container.docs:
+            keys = filter(None, project_container.docs.split(';'))
+            for key in keys:
+                docs.append(DocAlias.objects.using('datatracker').get(name=key))
         request.session[constants.ADD_DOCS] = list(docs)
 
     if constants.ADD_TAGS not in request.session:
@@ -411,12 +437,16 @@ def edit(request, pk):
 
     # Project must have been created by the current user and
     # User must have permission to add new CodeRequest
-    if project_container.owner != user:
+    if project_container.owner != user.id:
         raise Http404
 
     # Save project and code request in the cache to make 'update' and 'new' use the same code (save_project)
     request.session[constants.PROJECT_INSTANCE] = ProjectContainerForm(instance=project_container)
     request.session[constants.REQUEST_INSTANCE] = CodeRequestForm(instance=project_container.code_request)
+    if project_container.code_request.mentor:
+        selected_mentor = Person.objects.using('datatracker').get(id=project_container.code_request.mentor)
+        mentor_form = MentorForm(initial={'mentor':selected_mentor})
+        request.session[constants.MENTOR_INSTANCE] = mentor_form
 
     return save_project(request, constants.TEMPLATE_REQUESTS_EDIT, project_container)
 

@@ -2,6 +2,7 @@
 
 {% load ietf_filters bootstrap3 widget_tweaks %}
 {% load future %}
+{% load staticfiles %}
 
 {% block title %} Edit CodeRequest {% endblock %}
 
@@ -77,7 +78,7 @@
 								<div class="form-group">
 									<label class="control-label col-xs-2">Mentor:</label>
 									<div class="col-xs-4">
-										{{ reqform.mentor }}
+										{{ mentorform.mentor }}
 									</div>
 								</div>
 								<div class="form-group">
@@ -197,4 +198,11 @@
 
 </div>
 <!-- Content ends -->
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/select2.min.js' %}"></script>
+<script src="{% static 'js/select2-field.js' %}"></script>
+<script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+<script src="{% static 'js/ipr-edit.js' %}"></script>
 {% endblock %}

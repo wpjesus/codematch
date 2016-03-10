@@ -2,19 +2,18 @@ from django import forms
 from django.forms import ModelForm
 from ietf.codematch.requests.models import CodeRequest
 from ietf.codematch.matches.models import ProjectTag
-from ietf.person.models import Person
+from ietf.person.fields import SearchablePersonField
+from ietf.doc.fields import SearchableDocumentField
 
 
 class DocNameForm(forms.Form):
-    doc = forms.CharField(label="Document", max_length=128, required=True)
+    # doc = forms.CharField(label="Document", max_length=128, required=True)
+    doc = SearchableDocumentField(label="Drafts", required=False)
 
 
 class MentorForm(forms.Form):    
-    mentor = forms.ModelChoiceField(Person.objects.using('datatracker').all())
-
-    def __init__(self,*args,**kwargs):
-        super(MentorForm, self).__init__(*args,**kwargs)
-        self.fields['mentor'].queryset = Person.objects.using('datatracker').all()
+    mentor = SearchablePersonField(label="Must be present", required=False)
+        
 
 class TagForm(ModelForm):
     class Meta:

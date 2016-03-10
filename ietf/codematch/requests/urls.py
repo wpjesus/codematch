@@ -17,4 +17,5 @@ urlpatterns = patterns('ietf.codematch.requests.views',
                        url(r'^search/$', views.search, name="search"),
                        url(r'^search/(?P<type_list>.*)$', views.search, name="search"),
                        url(r'^(?P<pk>[0-9]+)/$', views.show, name='show'),
+                       url(r'^get_mentors/$', views.get_mentors, name='get_mentors'),
                        )
