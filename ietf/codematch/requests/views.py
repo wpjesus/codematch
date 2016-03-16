@@ -2,7 +2,7 @@ from ietf.codematch import constants
 from django.shortcuts import get_object_or_404
 from django.forms.models import modelform_factory
 from django.db.models import Count
-from django.http import Http404, HttpResponseRedirect, HttpResponse
+from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from ietf.person.models import Person
 from ietf.doc.models import DocAlias
@@ -11,27 +11,6 @@ from ietf.codematch.requests.forms import CodeRequestForm, DocNameForm, TagForm,
 from ietf.codematch.matches.models import ProjectContainer, ProjectTag, ProjectContact
 from ietf.codematch.helpers.utils import (render_page, is_user_allowed, clear_session, get_user)
 from django.conf import settings
-import json
-
-
-def get_mentors(request):
-    if request.is_ajax():
-        q = request.GET.get('term', '')
-        persons = Person.objects.using('datatracker').filter(name__icontains=q)
-        results = []
-        for pers in persons:
-            person_json = {}
-            person_json['id'] = pers.id
-            person_json['label'] = pers.name
-            person_json['value'] = pers.name
-            results.append(person_json)
-            data = json.dumps(results)
-    else:
-        data = 'fail'
-    mimetype = 'application/json'
-    response = HttpResponse(data, mimetype)
-    print response
-    return response
 
 
 def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state=""):
@@ -192,7 +171,9 @@ def show(request, pk):
     docs = []
 
     user = get_user(request)
-    mentor = Person.objects.using('datatracker').get(id=project_container.code_request.mentor)
+    mentor = None
+    if project_container.code_request.mentor:
+        mentor = Person.objects.using('datatracker').get(id=project_container.code_request.mentor)
 
     # According to model areas and working groups should come from documents
     keys = []
@@ -236,7 +217,7 @@ def save_project(request, template, project_container=None):
     """
 
     # NOTE: Is slow 'cause of the mentors list (?)
-
+    
     user = get_user(request)
 
     doc_form = DocNameForm()
@@ -256,6 +237,7 @@ def save_project(request, template, project_container=None):
         constants.CONTACT_INSTANCE] if constants.CONTACT_INSTANCE in request.session else ContactForm()
     mentor_form = request.session[
         constants.MENTOR_INSTANCE] if constants.MENTOR_INSTANCE in request.session else MentorForm()
+    is_mentor = request.session[constants.IS_MENTOR] if constants.IS_MENTOR in request.session else False
     
     docs = request.session[constants.ADD_DOCS]
     tags = request.session[constants.ADD_TAGS]
@@ -269,7 +251,19 @@ def save_project(request, template, project_container=None):
     if request.method == 'POST':
 
         doc_name = request.POST.get("doc")
-        mentor_id = request.POST.get("mentor")
+        if request.POST.get("chkMentor"):
+            is_mentor = True
+            mentor_id = Person.objects.using('datatracker').get(id=user.id).id
+        else:
+            is_mentor = False
+            mentor_id = request.POST.get("mentor")
+            
+        if mentor_id:
+            selected_mentor = Person.objects.using('datatracker').get(id=mentor_id)
+            mentor_form = MentorForm(initial={'mentor':selected_mentor})
+        else:
+            mentor_form = MentorForm()
+            
         tag = TagForm(request.POST)
         new_contact = ContactForm(request.POST)
 
@@ -303,13 +297,14 @@ def save_project(request, template, project_container=None):
         # Saving project (new or not) in the database
         elif request.POST.get('save') and new_proj.is_valid() and new_req.is_valid():
             # Creating new (or update) instance of the code request in the database
-            code_request = new_req.save()
+            code_request = new_req.save(commit=False)
+            if mentor_id:
+                code_request.mentor = mentor_id
+            code_request.save()
             # Creating new (or update) instance of the project container in the database
             project = new_proj.save(commit=False)
             project.owner = Person.objects.using('datatracker').get(user=request.user).id  # Set creator
             project.code_request = code_request  # Linking CodeRequest to Project
-            if mentor_id:
-                project.code_request.mentor = mentor_id
             project.save()
 
             modified = False
@@ -317,9 +312,9 @@ def save_project(request, template, project_container=None):
             rem_docs = request.session[constants.REM_DOCS]
             rem_tags = request.session[constants.REM_TAGS]
             rem_contacts = request.session[constants.REM_CONTACTS]
-
+            
             for doc in rem_docs:
-                project.docs.replace(doc.name, '', 1)
+                project.docs = project.docs.replace(doc.name + ';', '', 1)
                 modified = True
 
             for tag in rem_tags:
@@ -335,7 +330,8 @@ def save_project(request, template, project_container=None):
                 if keys is None:
                     project.docs = '{};'.format(doc.name)
                 else:
-                    project.docs += '{};'.format(doc.name)
+                    if doc.name not in project.docs:
+                        project.docs += '{};'.format(doc.name)
                 modified = True
 
             for m in contacts:
@@ -372,6 +368,7 @@ def save_project(request, template, project_container=None):
         request.session[constants.PROJECT_INSTANCE] = new_proj
         request.session[constants.REQUEST_INSTANCE] = new_req
         request.session[constants.MENTOR_INSTANCE] = mentor_form
+        request.session[constants.IS_MENTOR] = is_mentor
 
         proj_form = new_proj
         req_form = new_req
@@ -379,6 +376,7 @@ def save_project(request, template, project_container=None):
     return render_page(request, template, {
         'projectcontainer': project_container,
         'projform': proj_form,
+        'checked': is_mentor,
         'reqform': req_form,
         'contactform': contact_form,
         'docform': doc_form,
@@ -444,9 +442,12 @@ def edit(request, pk):
     request.session[constants.PROJECT_INSTANCE] = ProjectContainerForm(instance=project_container)
     request.session[constants.REQUEST_INSTANCE] = CodeRequestForm(instance=project_container.code_request)
     if project_container.code_request.mentor:
-        selected_mentor = Person.objects.using('datatracker').get(id=project_container.code_request.mentor)
-        mentor_form = MentorForm(initial={'mentor':selected_mentor})
-        request.session[constants.MENTOR_INSTANCE] = mentor_form
+        if project_container.code_request.mentor == user.id:
+            request.session[constants.IS_MENTOR] = True
+        else:
+            selected_mentor = Person.objects.using('datatracker').get(id=project_container.code_request.mentor)
+            mentor_form = MentorForm(initial={'mentor':selected_mentor})
+            request.session[constants.MENTOR_INSTANCE] = mentor_form
 
     return save_project(request, constants.TEMPLATE_REQUESTS_EDIT, project_container)
 
@@ -494,7 +495,7 @@ def remove_contact(request, pk, contact_name):
 
         # Project must have been created by the current user and
         # User must have permission to add new CodeRequest
-        if project_container.owner != user:
+        if project_container.owner != user.id:
             raise Http404
 
         if project_container.contacts.filter(contact=contact_name):
@@ -531,10 +532,10 @@ def remove_document(request, pk, doc_name):
 
         # Project must have been created by the current user and
         # User must have permission to add new CodeRequest
-        if project_container.owner != user:
+        if project_container.owner != user.id:
             raise Http404
 
-        if project_container.docs.filter(name=doc_name):
+        if doc_name in project_container.docs:
             cache_list = request.session[constants.REM_DOCS]
             cache_list.append(document)
 
@@ -568,7 +569,7 @@ def remove_tag(request, pk, tag_name):
 
         # Project must have been created by the current user and
         # User must have permission to add new CodeRequest
-        if project_container.owner != user:
+        if project_container.owner != user.id:
             raise Http404
 
         if project_container.tags.filter(name=tag_name):

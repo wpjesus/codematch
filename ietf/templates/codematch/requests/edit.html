@@ -76,9 +76,18 @@
 									</div>
 								</div>
 								<div class="form-group">
-									<label class="control-label col-xs-2">Mentor:</label>
+									<label class="control-label col-xs-2">I'm Mentor:</label>
 									<div class="col-xs-4">
-										{{ mentorform.mentor }}
+                                        <input type="checkbox" name="chkMentor" id="chk-mentor"
+                                        {% if checked %} checked
+                                        {% else %} unchecked {% endif %}
+                                        >
+                                    </div>
+                                </div>
+								<div class="form-group">
+									<label class="control-label col-xs-2">Mentor:</label>
+									<div class="col-xs-4" id="details">
+                                        {{ mentorform.mentor }}
 									</div>
 								</div>
 								<div class="form-group">
@@ -205,4 +214,21 @@
 <script src="{% static 'js/select2-field.js' %}"></script>
 <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
 <script src="{% static 'js/ipr-edit.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+     //disable on page load
+     {% if checked %}
+        $('#details :input').attr('disabled', true);
+     {% else %}
+        $('#details :input').attr('disabled', false);
+     {% endif %}
+     
+     $('#chk-mentor').change(function() {
+          $('#details :input').attr('disabled', this.checked);
+     })
+});
+$('#chk-mentor').change(function() {
+     $('#details :input').attr('disabled', !this.checked);
+});
+</script>
 {% endblock %}

@@ -81,7 +81,7 @@ class ProjectContainer(models.Model):
     
     # docs = models.ManyToManyField(DocAlias)
     # TODO: Thinks about use the CommaSeparatedIntegerField
-    docs = models.CharField(max_length=300, blank=True, null=True)
+    docs = models.CharField(max_length=10000, blank=True, null=True)
     
     codings = models.ManyToManyField(CodingProject)
 
