@@ -3,6 +3,7 @@
 {% load ietf_filters bootstrap3 widget_tweaks %}
 
 {% load future %}
+{% load staticfiles %}
 
 {% block title %} Create a new CodeMatch Project{% endblock %}
 
@@ -204,4 +205,11 @@
 
 </div>
 <!-- Content ends -->
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/select2.min.js' %}"></script>
+<script src="{% static 'js/select2-field.js' %}"></script>
+<script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+<script src="{% static 'js/ipr-edit.js' %}"></script>
 {% endblock %}

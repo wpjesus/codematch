@@ -311,7 +311,7 @@ def save_code(request, template, pk, ck="", coding=None):
                 modified = True
 
             for doc in rem_docs:
-                project.docs.replace(doc.name, '', 1)
+                project.docs = project.docs.replace(doc.name, '', 1)
                 modified = True
 
             for link in links:
@@ -345,7 +345,8 @@ def save_code(request, template, pk, ck="", coding=None):
                 if keys is None:
                     project.docs = '{};'.format(doc.name)
                 else:
-                    project.docs += '{};'.format(doc.name)
+                    if doc.name not in project.docs:
+                        project.docs += '{};'.format(doc.name)
                 modified = True
 
             if modified:
