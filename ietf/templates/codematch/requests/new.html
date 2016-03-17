@@ -9,8 +9,8 @@
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 {% block pagehead %}
-  <link rel="stylesheet" href="/css/lib/select2.css">
-  <link rel="stylesheet" href="/css/lib/select2-bootstrap.css">
+  <link rel="stylesheet" href="{% static 'css/lib/select2.css' %}">
+  <link rel="stylesheet" href="{% static 'css/lib/select2-bootstrap.css' %}">
 {% endblock %}
 
 {% block content %}
