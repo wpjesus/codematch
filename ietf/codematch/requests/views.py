@@ -129,8 +129,8 @@ def search(request, type_list="all"):
                     user = Person.objects.using('datatracker').get(id=pr.code_request.mentor)
                 except:
                     user = None
-                if user and query in user.name:
-                    ids += pr.id
+                if user and query.lower() in user.name.lower():
+                    ids.append(pr.id)
 
         if request.GET.get(constants.STRING_DOCS):
             ids += ProjectContainer.objects.exclude(code_request__isnull=True).filter(

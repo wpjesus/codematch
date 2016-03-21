@@ -169,7 +169,8 @@ def search(request, is_my_list="False"):
         if request.GET.get(constants.STRING_CODER):
             for pr in ProjectContainer.objects.all():
                 for cd in pr.codings.all():
-                    if query in Person.objects.using('datatracker').get(id=cd.coder).name:
+                    user = Person.objects.using('datatracker').get(id=cd.coder)
+                    if query.lower() in user.name.lower():
                         # TODO: Review this
                         ids.append(pr.id)
                         break

@@ -1,10 +1,9 @@
 from django.http import HttpResponseRedirect
+from django.contrib.auth.models import User
 from ietf.codematch.helpers.utils import (render_page)
 from ietf.codematch import constants
-
 from ietf.person.models import Person
 
-from django.contrib.auth.models import User
 
 def index(request):
     return render_page(request, constants.TEMPLATE_INDEX)
@@ -24,17 +23,13 @@ def back(request):
 
 
 def sync(request):
-    template = "/codematch/"
-    
-    if "previous_template" in request.session:
-        template = request.session["previous_template"]
+    refresh_template = request.session[constants.ACTUAL_TEMPLATE]
     
     all_persons = Person.objects.using('datatracker')
     codematch_persons = Person.objects.using('default').all().values_list('id', flat=True)
     
     for person in all_persons:
         if person.id not in codematch_persons:
-            print person.name
             try:
                 person.save()
             except:
@@ -44,10 +39,9 @@ def sync(request):
     codematch_users = User.objects.using('default').all().values_list('id', flat=True)
     for us in all_users:
         if us.id not in codematch_users:
-            print us.username
             try:
                 us.save()
             except:
                 pass
             
-    return HttpResponseRedirect(template)
+    return HttpResponseRedirect(refresh_template)
