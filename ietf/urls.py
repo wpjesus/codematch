@@ -1,7 +1,7 @@
 # Copyright The IETF Trust 2007, 2009, All Rights Reserved
 
 from django.conf import settings
-from django.conf.urls import patterns, include
+from django.conf.urls import patterns, include, handler500
 from django.contrib import admin
 from django.views.generic import TemplateView
 
@@ -23,6 +23,8 @@ sitemaps = {
     'liaison': LiaisonMap,
     'ipr': IPRMap,
 }
+
+handler500 = 'ietf.codematch.views.handler500'
 
 urlpatterns = patterns('',
     (r'^$', 'ietf.doc.views_search.frontpage'),

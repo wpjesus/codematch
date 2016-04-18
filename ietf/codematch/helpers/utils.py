@@ -81,6 +81,7 @@ def render_page(request, template, keys=None):
         :param template:
         :param request:
     """
+    
     if not keys:
         keys = {}
 

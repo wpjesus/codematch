@@ -1,5 +1,5 @@
 {# Copyright The IETF Trust 2007, All Rights Reserved #}
-{% extends "base.html" %}
+{% extends "base_codematch.html" %}
 {% load staticfiles %}
 {% block title %}500 Internal Server Error{% endblock %}
 {% block content %}
@@ -21,7 +21,7 @@
   </p>
 
   <ul>
-    <li><a href="/accounts/login/">Attempt to login again</a></li>
+    <li><a href="codematch/accounts/login/">Attempt to login again</a></li>
   </ul>    
 
 {% endblock %}

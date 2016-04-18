@@ -22,9 +22,13 @@ def back(request):
     return HttpResponseRedirect(template)
 
 
-def sync(request):
-    refresh_template = request.session[constants.ACTUAL_TEMPLATE]
-    
+def handler500(request):    
+    sync()
+    print 'updated local database'
+    return render_page(request, constants.TEMPLATE_ERROR_500)
+
+
+def sync():    
     all_persons = Person.objects.using('datatracker')
     codematch_persons = Person.objects.using('default').all().values_list('id', flat=True)
     
@@ -43,5 +47,3 @@ def sync(request):
                 us.save()
             except:
                 pass
-            
-    return HttpResponseRedirect(refresh_template)

@@ -1,5 +1,7 @@
-from django.conf.urls import patterns, url, include
+from django.conf.urls import *
 from ietf.codematch import views
+
+handler500 = 'ietf.codematch.views.handler500'
 
 urlpatterns = patterns('',
                        url(r'^$', views.index, name="index"),
