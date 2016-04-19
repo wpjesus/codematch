@@ -2,7 +2,6 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
 from ietf.codematch.helpers.utils import (render_page)
 from ietf.codematch import constants
-from ietf.person.models import Person
 
 
 def index(request):
@@ -22,14 +21,20 @@ def back(request):
     return HttpResponseRedirect(template)
 
 
-def handler500(request):    
+def handler500(request):
+    #TODO: Rever para filtrar apenas o erro especifico 500
     sync()
     print 'updated local database'
-    return render_page(request, constants.TEMPLATE_ERROR_500)
+    #  return render_page(request, constants.TEMPLATE_ERROR_500)
+    return render_page(request, constants.TEMPLATE_INDEX)
+
+
+def handler404(request):
+    return render_page(request, constants.TEMPLATE_ERROR_404)
 
 
 def sync():    
-    all_persons = Person.objects.using('datatracker')
+    """all_persons = Person.objects.using('datatracker')
     codematch_persons = Person.objects.using('default').all().values_list('id', flat=True)
     
     for person in all_persons:
@@ -37,7 +42,7 @@ def sync():
             try:
                 person.save()
             except:
-                pass
+                pass"""
     
     all_users = User.objects.using('datatracker').all()
     codematch_users = User.objects.using('default').all().values_list('id', flat=True)
