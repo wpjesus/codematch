@@ -32,7 +32,7 @@
 
                 <p class="p-meta">
                     <!-- Due date & % Completed -->
-                    <span>Due : {{ date }} - {{ percentual }}% Done</span>
+                    <span>Due : {{ date|date:"d M Y" }} - {{ percentual }}% Done</span>
                 </p>
 
                 <!-- Progress bar -->

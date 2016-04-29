@@ -23,7 +23,7 @@
           <li>
             <!-- Title and date -->
             <h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coder.name }}</a></h6>
-            <p>{{ coding.additional_information|linebreaks }}<a href="#"> <i class="fa fa-plus-square"></i> Mais</a></p>
+            <p>{{ coding.additional_information|linebreaks }}<a href="{% url 'show' projectcontainer.id coding.id %}"> <i class="fa fa-plus-square"></i> Mais</a></p>
           </li>
             {% endfor %}
         </ul> 

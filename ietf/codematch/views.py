@@ -53,7 +53,7 @@ def dashboard(request):
         
     all_codings = CodingProject.objects.filter(coder=user.id)[:3]
     for coding in all_codings:
-        my_codings.append((coding, str(datetime.datetime.now().date()), str(randint(0, 100)), 
+        my_codings.append((coding, datetime.datetime.now().date(), randint(0, 100), 
                           colors[randint(0, 2)]))
         
     keys['codings'] = codings    
