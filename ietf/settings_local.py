@@ -43,7 +43,7 @@ CACHES = {
 # }
 
 SERVER_MODE	  = 'development'
-#DEBUG             = True
+DEBUG             = True
 
 # If you need to debug email, you can start a debugging server that just
 # outputs whatever it receives with:
@@ -83,6 +83,8 @@ IDSUBMIT_IDNITS_BINARY = '<path to a local copy of idnits>'
 CODEMATCH_PREFIX = ""
 #(eg. codematch-dev - STATIC_URL="/static/") 
 STATIC_URL = "/../"
+
+IS_CODEMATCH_APP = True
 
 #Application that must be installed by Codematch
 CODEMATCH_APPS = (

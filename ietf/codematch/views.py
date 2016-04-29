@@ -1,8 +1,12 @@
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
-from ietf.codematch.helpers.utils import (render_page)
+from ietf.codematch.helpers.utils import (render_page, get_user)
 from ietf.codematch import constants
+from ietf.codematch.matches.models import ProjectContainer, CodingProject
+from ietf.person.models import Person
 
+from random import randint
+import datetime
 
 def index(request):
     return render_page(request, constants.TEMPLATE_INDEX)
@@ -10,6 +14,53 @@ def index(request):
 
 def about(request):
     return render_page(request, constants.TEMPLATE_ABOUT)
+
+
+def dashboard(request):
+    
+    modules = ['codematch/widgets/all_matches.html', 'codematch/widgets/my_matches.html', 
+               'codematch/widgets/my_requests.html']
+    colors = ['progress-bar progress-bar-info', 'progress-bar progress-bar-danger',
+              'progress-bar progress-bar-warning']
+    
+    user = get_user(request)
+    
+    total_items = randint(1, 3)
+    items = []
+    #for i in range(0,total_items):
+    #    items.append(modules[randint(0, 2)])
+    items.append(modules[0])
+    items.append(modules[1])
+    items.append(modules[2])
+    
+    keys = {'items': items}
+    
+    codings = []
+    my_codings = []
+    my_requests = []
+    all_projects = ProjectContainer.objects.all()
+    all_codings = CodingProject.objects.order_by('-id')[:3]
+    for coding in all_codings:
+        for project in all_projects:
+            if coding in project.codings.all():
+                coder = Person.objects.using('datatracker').get(id=coding.coder)
+                codings.append((coding, project, coder))
+                break
+    
+    all_projects = ProjectContainer.objects.exclude(code_request__isnull=True).filter(owner=user.id)[:3]
+    for project in all_projects:
+        my_requests.append(project)
+        
+    all_codings = CodingProject.objects.filter(coder=user.id)[:3]
+    for coding in all_codings:
+        my_codings.append((coding, str(datetime.datetime.now().date()), str(randint(0, 100)), 
+                          colors[randint(0, 2)]))
+        
+    keys['codings'] = codings    
+    keys['my_codings'] = my_codings
+    keys['my_requests'] = my_requests
+    
+    return render_page(request, constants.TEMPLATE_DASHBOARD, keys)
 
 
 def back(request):

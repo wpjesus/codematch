@@ -24,8 +24,9 @@ sitemaps = {
     'ipr': IPRMap,
 }
 
-handler500 = 'ietf.codematch.views.handler500'
-handler404 = 'ietf.codematch.views.handler404'
+if hasattr(settings, 'IS_CODEMATCH_APP'):
+    handler500 = 'ietf.codematch.views.handler500'
+    handler404 = 'ietf.codematch.views.handler404'
 
 urlpatterns = patterns('',
     (r'^$', 'ietf.doc.views_search.frontpage'),
@@ -93,8 +94,7 @@ for n,a in api._api_list:
 # This is needed to serve files which are not handled by collectstatic :
 if settings.SERVER_MODE in ('development', 'test'):
      urlpatterns += patterns('',
-         (r'^(?P<path>(?:images|css|js|test|static)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
-         # (r'^(?P<path>autocomplete/(?:img|css|js)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
+         (r'^(?P<path>(?:images|css|js|test|static|fonts|other)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
          (r'^(?P<path>admin/(?:img|css|js)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
          (r'^(?P<path>secretariat/(img|css|js)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
          (r'^(?P<path>robots\.txt)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT+"dev/"}),

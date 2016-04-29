@@ -35,6 +35,7 @@ PREVIOUS_TEMPLATE = 'previous_template'
 
 TEMPLATE_INDEX = "codematch/index.html"
 TEMPLATE_ABOUT = "codematch/about.html"
+TEMPLATE_DASHBOARD = "codematch/dashboard.html"
 TEMPLATE_LOGIN = '/codematch/accounts/login'
 TEMPLATE_ERROR_500 = "codematch/500.html"
 TEMPLATE_ERROR_404 = "codematch/404.html"
