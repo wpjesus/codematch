@@ -53,6 +53,10 @@ TEMPLATE_MATCHES_SHOW = "codematch/matches/show.html"
 TEMPLATE_MATCHES_SEARCH = "codematch/matches/search.html"
 # ACCOUNTS
 TEMPLATE_TOPCODERS = "codematch/accounts/topcoders.html"
+#WIDGETS
+WIDGET_ALL_MATCHES = 'codematch/widgets/all_matches.html'
+WIDGET_MY_MATCHES = 'codematch/widgets/my_matches.html'
+WIDGET_MY_REQUESTS = 'codematch/widgets/my_requests.html'
 
 # ----------------------------------------------------------------
 # Localized String

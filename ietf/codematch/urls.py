@@ -7,6 +7,7 @@ urlpatterns = patterns('',
                        url(r'^back/$', views.back, name="back"),
                        url(r'^sync/$', views.sync, name="sync"),
                        url(r'^dashboard/$', views.dashboard, name="dashboard"),
+                       url(r'^dashboard/(?P<rand>.*)/$', views.dashboard, name="dashboard"),
                        # Accounts
                        url(r'^accounts/$', include('ietf.codematch.accounts.urls')),
 

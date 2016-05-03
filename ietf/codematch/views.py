@@ -8,6 +8,7 @@ from ietf.person.models import Person
 from random import randint
 import datetime
 
+
 def index(request):
     return render_page(request, constants.TEMPLATE_INDEX)
 
@@ -16,28 +17,8 @@ def about(request):
     return render_page(request, constants.TEMPLATE_ABOUT)
 
 
-def dashboard(request):
-    
-    modules = ['codematch/widgets/all_matches.html', 'codematch/widgets/my_matches.html', 
-               'codematch/widgets/my_requests.html']
-    colors = ['progress-bar progress-bar-info', 'progress-bar progress-bar-danger',
-              'progress-bar progress-bar-warning']
-    
-    user = get_user(request)
-    
-    total_items = randint(1, 3)
-    items = []
-    #for i in range(0,total_items):
-    #    items.append(modules[randint(0, 2)])
-    items.append(modules[0])
-    items.append(modules[1])
-    items.append(modules[2])
-    
-    keys = {'items': items}
-    
+def get_all_matches(user, keys):
     codings = []
-    my_codings = []
-    my_requests = []
     all_projects = ProjectContainer.objects.all()
     all_codings = CodingProject.objects.order_by('-id')[:3]
     for coding in all_codings:
@@ -46,19 +27,53 @@ def dashboard(request):
                 coder = Person.objects.using('datatracker').get(id=coding.coder)
                 codings.append((coding, project, coder))
                 break
+                
+    keys['all_matches'] = codings
     
+    return constants.WIDGET_ALL_MATCHES
+
+
+def get_my_requests(user, keys):
+    my_requests = []
     all_projects = ProjectContainer.objects.exclude(code_request__isnull=True).filter(owner=user.id)[:3]
     for project in all_projects:
         my_requests.append(project)
         
+    keys['my_requests'] = my_requests
+    
+    return constants.WIDGET_MY_REQUESTS
+
+
+def get_my_matches(user, keys):
+    colors = ['progress-bar progress-bar-info', 'progress-bar progress-bar-danger',
+              'progress-bar progress-bar-warning']
+    
+    my_codings = []    
     all_codings = CodingProject.objects.filter(coder=user.id)[:3]
     for coding in all_codings:
         my_codings.append((coding, datetime.datetime.now().date(), randint(0, 100), 
                           colors[randint(0, 2)]))
-        
-    keys['codings'] = codings    
-    keys['my_codings'] = my_codings
-    keys['my_requests'] = my_requests
+            
+    keys['my_matches'] = my_codings
+    
+    return constants.WIDGET_MY_MATCHES
+    
+    
+def dashboard(request, rand=None):
+    
+    methods = [get_my_matches, get_my_requests, get_all_matches]
+    
+    user = get_user(request)
+    keys = {}
+    items = []
+    if rand is not None:
+        for i in range(randint(1,3)):
+            items.append(methods[randint(0, 2)](user, keys))
+    else:
+        for i in range(0, len(methods)):
+            items.append(methods[i](user, keys))
+    
+    keys['items'] = items
     
     return render_page(request, constants.TEMPLATE_DASHBOARD, keys)
 
