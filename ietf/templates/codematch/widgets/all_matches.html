@@ -24,13 +24,13 @@
           <li>
             <!-- Title and date -->
             <h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coder.name }}</a></h6>
-            <p>{{ coding.additional_information|linebreaks }}<a href="{% url 'show' projectcontainer.id coding.id %}"> <i class="fa fa-plus-square"></i> Mais</a></p>
+            <p>{{ coding.additional_information|linebreaks }}<a href="{% url 'show' projectcontainer.id coding.id %}"> <i class="fa fa-plus-square"></i> More</a></p>
           </li>
             {% endfor %}
         </ul> 
       </div>
       <div class="widget-foot" >
-        <button class="btn pull-right btn-xs btn-default" onclick="location.href = '{% url 'ietf.codematch.matches.views.show_list' %}'"><i class="fa fa-plus-square"></i> Mais</button>
+        <button class="btn pull-right btn-xs btn-default" onclick="location.href = '{% url 'ietf.codematch.matches.views.show_list' %}'"><i class="fa fa-plus-square"></i> More</button>
         <div class="clearfix"></div>
       </div>
     </div>

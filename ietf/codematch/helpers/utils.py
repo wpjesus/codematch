@@ -63,7 +63,7 @@ def clear_session(request):
     keys = [constants.ALL_PROJECTS, constants.PROJECT_INSTANCE, constants.REQUEST_INSTANCE, constants.CONTACT_INSTANCE,
             constants.ACTUAL_PROJECT, constants.MENTOR_INSTANCE, constants.IS_MENTOR,
             constants.CODE_INSTANCE, constants.ADD_DOCS, constants.ADD_TAGS, constants.ADD_LINKS,
-            constants.ADD_CONTACTS,
+            constants.ADD_CONTACTS, constants.DASHBOARD_ITEMS,
             constants.REM_CONTACTS, constants.REM_DOCS, constants.REM_TAGS, constants.REM_LINKS]
 
     # If MAINTAIN_STATE is true then session variables shouldn't be deleted

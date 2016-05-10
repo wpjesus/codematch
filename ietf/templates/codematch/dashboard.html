@@ -7,7 +7,7 @@
 <div class="content" style="padding:0">
 
     <!-- Main bar -->
-    <div class="mainbar">
+    <div class="mainbar" >
 
         <!-- Page heading -->
         <div class="page-head">
@@ -27,13 +27,27 @@
         <!-- Page heading ends -->
 
         <!-- Matter -->
-
-	    <div class="matter">
-        <div class="container">
+        {% if dev %}
+        <div id="mySidenav" class="sidenav">
+          <a href="javascript:void(0)" onclick="closeNav()">&times;</a>
+          <a href="#" onclick="request_access('all_matches')">All Matches</a>
+          <a href="#" onclick="request_access('my_matches')">My Matches</a>
+            <a href="#" onclick="request_access('my_requests')">My Requests</a>
+        </div>
+        
+        
+        <!-- Use any element to open the sidenav -->
+        <span onclick="openNav()">open</span>
+        {% endif %}
+        
+	    <div class="matter" >
+        <div class="container" id="main">
             
+        <div id="items">    
         {% for item in items %}
             {% include item %}
         {% endfor %}
+        </div>    
 
 		</div>
 		<!-- End os Container-->
