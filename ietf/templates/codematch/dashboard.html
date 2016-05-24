@@ -15,7 +15,7 @@
 
             <!-- Breadcrumb -->
             <div class="bread-crumb pull-right">
-                <a href="{% url "ietf.codematch.views.index" %}"><i class="fa fa-home"></i> Home</a>
+                <a href="{% url 'ietf.codematch.views.index' %}"><i class="fa fa-home"></i> Home</a>
                 <!-- Divider -->
                 <span class="divider">/</span>
                 <a href="#" class="bread-current">Dashboard</a>
@@ -27,32 +27,31 @@
         <!-- Page heading ends -->
 
         <!-- Matter -->
-        {% if dev %}
-        <div id="mySidenav" class="sidenav">
-          <a href="javascript:void(0)" onclick="closeNav()">&times;</a>
-          <a href="#" onclick="request_access('all_matches')">All Matches</a>
-          <a href="#" onclick="request_access('my_matches')">My Matches</a>
-            <a href="#" onclick="request_access('my_requests')">My Requests</a>
-        </div>
-        
-        
-        <!-- Use any element to open the sidenav -->
-        <span onclick="openNav()">open</span>
-        {% endif %}
-        
-	    <div class="matter" >
-        <div class="container" id="main">
+        {% if logged %}
+            {% if dev %}
+            <div id="mySidenav" class="sidenav">
+              <a href="javascript:void(0)" onclick="closeNav()">&times;</a>
+              <a href="#" onclick="request_access('all_matches')">All Matches</a>
+              <a href="#" onclick="request_access('my_matches')">My Matches</a>
+                <a href="#" onclick="request_access('my_requests')">My Requests</a>
+            </div>
             
-        <div id="items">    
-        {% for item in items %}
-            {% include item %}
-        {% endfor %}
-        </div>    
-
-		</div>
-		<!-- End os Container-->
- 	    </div>
- 	    <!-- End of Matter -->
+            <!-- Use any element to open the sidenav -->
+            <span onclick="openNav()">open</span>
+            {% endif %}
+            
+            <div class="matter" id="main">
+                <div class="container" >
+                    <div >    
+                    {% for item in items %}
+                        {% include item %}
+                    {% endfor %}
+                    </div>
+                </div>
+            <!-- End os Container-->
+            </div>
+            <!-- End of Matter -->
+        {% endif %}
     </div>
 
    <!-- Mainbar ends -->

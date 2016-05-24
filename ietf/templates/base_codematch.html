@@ -66,7 +66,7 @@
     <link rel="apple-touch-icon" href="{% static 'images/apple-touch-icon.png' %}">
   </head>
 
-  <body {% block bodyAttrs %}{%endblock%} data-group-menu-data-url="{% url 'group_menu_data' %}">
+  <body {% block bodyAttrs %}{%endblock%} data-group-menu-data-url="{% url 'group_menu_data' %}" id="body">
   
     {% include "base/menu_codematch.html" %}
 

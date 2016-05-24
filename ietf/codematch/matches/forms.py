@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm
-from ietf.codematch.matches.models import ProjectContainer, CodingProject, Implementation, ProjectContact
+from ietf.codematch.matches.models import ProjectContainer, CodingProject, Implementation, \
+    ProjectContact
 
 
 class SearchForm(forms.Form):
