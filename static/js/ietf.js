@@ -239,6 +239,8 @@ $(document).ready(function () {
     });
 });
 
+/* TODO MATHEUS: Lembrar de tirar isto daqui :D */
+
 /* Set the width of the side navigation to 250px and the left margin of the page content to 250px and add a black background color to body */
 function openNav() {
     document.getElementById("mySidenav").style.width = "250px";
@@ -258,7 +260,7 @@ function request_access($value){
     $.ajax({
         data : { request_data: request_data},
         success: function(data) {
-            $('#items').html(data);
+            $('#body').html(data);
         }
     })
 }

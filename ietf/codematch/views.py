@@ -11,10 +11,6 @@ def index(request):
 
 def about(request):
     return render_page(request, constants.TEMPLATE_ABOUT)
-
-
-def request_access(request):
-    print "DJANGO VIEW"
     
     
 def dashboard(request):
