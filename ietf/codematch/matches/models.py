@@ -45,7 +45,6 @@ class CodingProject(models.Model):
     additional_information = models.CharField(max_length=255)
 
     # The coder must have a user account in datatracker (as a person)
-    #coder = models.ForeignKey(Person, null=True, blank=True)
     coder = models.IntegerField(null=True, blank=True)
 
     # When the coding project was added
@@ -61,6 +60,7 @@ class CodingProject(models.Model):
 
     def __unicode__(self):  # __unicode__ on Python 2
         return self.title
+
 
 class ProjectContainer(models.Model):
     """ The ProjectContainer associates the Documents to the projects  """
@@ -93,10 +93,10 @@ class ProjectContainer(models.Model):
         return self.title
     
     
+# TODO: Thinks about change this to other model
 class DashboardConfig(models.Model):
     """ The Dashboard config is the saved preferences to dashboard from user """
     
     user = models.IntegerField(null=True, blank=True)
     
     data = models.CharField(null=True, blank=True, max_length=255)
-

@@ -31,9 +31,9 @@
             {% if dev %}
             <div id="mySidenav" class="sidenav">
               <a href="javascript:void(0)" onclick="closeNav()">&times;</a>
-              <a href="#" onclick="request_access('all_matches')">All Matches</a>
-              <a href="#" onclick="request_access('my_matches')">My Matches</a>
-                <a href="#" onclick="request_access('my_requests')">My Requests</a>
+              {% for name, option, style in options %}
+                <a style={{style}} href="#" onclick={{option}}>{{ name }}</a>
+              {% endfor %}  
             </div>
             
             <!-- Use any element to open the sidenav -->

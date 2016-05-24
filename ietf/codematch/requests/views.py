@@ -260,7 +260,7 @@ def save_project(request, template, project_container=None):
             
         if mentor_id:
             selected_mentor = Person.objects.using('datatracker').get(id=mentor_id)
-            mentor_form = MentorForm(initial={'mentor':selected_mentor})
+            mentor_form = MentorForm(initial={'mentor': selected_mentor})
         else:
             mentor_form = MentorForm()
             
@@ -446,7 +446,7 @@ def edit(request, pk):
             request.session[constants.IS_MENTOR] = True
         else:
             selected_mentor = Person.objects.using('datatracker').get(id=project_container.code_request.mentor)
-            mentor_form = MentorForm(initial={'mentor':selected_mentor})
+            mentor_form = MentorForm(initial={'mentor': selected_mentor})
             request.session[constants.MENTOR_INSTANCE] = mentor_form
 
     return save_project(request, constants.TEMPLATE_REQUESTS_EDIT, project_container)

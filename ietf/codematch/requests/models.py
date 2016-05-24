@@ -1,5 +1,4 @@
 from django.db import models
-from ietf.person.models import Person
 
 
 class CodeRequest(models.Model):

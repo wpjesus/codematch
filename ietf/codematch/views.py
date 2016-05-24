@@ -5,6 +5,7 @@ from ietf.codematch import constants
 from ietf.codematch.dashboard import (get_all_matches, get_my_matches, get_my_requests)
 from ietf.codematch.matches.models import DashboardConfig
 
+
 def index(request):
     return render_page(request, constants.TEMPLATE_INDEX)
 
@@ -27,10 +28,10 @@ def dashboard(request):
     
 def dashboard_dev(request):
     user = get_user(request)
-    # TODO: Trocar tela quando usuario nao cadastrado
+    # TODO: Change this screen to when user is not logged
     if not user:
         return render_page(request, constants.TEMPLATE_DASHBOARD, {'logged': False})
-    if not constants.DASHBOARD_ITEMS in request.session:
+    if constants.DASHBOARD_ITEMS not in request.session:
         items = []
         keys = {}
         config = DashboardConfig.objects.filter(user=user.id)
@@ -38,10 +39,11 @@ def dashboard_dev(request):
             data = config[0].data
             print data
         else:
-            dashModel = DashboardConfig()
-            dashModel.user = user.id
-            dashModel.data = ''
-            dashModel.save()
+            # TODO: Improve this
+            dash_model = DashboardConfig()
+            dash_model.user = user.id
+            dash_model.data = ''
+            dash_model.save()
             data = ''
     else:
         keys = request.session[constants.DASHBOARD_ITEMS]
@@ -50,40 +52,37 @@ def dashboard_dev(request):
     
     dashconfig = DashboardConfig.objects.get(user=user.id)
     
+    all_options = [('all_matches', 'All Matches', get_all_matches), 
+                   ('my_requests', 'My Requests', get_my_requests), 
+                   ('my_matches', 'My Matches', get_my_matches)]
+    
     if data:
-        if 'all_matches' in data:
-            all_matches = get_all_matches(user, keys)
-            if all_matches in items:
-                items.remove(all_matches)
-                dashconfig.data = dashconfig.data.replace(all_matches + ';', '')
-            else:
-                items.append(all_matches)
-                if all_matches not in dashconfig.data:
-                    dashconfig.data += all_matches + ';'
-        if 'my_requests' in data:
-            my_requests = get_my_requests(user, keys)
-            if my_requests in items:
-                items.remove(my_requests)
-                dashconfig.data = dashconfig.data.replace(my_requests + ';', '')
-            else:
-                items.append(my_requests)
-                if my_requests not in dashconfig.data:
-                    dashconfig.data += my_requests + ';'
-        if 'my_matches' in data:
-            my_matches = get_my_matches(user, keys)
-            if my_matches in items:
-                items.remove(my_matches)
-                dashconfig.data = dashconfig.data.replace(my_matches + ';', '')
-            else:
-                items.append(my_matches)
-                if my_matches not in dashconfig.data:
-                    dashconfig.data += my_matches + ';'
+        for option in all_options:
+            if option[0] in data:
+                value = option[2](user,keys)
+                if value in items:
+                    items.remove(value)
+                    dashconfig.data = dashconfig.data.replace(value + ';', '')
+                else:
+                    items.append(value)
+                    if value not in dashconfig.data:
+                        dashconfig.data += value + ';'
         
     keys['items'] = items
     keys['dev'] = True
     keys['logged'] = True
     
     dashconfig.save()
+    
+    options = []
+    for option in all_options:
+        matching = [s for s in items if option[0] in s]
+        if matching:
+            options.append((option[1], "request_access('{}')".format(option[0]), 'color:black'))
+        else:
+            options.append((option[1], "request_access('{}')".format(option[0]), None))
+        
+    keys['options'] = options
     
     request.session[constants.DASHBOARD_ITEMS] = keys
     request.session[constants.MAINTAIN_STATE] = True
@@ -101,7 +100,7 @@ def back(request):
 
 
 def handler500(request):
-    #TODO: Rever para filtrar apenas o erro especifico 500
+    # TODO: Review this to filter only the specific error
     sync(request)
     print 'updated local database'
     #  return render_page(request, constants.TEMPLATE_ERROR_500)
@@ -112,16 +111,9 @@ def handler404(request):
     return render_page(request, constants.TEMPLATE_ERROR_404)
 
 
-def sync(request):    
-    """all_persons = Person.objects.using('datatracker')
-    codematch_persons = Person.objects.using('default').all().values_list('id', flat=True)
+def sync(request):
+    """ :param request: """
     
-    for person in all_persons:
-        if person.id not in codematch_persons:
-            try:
-                person.save()
-            except:
-                pass"""
     all_users = User.objects.using('datatracker').all()
     codematch_users = User.objects.using('default').all().values_list('id', flat=True)
     for us in all_users:
