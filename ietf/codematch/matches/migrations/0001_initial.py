@@ -26,6 +26,17 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
+            name='DashboardConfig',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('user', models.IntegerField(null=True, blank=True)),
+                ('data', models.CharField(max_length=255, null=True, blank=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
             name='Implementation',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
@@ -55,7 +66,7 @@ class Migration(migrations.Migration):
                 ('creation_date', models.DateTimeField(auto_now_add=True)),
                 ('protocol', models.CharField(max_length=255)),
                 ('description', models.TextField()),
-                ('docs', models.CommaSeparatedIntegerField(max_length=200, null=True, blank=True)),
+                ('docs', models.CharField(max_length=10000, null=True, blank=True)),
                 ('code_request', models.ForeignKey(blank=True, to='requests.CodeRequest', null=True)),
                 ('codings', models.ManyToManyField(to='matches.CodingProject')),
                 ('contacts', models.ManyToManyField(to='matches.ProjectContact', null=True, blank=True)),

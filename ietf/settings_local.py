@@ -3,15 +3,29 @@ DATABASES = {
         'NAME': 'ietf_utf8',
         'ENGINE': 'django.db.backends.mysql',
         'USER': 'matheuspfitscher',
-        'PASSWORD': 'ietf', # Contact henrik@levkowetz.com to get the password
+        'PASSWORD': 'ietf',
         'HOST': '127.0.0.1'
     },
+    #'datatracker': {
+    #    'NAME': 'ietf_utf8',
+    #    'ENGINE': 'django.db.backends.mysql',
+    #    'USER': 'matheuspfitscher',
+    #    'PASSWORD': 'ietf', # Contact henrik@levkowetz.com to get the password
+    #    'HOST': '127.0.0.1'
+    #},
+    #'datatracker': {
+    #    'NAME': 'ietf_utf8',
+    #    'ENGINE': 'django.db.backends.mysql',
+    #    'USER': 'django_readonly',
+    #    'PASSWORD': 'f$xdv#vzwi',
+    #    'HOST': 'zinfandel.tools.ietf.org',
+    #}
     'datatracker': {
         'NAME': 'ietf_utf8',
         'ENGINE': 'django.db.backends.mysql',
-        'USER': 'django_readonly',
-        'PASSWORD': 'f$xdv#vzwi',
-        'HOST': 'zinfandel.tools.ietf.org',
+        'USER': 'codematch',
+        'PASSWORD': 'codematcher',
+        'HOST': 'ietf.org',
     }
 }
 
@@ -27,6 +41,8 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 # use a fast local cache (this requires you to set up memcached.  Alternatively,
 # you could use a disk cache.
 CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
+
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 CACHES = {
     'default': {
@@ -78,11 +94,26 @@ IDSUBMIT_IDNITS_BINARY = '<path to a local copy of idnits>'
 
 """ Codematch Settings """
 
+DEBUG_TOOLBAR_PANELS = [
+    'debug_toolbar.panels.versions.VersionsPanel',
+    'debug_toolbar.panels.timer.TimerPanel',
+    'debug_toolbar.panels.settings.SettingsPanel',
+    'debug_toolbar.panels.headers.HeadersPanel',
+    'debug_toolbar.panels.request.RequestPanel',
+    'debug_toolbar.panels.sql.SQLPanel',
+    'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+    'debug_toolbar.panels.templates.TemplatesPanel',
+    'debug_toolbar.panels.cache.CachePanel',
+    'debug_toolbar.panels.signals.SignalsPanel',
+    'debug_toolbar.panels.logging.LoggingPanel',
+    'debug_toolbar.panels.redirects.RedirectsPanel',
+]
+
 # If any folder structure on Apache 
 #(eg. codematch-dev - CODEMATCH_PREFIX="/codematch-dev/")
 CODEMATCH_PREFIX = ""
 #(eg. codematch-dev - STATIC_URL="/static/") 
-STATIC_URL = "/../"
+STATIC_URL = "/static/"
 
 IS_CODEMATCH_APP = True
 
@@ -91,5 +122,8 @@ CODEMATCH_APPS = (
         'ietf.codematch',
         'ietf.codematch.accounts',
         'ietf.codematch.matches',
-        'ietf.codematch.requests'
+        'ietf.codematch.requests',
     )
+if DEBUG:
+    CODEMATCH_APPS += ('debug_toolbar',)
+

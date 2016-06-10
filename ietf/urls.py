@@ -9,6 +9,8 @@ from ietf.liaisons.sitemaps import LiaisonMap
 from ietf.ipr.sitemaps import IPRMap
 from ietf import api
 
+import debug_toolbar
+
 admin.autodiscover()
 api.autodiscover()
 
@@ -35,10 +37,6 @@ urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^ann/', include('ietf.nomcom.redirect_ann_urls')),
     (r'^community/', include('ietf.community.urls')),
-    (r'^codematch/', include('ietf.codematch.urls')),
-    (r'^codematch/matches/', include('ietf.codematch.matches.urls')),
-    (r'^codematch/requests/', include('ietf.codematch.requests.urls')),
-    (r'^codematch/accounts/', include('ietf.codematch.accounts.urls')),
     (r'^accounts/settings/', include('ietf.cookies.urls')),
     (r'^doc/', include('ietf.doc.urls')),
     (r'^drafts/', include('ietf.doc.redirect_drafts_urls')),
@@ -69,6 +67,18 @@ urlpatterns = patterns('',
 
     # Google webmaster tools verification url
     (r'^googlea30ad1dacffb5e5b.html', TemplateView.as_view(template_name='googlea30ad1dacffb5e5b.html')),
+)
+
+if settings.IS_CODEMATCH_APP:
+    urlpatterns += patterns('',
+    (r'^codematch/', include('ietf.codematch.urls')),
+    (r'^codematch/matches/', include('ietf.codematch.matches.urls')),
+    (r'^codematch/requests/', include('ietf.codematch.requests.urls')),
+    (r'^codematch/accounts/', include('ietf.codematch.accounts.urls')),
+)
+if settings.DEBUG:
+    urlpatterns += patterns('',
+    (r'^codematch/__debug__/', include(debug_toolbar.urls)),
 )
 
 # Endpoints for Tastypie's REST API
