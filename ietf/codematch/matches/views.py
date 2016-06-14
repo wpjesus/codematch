@@ -52,17 +52,17 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
         keys = []
         if project_container.docs:
             keys = filter(None, project_container.docs.split(';'))
-        for key in keys:
-            # group = doc.document.group
-            group = DocAlias.objects.using('datatracker').get(name=key).document.group
-            if group.name not in working_groups:
-                working_groups.append(group.name)
-            if group.parent:
-                if group.parent.name not in areas:
-                    areas.append(group.parent.name)
+        documents = list(DocAlias.objects.using('datatracker').filter(name__in=keys).
+                         values_list('document__group__name', 'document__group__parent__name'))
+        for gname, gparentname in documents:
+            if gname not in working_groups:
+                working_groups.append(gname)
+            if gparentname:
+                if gparentname not in areas:
+                    areas.append(gparentname)
             else:
-                if group.name not in areas:
-                    areas.append(group.name)
+                if gname not in areas:
+                    areas.append(gname)
         if not areas:
             areas = [constants.STRING_NONE]
         if not working_groups:
