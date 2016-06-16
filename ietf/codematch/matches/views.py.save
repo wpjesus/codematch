@@ -499,7 +499,7 @@ def remove_link(request, ck, link_name):
             raise Http404
 
         if coding.links.filter(link=link_name):
-            cache_list = request.session[constants.REM_LINKS]
+om            cache_list = request.session[constants.REM_LINKS]
             cache_list.append(link)
 
     links.remove(link)

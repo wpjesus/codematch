@@ -23,6 +23,7 @@ def back(request):
 
 
 def sync(request):
+    return
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
     
     all_persons = Person.objects.using('datatracker')

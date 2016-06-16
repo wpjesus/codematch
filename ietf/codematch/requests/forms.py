@@ -10,7 +10,6 @@ class DocNameForm(forms.Form):
     # doc = forms.CharField(label="Document", max_length=128, required=True)
     doc = SearchableDocumentField(label="Drafts", required=False)
 
-
 class MentorForm(forms.Form):    
     mentor = SearchablePersonField(label="Must be present", required=False)
         

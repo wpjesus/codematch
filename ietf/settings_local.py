@@ -1,18 +1,25 @@
 DATABASES = {
     'default': {
-        'NAME': 'ietf_utf8',
+        'NAME': 'ietf_utf8_master',
         'ENGINE': 'django.db.backends.mysql',
-        'USER': 'matheuspfitscher',
+        'USER': 'matheus',
         'PASSWORD': 'ietf', # Contact henrik@levkowetz.com to get the password
         'HOST': '127.0.0.1'
     },
     'datatracker': {
-        'NAME': 'ietf_utf8',
+        'NAME': 'ietf_utf8_master',
         'ENGINE': 'django.db.backends.mysql',
-        'USER': 'django_readonly',
-        'PASSWORD': 'f$xdv#vzwi',
-        'HOST': 'zinfandel.tools.ietf.org',
-    }
+        'USER': 'matheus',
+        'PASSWORD': 'ietf', # Contact henrik@levkowetz.com to get the password
+        'HOST': '127.0.0.1'
+    },
+    #'datatracker': {
+    #    'NAME': 'ietf_utf8',
+    #    'ENGINE': 'django.db.backends.mysql',
+    #    'USER': 'django_readonly',
+    #    'PASSWORD': 'f$xdv#vzwi',
+    #    'HOST': 'zinfandel.tools.ietf.org',
+    #}
 }
 
 DATABASE_ROUTERS = ["ietf.new_router.DatatrackerRouter"]
@@ -43,7 +50,7 @@ CACHES = {
 # }
 
 SERVER_MODE	  = 'development'
-DEBUG             = True
+DEBUG             = False
 
 # If you need to debug email, you can start a debugging server that just
 # outputs whatever it receives with:
@@ -80,9 +87,9 @@ IDSUBMIT_IDNITS_BINARY = '<path to a local copy of idnits>'
 
 # If any folder structure on Apache 
 #(eg. codematch-dev - CODEMATCH_PREFIX="/codematch-dev/")
-CODEMATCH_PREFIX = ""
+CODEMATCH_PREFIX = "/codematch-master/"
 #(eg. codematch-dev - STATIC_URL="/static/") 
-STATIC_URL = "/../"
+STATIC_URL = CODEMATCH_PREFIX + "/static/"
 
 #Application that must be installed by Codematch
 CODEMATCH_APPS = (

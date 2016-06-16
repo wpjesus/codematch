@@ -90,7 +90,7 @@ for n,a in api._api_list:
 # This is needed to serve files which are not handled by collectstatic :
 if settings.SERVER_MODE in ('development', 'test'):
      urlpatterns += patterns('',
-         (r'^(?P<path>(?:images|css|js|test|static)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
+         (r'^(?P<path>(?:images|css|js|test|static|fonts|other)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
          # (r'^(?P<path>autocomplete/(?:img|css|js)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
          (r'^(?P<path>admin/(?:img|css|js)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
          (r'^(?P<path>secretariat/(img|css|js)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
