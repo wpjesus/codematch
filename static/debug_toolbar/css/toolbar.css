@@ -38,7 +38,6 @@
 	font-family:sans-serif;
 	text-align:left;
 	text-shadow: none;
-	white-space: normal;
 	-webkit-transition: none;
     -moz-transition: none;
     -o-transition: none;
@@ -656,7 +655,4 @@
 }
 #djDebug .djdt-highlighted {
     background-color: lightgrey;
-}
-.djdt-hidden {
-    display: none;
 }
