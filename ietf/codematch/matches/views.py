@@ -162,17 +162,26 @@ def search(request, is_my_list="False"):
 
         ids = []
 
-        if request.GET.get(constants.STRING_TITLE):
+	valid_searches = [constants.STRING_TITLE, constants.STRING_DESCRIPTION, constants.STRING_PROTOCOL,
+			  constants.STRING_CODER, constants.STRING_AREA, constants.STRING_WORKINGGROUP]
+
+	search_in_all = True
+	for v in valid_searches:
+	    if v in request.GET:
+		search_in_all = False
+		break
+
+        if search_in_all or request.GET.get(constants.STRING_TITLE):
             ids += ProjectContainer.objects.filter(codings__title__icontains=query).values_list('id', flat=True)
 
-        if request.GET.get(constants.STRING_DESCRIPTION):
+        if search_in_all or request.GET.get(constants.STRING_DESCRIPTION):
             projs = ProjectContainer.objects.filter(codings__additional_information__icontains=query)
             ids += projs.values_list('id', flat=True)
 
         if request.GET.get(constants.STRING_PROTOCOL):
             ids += ProjectContainer.objects.filter(protocol__icontains=query).values_list('id', flat=True)
 
-        if request.GET.get(constants.STRING_CODER):
+        if search_in_all or request.GET.get(constants.STRING_CODER):
             for pr in ProjectContainer.objects.all():
                 for cd in pr.codings.all():
                     user = Person.objects.using('datatracker').get(id=cd.coder)
@@ -182,13 +191,31 @@ def search(request, is_my_list="False"):
                         break
             # ids += ProjectContainer.objects.filter(codings__coder__name__icontains=query).values_list('id', flat=True)
 
-        if request.GET.get(constants.STRING_AREA):
-            ids += ProjectContainer.objects.filter(docs__document__group__parent__name__icontains=query).values_list(
-                'id', flat=True)
+        if search_in_all or request.GET.get(constants.STRING_AREA):
+		for project_container in ProjectContainer.objects.all():
+		    docs = []
+		    if not project_container.docs or project_container.docs == '':
+			continue
+           	    keys = filter(None, project_container.docs.split(';'))
+		    docs.extend(list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('document__group__parent__name')))
+		    for doc in docs:
+		        if query.lower() in doc[0].lower():
+			   ids.append(project_container.id)
+			   break
+            #ids += ProjectContainer.objects.filter(docs__document__group__parent__name__icontains=query).values_list(
+            #    'id', flat=True)
 
-        if request.GET.get(constants.STRING_WORKINGGROUP):
-            ids += ProjectContainer.objects.filter(docs__document__group__name__icontains=query).values_list('id',
-                                                                                                             flat=True)
+        if search_in_all or request.GET.get(constants.STRING_WORKINGGROUP):
+                for project_container in ProjectContainer.objects.all():
+		    docs = []
+                    if not project_container.docs or project_container.docs == '':
+                        continue
+                    keys = filter(None, project_container.docs.split(';'))
+	            docs.extend(list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('document__group__name')))
+                    for doc in docs:
+                        if query.lower() in doc[0].lower():
+                           ids.append(project_container.id)
+                           break
 
         project_containers = ProjectContainer.objects.filter(id__in=list(set(ids)))
 

@@ -50,7 +50,7 @@ CACHES = {
 # }
 
 SERVER_MODE	  = 'development'
-DEBUG             = False
+DEBUG             = True
 
 # If you need to debug email, you can start a debugging server that just
 # outputs whatever it receives with:

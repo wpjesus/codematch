@@ -110,7 +110,7 @@
 										{% if user.is_authenticated and docs and canadddocuments %}
 				            				<h4><strong>Documents</strong></h4>
 											{% for doc in docs %}
-												{{ doc.document.group }}: <a  href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
+												{{ doc.document.title }}: <a  href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
 												<a class="label label-info" href="{% url 'ietf.codematch.requests.views.remove_document' 0 doc.name %}" >delete</a>
 												<br />
 											{% endfor %}

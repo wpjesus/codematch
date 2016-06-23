@@ -69,7 +69,9 @@ STRING_POPULARITY = 'popularity'
 STRING_TWITTER = 'twitter'
 STRING_NONE = 'None'
 
-ATT_CREATION_DATE = 'creation_date'
+ATT_CREATION_DATE = '-creation_date'
+ATT_WORKING_GROUP = 'working_group'
+ATT_AREA = 'area'
 
 MAIL_TYPES = [
     # core events

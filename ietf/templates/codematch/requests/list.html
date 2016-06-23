@@ -50,8 +50,8 @@
 					{% else %} href="{% url template typelist 'title' state %}"
 					{% endif %}>Title</a> |
 					<a
-					{% if attribute == "creation_date" %} style="color: #A0A0A0"
-					{% else %} href="{% url template typelist 'creation_date' state %}"
+					{% if attribute == "-creation_date" %} style="color: #A0A0A0"
+					{% else %} href="{% url template typelist '-creation_date' state %}"
 					{% endif %}>Release date</a> |
 					<a
 					{% if attribute == "code_request__estimated_lof" %} style="color: #A0A0A0"
@@ -66,12 +66,12 @@
 					{% else %} href="{% url template typelist 'protocol' state %}"
 					{% endif %}>Protocol</a> |
 					<a
-					{% if attribute == "docs__document__group__name" %} style="color: #A0A0A0"
-					{% else %} href="{% url template typelist 'docs__document__group__name' state %}"
+					{% if attribute == "working_group" %} style="color: #A0A0A0"
+					{% else %} href="{% url template typelist 'working_group' state %}"
 					{% endif %}>Working Group</a> |
 					<a
-					{% if attribute == "docs__document__group__parent__name" %} style="color: #A0A0A0"
-					{% else %} href="{% url template typelist 'docs__document__group__parent__name' state %}"
+					{% if attribute == "area" %} style="color: #A0A0A0"
+					{% else %} href="{% url template typelist 'area' state %}"
 					{% endif %}>Area</a>
 
 					<!--<a href="{% url "ietf.codematch.requests.views.show_list" 'title' %}">Area</a> | -->

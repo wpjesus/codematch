@@ -52,8 +52,8 @@
 								{% else %} href="{% url template mylist 'coder' state %}"
 								{% endif %}>Coder</a> |
 								<a
-								{% if attribute == "creation_date" %} style="color: #A0A0A0"
-								{% else %} href="{% url template mylist 'creation_date' state %}"
+								{% if attribute == "-creation_date" %} style="color: #A0A0A0"
+								{% else %} href="{% url template mylist '-creation_date' state %}"
 								{% endif %}>Release date</a>
                                 <!--<a href="{% url "ietf.codematch.matches.views.show_list" 'title' %}">Code Request</a> | -->
                                 <!--<a href="{% url "ietf.codematch.matches.views.show_list" 'title' %}">Protocol</a> | -->
