@@ -1,86 +1,95 @@
 #### TODO LIST ###
 - Melhorar performance (principalmente new e edit CodeRequest)
-- Definir padrão para permissões
+- Definir padrï¿½o para permissï¿½es
 - Pensar em unir o template de update e new
-- Estudar outras aplicações do DataTracker para padronizar código
-- Pensar em separar as funções dentro de POST dos métodos
-- Criar Script de migração de base se necessário
-- Fazer esquema para permitir novos cadastros de usuários
+- Estudar outras aplicaï¿½ï¿½es do DataTracker para padronizar cï¿½digo
+- Pensar em separar as funï¿½ï¿½es dentro de POST dos mï¿½todos
+- Criar Script de migraï¿½ï¿½o de base se necessï¿½rio
+- Fazer esquema para permitir novos cadastros de usuï¿½rios
 - Atualizar interface para mockups v5
-- Revisar onde est‹o permiss›es, ou centralizar tudo em utils ou entao descentralizar total (canadddocuments por exemplo)
-- Padronizar c—digo de Matches e Requests
-- Rever Owner em Show (Ser‡ que n‹o  melhor trocar para um bool j‡ em c—digo)
+- Revisar onde estï¿½o permissï¿½es, ou centralizar tudo em utils ou entao descentralizar total (canadddocuments por exemplo)
+- Padronizar cï¿½digo de Matches e Requests
+- Rever Owner em Show (Serï¿½ que nï¿½o ï¿½ melhor trocar para um bool jï¿½ em cï¿½digo)
 - Back quando acabou de atualizar ou criar algum item
 - Ver como commitar settings_local.py sem dar conflitos ao dar pull
-- Rever base.html da vers‹o 6.6.1 (reaproveitei o da vers‹o que eu tinha modificado)
+- Rever base.html da versï¿½o 6.6.1 (reaproveitei o da versï¿½o que eu tinha modificado)
 - Tive que alterar os scripts generate na pasta bin
 
 ### DONE LIST ###
-- Adicionar documentos e tags dentro do formulário de novo coderequest
+- Adicionar documentos e tags dentro do formulï¿½rio de novo coderequest
 - Mesma tela para All CodeRequests, Code requests i've created and CodeRequest i'm mentoring
-- Comentário e centralização da função new e update
-- Todas as preferências relacionadas ao CodeMatch postas em settings_local
+- Comentï¿½rio e centralizaï¿½ï¿½o da funï¿½ï¿½o new e update
+- Todas as preferï¿½ncias relacionadas ao CodeMatch postas em settings_local
 - Codematch muito lento (!) (Melhorar, ainda tem um erro estranho acontencendo no servidor)
 - Separar tags por virgula 
-- Back voltar sens’vel ao contexto 
+- Back voltar sensï¿½vel ao contexto 
 - Update e Archive no show 
 - Colocar Associate my project antes de Edit 
-- Colocar mensagem quando n‹o existem itens na lista 
+- Colocar mensagem quando nï¿½o existem itens na lista 
 - Retirar a mensagem superior aos CodeRequests 
-- Permitir remo‹o de documentos e tags
+- Permitir remoï¿½ï¿½o de documentos e tags
 
 ### BUGS ###
 - Login repetidas vezes
-- Quando a tela está reduzida o menu desaparece
+- Quando a tela estï¿½ reduzida o menu desaparece
 - Search codematch vem todos do mesmo projeto
 
 ### QUESTION LIST ###
-- Existem diversos testes sendo feitos nos templates, deveriam ser passados para o código?
+- Existem diversos testes sendo feitos nos templates, deveriam ser passados para o cï¿½digo?
 - Sera que deveria ser definido Mentor para o Codematch StandAlone
-- Bug da tela deve ser falado com Wanderson pq provavelmente n‹o  minha culpa :D
+- Bug da tela deve ser falado com Wanderson pq provavelmente nï¿½o ï¿½ minha culpa :D
 
-### VERSION 1.1 ###
+### VERSION 1.1.0 ###
 * Ordenar por Coder
-* My Codematches est‡ errado
+* My Codematches estï¿½ errado
 * Criando multiplas vezes o mesmo CodeMatch
-* Falta mem—ria as vezes na m‡quina virtual (!)
-* Search pesquisa em ProjectContainers que n‹o deveria
-* Search est‡ sem a parte da Query :(
-* Register in est‡ redirecionando errado 
+* Falta memï¿½ria as vezes na mï¿½quina virtual (!)
+* Search pesquisa em ProjectContainers que nï¿½o deveria
+* Search estï¿½ sem a parte da Query :(
+* Register in estï¿½ redirecionando errado 
 
-### VERSION 1.2 ###
+### VERSION 1.1.2 ###
 * Corrigido o bug de login multiplas vezes
 
+### VERSION 1.2.0 ##
+* Corrigido search
+* Trocar texto Coders of hall of fame para Top Coders
+* Ordenar por protocolo deveria considerar iguais protocolos escritos de maneiras diferentes? (foi definido que sempre usar o upper()
+* Search sem nenhum marcado deve considerar todos
+* Corrigido search que envolve documentos (docs, areas e working groups)
+* Corrigido os icones
+* UtilizaÃ§Ã£o da base de dados local
+
 ### NOTES ###
-- Quando der problema no mysql da maquina virtual provavelmente  falta de espao
+- Quando der problema no mysql da maquina virtual provavelmente ï¿½ falta de espaï¿½o
 
 ### DOCUMENTATION ###
-Estrutura composta no momento de 4 pastas além da raíz (Accounts, Helpers, Matches e Requests).
-- Accounts é onde devem ser colocadas as funções referente ao Login e Logout entre outras preferências de conta
-- Helpers é onde devem ser postas as funções que são utilizadas por todas as outras aplicações
-- Matches é a aplicação que cuida dos Codings
-- Requests é a aplicação que dos ProjectContainers e CodeRequests
-- A raíz não deve ter grandes funcionalidades além de ativar as outras aplicações, é apenas uma porta de entrada
-- Obs: A mesma estrutura é usada para o código e para os templates
+Estrutura composta no momento de 4 pastas alï¿½m da raï¿½z (Accounts, Helpers, Matches e Requests).
+- Accounts ï¿½ onde devem ser colocadas as funï¿½ï¿½es referente ao Login e Logout entre outras preferï¿½ncias de conta
+- Helpers ï¿½ onde devem ser postas as funï¿½ï¿½es que sï¿½o utilizadas por todas as outras aplicaï¿½ï¿½es
+- Matches ï¿½ a aplicaï¿½ï¿½o que cuida dos Codings
+- Requests ï¿½ a aplicaï¿½ï¿½o que dos ProjectContainers e CodeRequests
+- A raï¿½z nï¿½o deve ter grandes funcionalidades alï¿½m de ativar as outras aplicaï¿½ï¿½es, ï¿½ apenas uma porta de entrada
+- Obs: A mesma estrutura ï¿½ usada para o cï¿½digo e para os templates
 
-Como é utilizado esquema de permissões, algumas permissões devem ser sempre adicionadas para toda página que for ser renderizada, por isso foi centralizado em Helpers/Utils.py um método que adiciona váriaveis de contexto ao dicionário. É preciso que sempre seja chamado o método render_page quando se quiser renderizar uma página, NÃO USAR o método render pois algumas coisas poderão ficar inconsistentes.
+Como ï¿½ utilizado esquema de permissï¿½es, algumas permissï¿½es devem ser sempre adicionadas para toda pï¿½gina que for ser renderizada, por isso foi centralizado em Helpers/Utils.py um mï¿½todo que adiciona vï¿½riaveis de contexto ao dicionï¿½rio. ï¿½ preciso que sempre seja chamado o mï¿½todo render_page quando se quiser renderizar uma pï¿½gina, Nï¿½O USAR o mï¿½todo render pois algumas coisas poderï¿½o ficar inconsistentes.
 
-Também em Helpers/Utils.py está o método is_user_allowed que deve cuidar das permissões do usuário atual.
+Tambï¿½m em Helpers/Utils.py estï¿½ o mï¿½todo is_user_allowed que deve cuidar das permissï¿½es do usuï¿½rio atual.
 
-Todas as preferências que forem apenas do Codematch devem estar centradas em settings_local, acredito que o arquivo settings.py deva ser mexido o menos possível para facilitar uma futura integração com DataTracker.
+Todas as preferï¿½ncias que forem apenas do Codematch devem estar centradas em settings_local, acredito que o arquivo settings.py deva ser mexido o menos possï¿½vel para facilitar uma futura integraï¿½ï¿½o com DataTracker.
 
-Métodos que precisam que o usuário esteja logado devem possuir o decorator login_required desta forma:
+Mï¿½todos que precisam que o usuï¿½rio esteja logado devem possuir o decorator login_required desta forma:
 - @login_required(login_url = settings.CODEMATCH_PREFIX + '/codematch/accounts/login')', onde o prefixo CODEMATCH_PREFIX deve vir da pasta settings_local. 
-É possível assim que tenhamos diversas aplicações rodando no mesmo servidor apache, sendo separadas apenas pelo prefixo 'codematch-dev' ou 'codematch-master' por exemplo.
+ï¿½ possï¿½vel assim que tenhamos diversas aplicaï¿½ï¿½es rodando no mesmo servidor apache, sendo separadas apenas pelo prefixo 'codematch-dev' ou 'codematch-master' por exemplo.
 
-Ao referenciar algum arquivo da pasta static é preciso colocar a tag 'static' tal qual está em base_codematch.html ou base.html e lembrar de importar a definição {% load staticfiles %}.
-Medida também para que se possa rodar diversas aplicações no mesmo servidor Apache.
+Ao referenciar algum arquivo da pasta static ï¿½ preciso colocar a tag 'static' tal qual estï¿½ em base_codematch.html ou base.html e lembrar de importar a definiï¿½ï¿½o {% load staticfiles %}.
+Medida tambï¿½m para que se possa rodar diversas aplicaï¿½ï¿½es no mesmo servidor Apache.
 
-Usuário válidos estão na tabela person_person (SELECT * FROM person_person) do Datatracker e a senha é sempre 'password'.
+Usuï¿½rio vï¿½lidos estï¿½o na tabela person_person (SELECT * FROM person_person) do Datatracker e a senha ï¿½ sempre 'password'.
 
-Para o usuário ver CodeRequest i've created ou CodeRequest i'm mentoring na barra superior ele deve ter a permissão para tal ou já ter criado/supervisionado algum CodeRequest antes.
+Para o usuï¿½rio ver CodeRequest i've created ou CodeRequest i'm mentoring na barra superior ele deve ter a permissï¿½o para tal ou jï¿½ ter criado/supervisionado algum CodeRequest antes.
 
-### TIPS PARA INSTALAÇÃO ###
+### TIPS PARA INSTALAï¿½ï¿½O ###
 Instalar Django con 
         sudo pip install Django
 Instalar Homebrew:
@@ -89,7 +98,7 @@ Instalar mysql y stunnel con brew install mysql
         brew install mysql
                 brew install stunnel
 
-Para baixar o repositório do datatracker:
+Para baixar o repositï¿½rio do datatracker:
 	'svn checkout http://svn.tools.ietf.org/svn/tools/ietfdb/tags/6.0.4'
 
 (1) Instrucciones para instalar Datatracker en:
@@ -118,7 +127,7 @@ Instalar libmagic
 Uno de los include se queja por falta de __init__py
         sudo touch /System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/mpl_toolkits/__init__.py
 
-Crear el shell script the arranque para mysql & stunnel (las instrucciones están en(1)
+Crear el shell script the arranque para mysql & stunnel (las instrucciones estï¿½n en(1)
 
 Crear el superuser de django
         python ietf/manage.py createsuperuser
