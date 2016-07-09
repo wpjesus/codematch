@@ -17,12 +17,16 @@ def is_user_allowed(user, permission):
 
 
 def get_user(request):
-    if request.user.is_authenticated():
-        user = Person.objects.using('datatracker').get(user=request.user)
-        return user
+    # TODO: Colocar o usuario nas variaveis de sessao
+    if constants.USER not in request.session or request.session[constants.USER].user != request.user:
+        if request.user.is_authenticated():
+            user = Person.objects.using('datatracker').get(user=request.user)
+            request.session[constants.USER] = user
+            return user
+        else:
+            return None
     else:
-        return None
-
+        return request.session[constants.USER]
 
 def get_menu_arguments(request, keys):
     user = get_user(request)

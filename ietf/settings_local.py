@@ -1,25 +1,25 @@
 DATABASES = {
     'default': {
-        'NAME': 'ietf_utf8_master',
+        'NAME': 'ietf_utf8',
         'ENGINE': 'django.db.backends.mysql',
-        'USER': 'matheus',
+        'USER': 'ubuntu',
         'PASSWORD': 'ietf', # Contact henrik@levkowetz.com to get the password
         'HOST': '127.0.0.1'
     },
+#     'datatracker': {
+#        'NAME': 'ietf_utf8',
+#       'ENGINE': 'django.db.backends.mysql',
+#      'USER': 'django_readonly',
+#     'PASSWORD': 'f$xdv#vzwi',
+#    'HOST': 'zinfandel.tools.ietf.org',
+# }
     'datatracker': {
-        'NAME': 'ietf_utf8_master',
+       'NAME': 'ietf_utf8',
         'ENGINE': 'django.db.backends.mysql',
-        'USER': 'matheus',
-        'PASSWORD': 'ietf', # Contact henrik@levkowetz.com to get the password
-        'HOST': '127.0.0.1'
-    },
-    #'datatracker': {
-    #    'NAME': 'ietf_utf8',
-    #    'ENGINE': 'django.db.backends.mysql',
-    #    'USER': 'django_readonly',
-    #    'PASSWORD': 'f$xdv#vzwi',
-    #    'HOST': 'zinfandel.tools.ietf.org',
-    #}
+        'USER': 'codematch',
+        'PASSWORD': 'codematcher',
+        'HOST': 'ietf.org',
+    }
 }
 
 DATABASE_ROUTERS = ["ietf.new_router.DatatrackerRouter"]
@@ -29,6 +29,15 @@ DATABASE_ROUTERS = ["ietf.new_router.DatatrackerRouter"]
 # to save session data to the readonly database:
 # NOTE: you should omit this if you are using a local database
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
+INTERNAL_IPS = ('143.54.85.85',)
+
+def show_toolbar(request):
+    return False
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK" : show_toolbar,
+}
 
 # Since the grenache database above is remote, you probably also should
 # use a fast local cache (this requires you to set up memcached.  Alternatively,
@@ -50,7 +59,7 @@ CACHES = {
 # }
 
 SERVER_MODE	  = 'development'
-DEBUG             = False
+DEBUG             = True
 
 # If you need to debug email, you can start a debugging server that just
 # outputs whatever it receives with:
@@ -85,11 +94,28 @@ IDSUBMIT_IDNITS_BINARY = '<path to a local copy of idnits>'
 
 """ Codematch Settings """
 
+DEBUG_TOOLBAR_PANELS = [
+    'debug_toolbar.panels.versions.VersionsPanel',
+    'debug_toolbar.panels.timer.TimerPanel',
+    'debug_toolbar.panels.settings.SettingsPanel',
+    'debug_toolbar.panels.headers.HeadersPanel',
+    'debug_toolbar.panels.request.RequestPanel',
+    'debug_toolbar.panels.sql.SQLPanel',
+    'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+    'debug_toolbar.panels.templates.TemplatesPanel',
+    'debug_toolbar.panels.cache.CachePanel',
+    'debug_toolbar.panels.signals.SignalsPanel',
+    'debug_toolbar.panels.logging.LoggingPanel',
+    'debug_toolbar.panels.redirects.RedirectsPanel',
+]
+
 # If any folder structure on Apache 
 #(eg. codematch-dev - CODEMATCH_PREFIX="/codematch-dev/")
-CODEMATCH_PREFIX = "/codematch-master/"
+CODEMATCH_PREFIX = ""
 #(eg. codematch-dev - STATIC_URL="/static/") 
 STATIC_URL = CODEMATCH_PREFIX + "/static/"
+
+IS_CODEMATCH_APP = True
 
 #Application that must be installed by Codematch
 CODEMATCH_APPS = (
@@ -98,3 +124,6 @@ CODEMATCH_APPS = (
         'ietf.codematch.matches',
         'ietf.codematch.requests'
     )
+
+if DEBUG:
+	CODEMATCH_APPS += ('debug_toolbar',)

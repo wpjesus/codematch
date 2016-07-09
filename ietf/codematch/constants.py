@@ -9,6 +9,7 @@ RELEASE_DATE = "2016-06-23"
 # Session Constants
 # ----------------------------------------------------------------
 
+USER = 'user'
 ALL_PROJECTS = 'all_projects'
 PROJECT_INSTANCE = 'project_instance'
 REQUEST_INSTANCE = 'request_instance'

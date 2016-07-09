@@ -199,6 +199,7 @@ MIDDLEWARE_CLASSES = (
     'ietf.middleware.RedirectTrailingPeriod',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'ietf.middleware.UnicodeNfkcNormalization',
+    'debug_toolbar.middleware.DebugToolbarMiddleware', # TODO: Remover isto
 )
 
 ROOT_URLCONF = 'ietf.urls'
