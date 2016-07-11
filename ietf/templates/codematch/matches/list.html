@@ -70,13 +70,13 @@
                                 	{% for coding, projectcontainer, coder in codings %}
 	                               		<li>
 	                                    	<!-- Title and date -->
-	                                    	<h5><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coder.name }}</a>
+	                                    	<h5><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coder }}</a>
             		                      	{% if user.is_authenticated and coder == owner %}
 					                   			<a class="label label-info" href="{% url 'ietf.codematch.matches.views.edit' projectcontainer.id coding.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a>
 							               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
 											{% endif %}
 											</h5>
-	                                    	<!--<h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coding.coder.name }}</a></h6>-->
+	                                    	<!--<h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coder }}</a></h6>-->
 	                                    	<p>{{ coding.additional_information|linebreaks }}</p>
 	                                    	<p>
 	                                    	{% if projectcontainer.code_request == None %}

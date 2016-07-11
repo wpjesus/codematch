@@ -21,20 +21,19 @@ def back(request):
 
     return HttpResponseRedirect(template)
 
+def handler500(request):
+    # TODO: Review this to filter only the specific error
+    sync(request)
+    print 'updated local database'
+    #  return render_page(request, constants.TEMPLATE_ERROR_500)
+    return render_page(request, constants.TEMPLATE_INDEX)
+
+
+def handler404(request):
+    return render_page(request, constants.TEMPLATE_ERROR_404)
 
 def sync(request):
-    return
-    refresh_template = request.session[constants.ACTUAL_TEMPLATE]
-    
-    all_persons = Person.objects.using('datatracker')
-    codematch_persons = Person.objects.using('default').all().values_list('id', flat=True)
-    
-    for person in all_persons:
-        if person.id not in codematch_persons:
-            try:
-                person.save()
-            except:
-                pass
+    """ :param request: """
     
     all_users = User.objects.using('datatracker').all()
     codematch_users = User.objects.using('default').all().values_list('id', flat=True)
@@ -44,5 +43,3 @@ def sync(request):
                 us.save()
             except:
                 pass
-            
-    return HttpResponseRedirect(refresh_template)

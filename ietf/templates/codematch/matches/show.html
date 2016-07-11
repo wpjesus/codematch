@@ -127,8 +127,8 @@
 
 											{% if docs and projectcontainer.code_request == None %}
 												<h4><strong>Documents</strong></h4>
-												{% for doc in docs %}
-													{{ doc.document.group }}: <a href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
+												{% for docname, gname, gparentname in docs %}
+													{{ gname }}: <a href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ docname }} </a>
 													<br />
 												{% endfor %}
 												<br />

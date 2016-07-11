@@ -22,6 +22,11 @@ def top_coders(request):
     coders = []
     topcoders = []
     dict_code = {}
+    ids = []
+    for coding in codings:
+        ids.append(coding.coder)
+    ids = list(set(ids))
+    all_coders = list(Person.objects.using('datatracker').filter(id__in=ids).values_list('id', 'name'))
     for code in codings:
         if code.coder not in coders:
             coders.append(code.coder)
@@ -32,7 +37,11 @@ def top_coders(request):
             c.count += 1
     codes = sorted(codes, key=lambda c: c.count, reverse=True)
     for cd in codes:
-        topcoders.append((cd.count, Person.objects.using('datatracker').get(id=cd.coder)))
+        coder = 'None'
+        for id, name in all_coders:
+            if cd.coder == id:
+                coder = name
+        topcoders.append((cd.count, coder))
     return render_page(request, constants.TEMPLATE_TOPCODERS, {
         'topcoders': topcoders,
     })

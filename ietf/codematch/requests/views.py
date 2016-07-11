@@ -66,18 +66,26 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
             select = list(set(project_containers.values_list(att, flat=True)))
         else:
 	    docs = []
+	    keys = []
+	    for project_container in project_containers:
+        	if project_container.docs:
+	            keys += filter(None, project_container.docs.split(';'))
+	    keys = list(set(keys))
+	    all_documents = list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('name', 'document__group__name', 'document__group__parent__name'))
             for p in project_containers:
-            	if p.docs:
-                	keys = filter(None, p.docs.split(';'))
-                else:
-                	continue
-		if map_attributes[att] == constants.STRING_WORKINGGROUP:
-                	docs.extend(list(DocAlias.objects.using('datatracker').filter(name__in=keys).
-                         values_list('document__group__name')))
-		else:
-                        docs.extend(list(DocAlias.objects.using('datatracker').filter(name__in=keys).
-                         values_list('document__group__parent__name')))
-
+		keys = []
+		if p.docs:
+			keys = filter(None, p.docs.split(';'))
+		for name, gname, gparentname in all_documents:
+	            for key in keys:
+			if key == name:
+			    if map_attributes[att] == constants.STRING_WORKINGGROUP:
+			        docs.append(gname)
+			    else:
+			        docs.append(gparentname)
+                	#docs.extend(list(DocAlias.objects.using('datatracker').filter(name__in=keys).
+                        # values_list('document__group__name')))
+                        # values_list('document__group__parent__name')))
 	    select = list(set(docs))
 
 	for s in select:
@@ -89,18 +97,22 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
 		    compare = s.upper()
                     prop = getattr(p, val).upper()  # Get Protocol name
                 else:
-		    compare = s[0]
+		    compare = s
                     prop = None
 		    if p.docs:
             	    	keys = filter(None, p.docs.split(';'))
         	    else:
 		        continue
-		    docs = DocAlias.objects.using('datatracker').filter(name__in=keys)
-                    for d in docs:
-                        if val == constants.STRING_WORKINGGROUP:
-                            prop = d.document.group.name  # Get working group name
-                        else:
-                            prop = d.document.group.parent.name  # Get area name
+		    #docs = DocAlias.objects.using('datatracker').filter(name__in=keys)
+                    for name, gname, gparentname in all_documents:
+			for key in keys:
+                            if key == name:
+    			        if val == constants.STRING_WORKINGGROUP:
+        	                    prop = gname  # Get working group name
+				    break
+                	        else:
+                        	    prop = gparentname  # Get area name
+				    break
                 if prop is not None and p not in new_projs and prop == compare:
                     new_projs.append(p)
             if len(new_projs) > 0 and not any(compare in comp[1] for comp in list_of_lists):
@@ -242,18 +254,19 @@ def show(request, pk):
     keys = []
     if project_container.docs:
         keys = filter(None, project_container.docs.split(';'))
-    for key in keys:
+    docs = list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('name', 'document__group__name', 'document__group__parent__name'))
+    for name, gname, gparentname in docs:
         # group = doc.document.group
-        doc = DocAlias.objects.using('datatracker').get(name=key)
-        docs.append(doc)
-        group = doc.document.group
-        if group.name not in working_groups:
-            working_groups.append(group.name)
-        if group.parent:
-            if group.parent.name not in areas:
-                areas.append(group.parent.name)  # use acronym?
+        #doc = DocAlias.objects.using('datatracker').get(name=key)
+        # docs.append(doc)
+        #group = doc.document.group
+        if gname not in working_groups:
+            working_groups.append(gname)
+        if gparentname:
+            if gparentname not in areas:
+                areas.append(gparentname)  # use acronym?
         else:
-            areas.append(group.name)
+            areas.append(gname)
 
     if not areas:
         areas = [constants.STRING_NONE]

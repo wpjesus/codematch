@@ -31,13 +31,8 @@ DATABASE_ROUTERS = ["ietf.new_router.DatatrackerRouter"]
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
-INTERNAL_IPS = ('143.54.85.85',)
+INTERNAL_IPS = ('143.54.12.118',)
 
-def show_toolbar(request):
-    return False
-DEBUG_TOOLBAR_CONFIG = {
-    "SHOW_TOOLBAR_CALLBACK" : show_toolbar,
-}
 
 # Since the grenache database above is remote, you probably also should
 # use a fast local cache (this requires you to set up memcached.  Alternatively,

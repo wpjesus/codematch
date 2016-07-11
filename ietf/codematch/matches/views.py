@@ -11,7 +11,6 @@ from ietf.codematch.matches.models import ProjectContainer, CodingProject, Imple
 from ietf.codematch.helpers.utils import (render_page, is_user_allowed, clear_session, get_user)
 from django.conf import settings
 
-
 def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, state=""):
     """ List all Codematches type_list (all = All CodeRequests / mylist = CodeRequests I've Created /
         mentoring = CodeRequests i'm mentoring)
@@ -35,37 +34,58 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
         all_codings = sorted(CodingProject.objects.all(), key=lambda p: Person.objects.get(id=p.coder))
     else:
         all_codings = CodingProject.objects.order_by(att)[:20]
+    ids = []
+    for coding in all_codings:
+	ids.append(coding.coder)
+    ids = list(set(ids))
+    all_coders = list(Person.objects.using('datatracker').filter(id__in=ids).values_list('id', 'name'))
     for coding in all_codings:
         for project in all_projects:
             if coding in project.codings.all() and (is_my_list == "False" or user.id == coding.coder):
-                coder = Person.objects.using('datatracker').get(id=coding.coder)
+		coder_id = coding.coder
+		coder = 'None'
+		for id, name in all_coders:
+                    if coder_id == id:
+		        coder = name
+                #if coder_id in all_coders:
+		#	coder = all_coders[coder_id]
+		#else:
+		#	coder = Person.objects.using('datatracker').get(id=coder_id)
+		#	all_coders[coder_id] = coder
                 selected_codings.append((coding, project, coder))
 
+    keys = []
+    for project_container in all_projects:
+	if project_container.docs:
+		keys += filter(None, project_container.docs.split(';'))
+    keys = list(set(keys))
+    all_documents = list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('name', 'document__group__name', 'document__group__parent__name'))
     docs = []
     areas_list = []
     working_groups_list = []
-
     for project_container in all_projects:
         areas = []
         working_groups = []
         # According to model areas and working groups should come from documents
         keys = []
-        if project_container.docs:
+        documents = []
+	if project_container.docs:
             keys = filter(None, project_container.docs.split(';'))
-        for key in keys:
-            # group = doc.document.group
-            try:
-            	group = DocAlias.objects.using('datatracker').get(name=key).document.group
-            except:
-		continue
-	    if group.name not in working_groups:
-                working_groups.append(group.name)
-            if group.parent:
-                if group.parent.name not in areas:
-                    areas.append(group.parent.name)
+	for key in keys:
+	    for name, gname, gparentname in all_documents:
+	        if name == key:
+		    documents.append((gname, gparentname))
+	#documents = list(DocAlias.objects.using('datatracker').filter(name__in=keys).
+        #                 values_list('document__group__name', 'document__group__parent__name'))
+        for gname, gparentname in documents:
+            if gname not in working_groups:
+                working_groups.append(gname)
+            if gparentname:
+                if gparentname not in areas:
+                    areas.append(gparentname)
             else:
-                if group.name not in areas:
-                    areas.append(group.name)
+                if gname not in areas:
+                    areas.append(gname)
         if not areas:
             areas = [constants.STRING_NONE]
         if not working_groups:
@@ -86,7 +106,6 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
         'state': state,
         'template': 'ietf.codematch.matches.views.show_list'  # TODO fix this
     })
-
 
 def show(request, pk, ck):
     """ Show individual Codematch Project and Add Implementation
@@ -111,22 +130,16 @@ def show(request, pk, ck):
 
     # According to model areas and working groups should come from documents
     keys = []
+    areas = []
     if project_container.docs:
         keys = filter(None, project_container.docs.split(';'))
-    for key in keys:
-        # group = doc.document.group
-	try:
-        	doc = DocAlias.objects.using('datatracker').get(name=key)
-		docs.append(doc)
-        	group = doc.document.group
-	except:
-		continue
-        if group.parent:
-            if group.parent.name not in areas:
-                areas.append(group.parent.name)  # use acronym?
+    docs = list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('name', 'document__group__name', 'document__group__parent__name'))
+    for name, gname, gparentname in docs:
+        if gparentname:
+            if gparentname not in areas:
+                areas.append(gparentname)  # use acronym?
         else:
-            if group.name not in areas:
-                areas.append(group.name)
+            areas.append(gname)
     tags += coding.tags.all()
 
     if not areas:
