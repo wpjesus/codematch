@@ -12,8 +12,9 @@ from ietf.codematch.matches.models import ProjectContainer, ProjectTag, ProjectC
 from ietf.codematch.helpers.utils import (render_page, is_user_allowed, clear_session, get_user)
 from django.conf import settings
 
+from django.core.paginator import Paginator
 
-def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state=""):
+def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="", page=1):
     """ List all CodeRequests
         :param state: string - if the state is true then the project_containers
                                has been previously loaded (eg. Loaded from the search)
@@ -48,71 +49,77 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
     if att == constants.STRING_POPULARITY:
         project_containers = project_containers.annotate(count=Count('codings')).order_by('-count')[:20]
     else:
-	if att != constants.ATT_WORKING_GROUP and att != constants.ATT_AREA: 
-            project_containers = project_containers.order_by(att)[:20]
+        if att != constants.ATT_WORKING_GROUP and att != constants.ATT_AREA:
+            project_containers = project_containers.order_by(att)
     list_of_lists = []
+    
+    paginator = Paginator(project_containers, 5)
+    page = int(page)
+    all_codings = paginator.page(page)
 
     # Attributes that should grouping
     map_attributes = {'protocol': constants.STRING_PROTOCOL,
                       'working_group': constants.STRING_WORKINGGROUP,
-		      'area': constants.STRING_AREA }
-		      #'docs__document__group__name': constants.STRING_WORKINGGROUP,
-                      #'docs__document__group__parent__name': constants.STRING_AREA}
+                      'area': constants.STRING_AREA}
+    # 'docs__document__group__name': constants.STRING_WORKINGGROUP,
+    # 'docs__document__group__parent__name': constants.STRING_AREA}
 
     # If the attribute is in the dictionary then should do the sorting and grouping for this attribute
     if att in map_attributes:
         # Get all values for this attribute (eg. protocol: OSPF, RIP, NewProtocol)
-	if att == 'protocol':
+        if att == 'protocol':
             select = list(set(project_containers.values_list(att, flat=True)))
         else:
-	    docs = []
-	    keys = []
-	    for project_container in project_containers:
-        	if project_container.docs:
-	            keys += filter(None, project_container.docs.split(';'))
-	    keys = list(set(keys))
-	    all_documents = list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('name', 'document__group__name', 'document__group__parent__name'))
+            docs = []
+            keys = []
+            for project_container in project_containers:
+                if project_container.docs:
+                    keys += filter(None, project_container.docs.split(';'))
+            keys = list(set(keys))
+            all_documents = list(
+                DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('name', 'document__group__name',
+                                                                                        'document__group__parent__name'))
             for p in project_containers:
-		keys = []
-		if p.docs:
-			keys = filter(None, p.docs.split(';'))
-		for name, gname, gparentname in all_documents:
-	            for key in keys:
-			if key == name:
-			    if map_attributes[att] == constants.STRING_WORKINGGROUP:
-			        docs.append(gname)
-			    else:
-			        docs.append(gparentname)
-                	#docs.extend(list(DocAlias.objects.using('datatracker').filter(name__in=keys).
-                        # values_list('document__group__name')))
-                        # values_list('document__group__parent__name')))
-	    select = list(set(docs))
+                keys = []
+                if p.docs:
+                    keys = filter(None, p.docs.split(';'))
+                for name, gname, gparentname in all_documents:
+                    for key in keys:
+                        if key == name:
+                            if map_attributes[att] == constants.STRING_WORKINGGROUP:
+                                docs.append(gname)
+                            else:
+                                docs.append(gparentname)
+                            # docs.extend(list(DocAlias.objects.using('datatracker').filter(name__in=keys).
+                            # values_list('document__group__name')))
+                            # values_list('document__group__parent__name')))
+            select = list(set(docs))
 
-	for s in select:
-	    compare = None
+        for s in select:
+            compare = None
             new_projs = []
             val = map_attributes[att]
             for p in project_containers:
                 if att == constants.STRING_PROTOCOL:
-		    compare = s.upper()
+                    compare = s.upper()
                     prop = getattr(p, val).upper()  # Get Protocol name
                 else:
-		    compare = s
+                    compare = s
                     prop = None
-		    if p.docs:
-            	    	keys = filter(None, p.docs.split(';'))
-        	    else:
-		        continue
-		    #docs = DocAlias.objects.using('datatracker').filter(name__in=keys)
+                    if p.docs:
+                        keys = filter(None, p.docs.split(';'))
+                    else:
+                        continue
+                    # docs = DocAlias.objects.using('datatracker').filter(name__in=keys)
                     for name, gname, gparentname in all_documents:
-			for key in keys:
+                        for key in keys:
                             if key == name:
-    			        if val == constants.STRING_WORKINGGROUP:
-        	                    prop = gname  # Get working group name
-				    break
-                	        else:
-                        	    prop = gparentname  # Get area name
-				    break
+                                if val == constants.STRING_WORKINGGROUP:
+                                    prop = gname  # Get working group name
+                                    break
+                                else:
+                                    prop = gparentname  # Get area name
+                                    break
                 if prop is not None and p not in new_projs and prop == compare:
                     new_projs.append(p)
             if len(new_projs) > 0 and not any(compare in comp[1] for comp in list_of_lists):
@@ -125,6 +132,11 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
     return render_page(request, constants.TEMPLATE_REQUESTS_LIST, {
         'projectcontainers': list_of_lists,
         'owner': user,
+        'numpages': paginator.num_pages,
+        'pages': range(1, paginator.num_pages + 1),
+        'hasnext': all_codings.has_next(),
+        'hasprevious': all_codings.has_previous(),
+        'page': page,
         'attribute': att,
         'typelist': type_list,
         'state': state,
@@ -150,7 +162,7 @@ def search(request, type_list="all"):
 
         valid_searches = [constants.STRING_TITLE, constants.STRING_DESCRIPTION, constants.STRING_PROTOCOL,
                           constants.STRING_MENTOR, constants.STRING_AREA, constants.STRING_WORKINGGROUP,
-			  constants.STRING_DOCS]
+                          constants.STRING_DOCS]
 
         search_in_all = True
         for v in valid_searches:
@@ -182,42 +194,43 @@ def search(request, type_list="all"):
                     ids.append(pr.id)
 
         if search_in_all or request.GET.get(constants.STRING_DOCS):
-                docs = []
-                for project_container in ProjectContainer.objects.exclude(code_request__isnull=True).all():
-                    if not project_container.docs or project_container.docs == '':
-                        continue
-                    keys = filter(None, project_container.docs.split(';'))
-                    docs.extend(list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('document__name')))
-                    for doc in docs:
-                        if query.lower() in doc[0].lower():
-                           ids.append(project_container.id)
-                           break
-
+            docs = []
+            for project_container in ProjectContainer.objects.exclude(code_request__isnull=True).all():
+                if not project_container.docs or project_container.docs == '':
+                    continue
+                keys = filter(None, project_container.docs.split(';'))
+                docs.extend(
+                    list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('document__name')))
+                for doc in docs:
+                    if query.lower() in doc[0].lower():
+                        ids.append(project_container.id)
+                        break
 
         if search_in_all or request.GET.get(constants.STRING_AREA):
-                docs = []
-                for project_container in ProjectContainer.objects.all():
-                    if not project_container.docs or project_container.docs == '':
-                        continue
-                    keys = filter(None, project_container.docs.split(';'))
-                    docs.extend(list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('document__group__parent__name')))
-                    for doc in docs:
-                        if query.lower() in doc[0].lower():
-                           ids.append(project_container.id)
-                           break
+            docs = []
+            for project_container in ProjectContainer.objects.all():
+                if not project_container.docs or project_container.docs == '':
+                    continue
+                keys = filter(None, project_container.docs.split(';'))
+                docs.extend(list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list(
+                    'document__group__parent__name')))
+                for doc in docs:
+                    if query.lower() in doc[0].lower():
+                        ids.append(project_container.id)
+                        break
 
         if search_in_all or request.GET.get(constants.STRING_WORKINGGROUP):
-                docs = []
-                for project_container in ProjectContainer.objects.all():
-                    if not project_container.docs or project_container.docs == '':
-                        continue
-                    keys = filter(None, project_container.docs.split(';'))
-                    docs.extend(list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('document__group__name')))
-                    for doc in docs:
-                        if query.lower() in doc[0].lower():
-                           ids.append(project_container.id)
-                           break
-
+            docs = []
+            for project_container in ProjectContainer.objects.all():
+                if not project_container.docs or project_container.docs == '':
+                    continue
+                keys = filter(None, project_container.docs.split(';'))
+                docs.extend(list(
+                    DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('document__group__name')))
+                for doc in docs:
+                    if query.lower() in doc[0].lower():
+                        ids.append(project_container.id)
+                        break
 
         project_containers = ProjectContainer.objects.filter(id__in=list(set(ids)))
 
@@ -254,12 +267,13 @@ def show(request, pk):
     keys = []
     if project_container.docs:
         keys = filter(None, project_container.docs.split(';'))
-    docs = list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('name', 'document__group__name', 'document__group__parent__name'))
+    docs = list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('name', 'document__group__name',
+                                                                                        'document__group__parent__name'))
     for name, gname, gparentname in docs:
         # group = doc.document.group
-        #doc = DocAlias.objects.using('datatracker').get(name=key)
+        # doc = DocAlias.objects.using('datatracker').get(name=key)
         # docs.append(doc)
-        #group = doc.document.group
+        # group = doc.document.group
         if gname not in working_groups:
             working_groups.append(gname)
         if gparentname:
@@ -293,7 +307,7 @@ def save_project(request, template, project_container=None):
     """
 
     # NOTE: Is slow 'cause of the mentors list (?)
-    
+
     user = get_user(request)
 
     doc_form = DocNameForm()
@@ -314,7 +328,7 @@ def save_project(request, template, project_container=None):
     mentor_form = request.session[
         constants.MENTOR_INSTANCE] if constants.MENTOR_INSTANCE in request.session else MentorForm()
     is_mentor = request.session[constants.IS_MENTOR] if constants.IS_MENTOR in request.session else False
-    
+
     docs = request.session[constants.ADD_DOCS]
     tags = request.session[constants.ADD_TAGS]
     contacts = request.session[constants.ADD_CONTACTS]
@@ -333,13 +347,13 @@ def save_project(request, template, project_container=None):
         else:
             is_mentor = False
             mentor_id = request.POST.get("mentor")
-            
+
         if mentor_id:
             selected_mentor = Person.objects.using('datatracker').get(id=mentor_id)
-            mentor_form = MentorForm(initial={'mentor':selected_mentor})
+            mentor_form = MentorForm(initial={'mentor': selected_mentor})
         else:
             mentor_form = MentorForm()
-            
+
         tag = TagForm(request.POST)
         new_contact = ContactForm(request.POST)
 
@@ -388,7 +402,7 @@ def save_project(request, template, project_container=None):
             rem_docs = request.session[constants.REM_DOCS]
             rem_tags = request.session[constants.REM_TAGS]
             rem_contacts = request.session[constants.REM_CONTACTS]
-            
+
             for doc in rem_docs:
                 project.docs = project.docs.replace(doc.name + ';', '', 1)
                 modified = True
@@ -448,7 +462,7 @@ def save_project(request, template, project_container=None):
 
         proj_form = new_proj
         req_form = new_req
-    
+
     return render_page(request, template, {
         'projectcontainer': project_container,
         'projform': proj_form,
@@ -522,7 +536,7 @@ def edit(request, pk):
             request.session[constants.IS_MENTOR] = True
         else:
             selected_mentor = Person.objects.using('datatracker').get(id=project_container.code_request.mentor)
-            mentor_form = MentorForm(initial={'mentor':selected_mentor})
+            mentor_form = MentorForm(initial={'mentor': selected_mentor})
             request.session[constants.MENTOR_INSTANCE] = mentor_form
 
     return save_project(request, constants.TEMPLATE_REQUESTS_EDIT, project_container)

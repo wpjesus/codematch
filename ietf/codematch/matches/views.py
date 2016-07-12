@@ -11,9 +11,13 @@ from ietf.codematch.matches.models import ProjectContainer, CodingProject, Imple
 from ietf.codematch.helpers.utils import (render_page, is_user_allowed, clear_session, get_user)
 from django.conf import settings
 
-def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, state=""):
+from django.core.paginator import Paginator
+
+
+def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, state="", page=1):
     """ List all Codematches type_list (all = All CodeRequests / mylist = CodeRequests I've Created /
         mentoring = CodeRequests i'm mentoring)
+        :param page: 
         :param request: HttpResponse
         :param state: string - if the state is true then the project_containers
                       has been previously loaded (eg. Loaded from the search)
@@ -33,36 +37,43 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
     if att == constants.STRING_CODER:
         all_codings = sorted(CodingProject.objects.all(), key=lambda p: Person.objects.get(id=p.coder))
     else:
-        all_codings = CodingProject.objects.order_by(att)[:20]
+        all_codings = CodingProject.objects.order_by(att)
     ids = []
+    
+    paginator = Paginator(all_codings, 5)
+    page = int(page)
+    all_codings = paginator.page(page)
+    
     for coding in all_codings:
-	ids.append(coding.coder)
+        ids.append(coding.coder)
     ids = list(set(ids))
     all_coders = list(Person.objects.using('datatracker').filter(id__in=ids).values_list('id', 'name'))
     for coding in all_codings:
         for project in all_projects:
             if coding in project.codings.all() and (is_my_list == "False" or user.id == coding.coder):
-		coder_id = coding.coder
-		coder = 'None'
-		is_owner = False
-		for id, name in all_coders:
+                coder_id = coding.coder
+                coder = 'None'
+                is_owner = False
+                for id, name in all_coders:
                     if coder_id == id:
-		        coder = name
-		    if coder_id == user_id:
-			is_owner = True
-                #if coder_id in all_coders:
-		#	coder = all_coders[coder_id]
-		#else:
-		#	coder = Person.objects.using('datatracker').get(id=coder_id)
-		#	all_coders[coder_id] = coder
+                        coder = name
+                    if coder_id == user_id:
+                        is_owner = True
+                # if coder_id in all_coders:
+                #	coder = all_coders[coder_id]
+                # else:
+                #	coder = Person.objects.using('datatracker').get(id=coder_id)
+                #	all_coders[coder_id] = coder
                 selected_codings.append((coding, project, coder, is_owner))
 
     keys = []
     for project_container in all_projects:
-	if project_container.docs:
-		keys += filter(None, project_container.docs.split(';'))
+        if project_container.docs:
+            keys += filter(None, project_container.docs.split(';'))
     keys = list(set(keys))
-    all_documents = list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('name', 'document__group__name', 'document__group__parent__name'))
+    all_documents = list(
+        DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('name', 'document__group__name',
+                                                                                'document__group__parent__name'))
     docs = []
     areas_list = []
     working_groups_list = []
@@ -72,13 +83,13 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
         # According to model areas and working groups should come from documents
         keys = []
         documents = []
-	if project_container.docs:
+        if project_container.docs:
             keys = filter(None, project_container.docs.split(';'))
-	for key in keys:
-	    for name, gname, gparentname in all_documents:
-	        if name == key:
-		    documents.append((gname, gparentname))
-	#documents = list(DocAlias.objects.using('datatracker').filter(name__in=keys).
+        for key in keys:
+            for name, gname, gparentname in all_documents:
+                if name == key:
+                    documents.append((gname, gparentname))
+        # documents = list(DocAlias.objects.using('datatracker').filter(name__in=keys).
         #                 values_list('document__group__name', 'document__group__parent__name'))
         for gname, gparentname in documents:
             if gname not in working_groups:
@@ -97,10 +108,14 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
         working_groups_list.append((working_groups, project_container))
 
     docs = list(set(docs))
-
     return render_page(request, constants.TEMPLATE_MATCHES_LIST, {
         'codings': selected_codings,
         'docs': docs,
+        'numpages': paginator.num_pages,
+        'pages': range(1, paginator.num_pages + 1),
+        'hasnext': all_codings.has_next(),
+        'hasprevious': all_codings.has_previous(),
+        'page': page,
         'areas_list': areas_list,
         'workinggroups_list': working_groups_list,
         'attribute': att,
@@ -108,6 +123,7 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
         'state': state,
         'template': 'ietf.codematch.matches.views.show_list'  # TODO fix this
     })
+
 
 def show(request, pk, ck):
     """ Show individual Codematch Project and Add Implementation
@@ -135,7 +151,8 @@ def show(request, pk, ck):
     areas = []
     if project_container.docs:
         keys = filter(None, project_container.docs.split(';'))
-    docs = list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('name', 'document__group__name', 'document__group__parent__name'))
+    docs = list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('name', 'document__group__name',
+                                                                                        'document__group__parent__name'))
     for name, gname, gparentname in docs:
         if gparentname:
             if gparentname not in areas:
@@ -177,14 +194,14 @@ def search(request, is_my_list="False"):
 
         ids = []
 
-	valid_searches = [constants.STRING_TITLE, constants.STRING_DESCRIPTION, constants.STRING_PROTOCOL,
-			  constants.STRING_CODER, constants.STRING_AREA, constants.STRING_WORKINGGROUP]
+        valid_searches = [constants.STRING_TITLE, constants.STRING_DESCRIPTION, constants.STRING_PROTOCOL,
+                          constants.STRING_CODER, constants.STRING_AREA, constants.STRING_WORKINGGROUP]
 
-	search_in_all = True
-	for v in valid_searches:
-	    if v in request.GET:
-		search_in_all = False
-		break
+        search_in_all = True
+        for v in valid_searches:
+            if v in request.GET:
+                search_in_all = False
+                break
 
         if search_in_all or request.GET.get(constants.STRING_TITLE):
             ids += ProjectContainer.objects.filter(codings__title__icontains=query).values_list('id', flat=True)
@@ -204,33 +221,35 @@ def search(request, is_my_list="False"):
                         # TODO: Review this
                         ids.append(pr.id)
                         break
-            # ids += ProjectContainer.objects.filter(codings__coder__name__icontains=query).values_list('id', flat=True)
+                        # ids += ProjectContainer.objects.filter(codings__coder__name__icontains=query).values_list('id', flat=True)
 
         if search_in_all or request.GET.get(constants.STRING_AREA):
-		for project_container in ProjectContainer.objects.all():
-		    docs = []
-		    if not project_container.docs or project_container.docs == '':
-			continue
-           	    keys = filter(None, project_container.docs.split(';'))
-		    docs.extend(list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('document__group__parent__name')))
-		    for doc in docs:
-		        if query.lower() in doc[0].lower():
-			   ids.append(project_container.id)
-			   break
-            #ids += ProjectContainer.objects.filter(docs__document__group__parent__name__icontains=query).values_list(
-            #    'id', flat=True)
+            for project_container in ProjectContainer.objects.all():
+                docs = []
+                if not project_container.docs or project_container.docs == '':
+                    continue
+                keys = filter(None, project_container.docs.split(';'))
+                docs.extend(list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list(
+                    'document__group__parent__name')))
+                for doc in docs:
+                    if query.lower() in doc[0].lower():
+                        ids.append(project_container.id)
+                        break
+                        # ids += ProjectContainer.objects.filter(docs__document__group__parent__name__icontains=query).values_list(
+                        #    'id', flat=True)
 
         if search_in_all or request.GET.get(constants.STRING_WORKINGGROUP):
-                for project_container in ProjectContainer.objects.all():
-		    docs = []
-                    if not project_container.docs or project_container.docs == '':
-                        continue
-                    keys = filter(None, project_container.docs.split(';'))
-	            docs.extend(list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('document__group__name')))
-                    for doc in docs:
-                        if query.lower() in doc[0].lower():
-                           ids.append(project_container.id)
-                           break
+            for project_container in ProjectContainer.objects.all():
+                docs = []
+                if not project_container.docs or project_container.docs == '':
+                    continue
+                keys = filter(None, project_container.docs.split(';'))
+                docs.extend(list(
+                    DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('document__group__name')))
+                for doc in docs:
+                    if query.lower() in doc[0].lower():
+                        ids.append(project_container.id)
+                        break
 
         project_containers = ProjectContainer.objects.filter(id__in=list(set(ids)))
 

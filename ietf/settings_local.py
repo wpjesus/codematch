@@ -2,24 +2,24 @@ DATABASES = {
     'default': {
         'NAME': 'ietf_utf8',
         'ENGINE': 'django.db.backends.mysql',
-        'USER': 'ubuntu',
-        'PASSWORD': 'ietf', # Contact henrik@levkowetz.com to get the password
+        'USER': 'matheuspfitscher',
+        'PASSWORD': 'ietf',  # Contact henrik@levkowetz.com to get the password
         'HOST': '127.0.0.1'
     },
-#     'datatracker': {
-#        'NAME': 'ietf_utf8',
-#       'ENGINE': 'django.db.backends.mysql',
-#      'USER': 'django_readonly',
-#     'PASSWORD': 'f$xdv#vzwi',
-#    'HOST': 'zinfandel.tools.ietf.org',
-# }
     'datatracker': {
-       'NAME': 'ietf_utf8',
+        'NAME': 'ietf_utf8',
         'ENGINE': 'django.db.backends.mysql',
-        'USER': 'codematch',
-        'PASSWORD': 'codematcher',
-        'HOST': 'ietf.org',
-    }
+        'USER': 'matheuspfitscher',
+        'PASSWORD': 'ietf',  # Contact henrik@levkowetz.com to get the password
+        'HOST': '127.0.0.1'
+    },
+    # 'datatracker': {
+    #   'NAME': 'ietf_utf8',
+    #    'ENGINE': 'django.db.backends.mysql',
+    #    'USER': 'codematch',
+    #    'PASSWORD': 'codematcher',
+    #    'HOST': 'ietf.org',
+    # }
 }
 
 DATABASE_ROUTERS = ["ietf.new_router.DatatrackerRouter"]
@@ -32,7 +32,6 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 INTERNAL_IPS = ('143.54.12.118',)
-
 
 # Since the grenache database above is remote, you probably also should
 # use a fast local cache (this requires you to set up memcached.  Alternatively,
@@ -53,8 +52,8 @@ CACHES = {
 #    }
 # }
 
-SERVER_MODE	  = 'development'
-DEBUG             = True
+SERVER_MODE = 'development'
+DEBUG = True
 
 # If you need to debug email, you can start a debugging server that just
 # outputs whatever it receives with:
@@ -77,7 +76,7 @@ INTERNET_DRAFT_ARCHIVE_DIR = INTERNET_DRAFT_PATH
 IDSUBMIT_REPOSITORY_PATH = INTERNET_DRAFT_PATH
 RFC_PATH = '%s/devsync/ietf-ftp/rfc/' % ARCHIVE_PATH
 IESG_WG_EVALUATION_DIR = '%s/devsync/www6/iesg/evaluation' % ARCHIVE_PATH
-IETFWG_DESCRIPTIONS_PATH = '%s/devsync/www6s/wg-descriptions'  % ARCHIVE_PATH
+IETFWG_DESCRIPTIONS_PATH = '%s/devsync/www6s/wg-descriptions' % ARCHIVE_PATH
 IPR_DOCUMENT_PATH = '%s/devsync/ietf-ftp/ietf/IPR' % ARCHIVE_PATH
 AGENDA_PATH = '%s/devsync/www6s/proceedings' % ARCHIVE_PATH
 AGENDA_PATH_PATTERN = AGENDA_PATH + '/%(meeting)s/agenda/%(wg)s.%(ext)s'
@@ -105,20 +104,20 @@ DEBUG_TOOLBAR_PANELS = [
 ]
 
 # If any folder structure on Apache 
-#(eg. codematch-dev - CODEMATCH_PREFIX="/codematch-dev/")
+# (eg. codematch-dev - CODEMATCH_PREFIX="/codematch-dev/")
 CODEMATCH_PREFIX = ""
-#(eg. codematch-dev - STATIC_URL="/static/") 
-STATIC_URL = CODEMATCH_PREFIX + "/static/"
+# (eg. codematch-dev - STATIC_URL="/static/") 
+STATIC_URL = CODEMATCH_PREFIX + "/../"
 
 IS_CODEMATCH_APP = True
 
-#Application that must be installed by Codematch
+# Application that must be installed by Codematch
 CODEMATCH_APPS = (
-        'ietf.codematch',
-        'ietf.codematch.accounts',
-        'ietf.codematch.matches',
-        'ietf.codematch.requests'
-    )
+    'ietf.codematch',
+    'ietf.codematch.accounts',
+    'ietf.codematch.matches',
+    'ietf.codematch.requests'
+)
 
 if DEBUG:
-	CODEMATCH_APPS += ('debug_toolbar',)
+    CODEMATCH_APPS += ('debug_toolbar',)

@@ -3,6 +3,8 @@ from ietf.codematch.requests import views
 
 urlpatterns = patterns('ietf.codematch.requests.views',
                        url(r'^show_list/$', views.show_list, name="show_list"),
+                       url(r'^show_list/(?P<type_list>.*)/(?P<att>.*)/(?P<state>.*)/(?P<page>.*)$', views.show_list,
+                           name="show_list"),
                        url(r'^show_list/(?P<type_list>.*)/(?P<att>.*)/(?P<state>.*)$', views.show_list,
                            name="show_list"),
                        url(r'^show_list/(?P<type_list>.*)/(?P<att>.*)$', views.show_list, name="show_list"),

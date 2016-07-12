@@ -139,6 +139,29 @@
                  	{% if state != ""%}
                  		<a class="btn btn-default" href="{% url 'ietf.codematch.views.back' %}">Back</a>
                  	{% endif %}
+                    {% if projectcontainers %}
+                     <ul class="pagination">
+                        <li><a
+                            {% if page == 1 %} style="color: #A0A0A0"
+                            {% else %} href="{% url template typelist attribute state 1 %}"
+                            {% endif %}>&laquo;</a>
+                        </li>
+                        {% for i in pages %}
+                            <li><a
+                                {% if i == page %}
+                                class="active"
+                                {% endif %}
+                                {% if page == i %} style="color: #A0A0A0"
+                                {% else %} href="{% url template mylist attribute state i %}"
+                                {%endif%}>{{i}}</a></li>
+                        {% endfor %}
+                         <li><a
+                            {% if page == numpages %} style="color: #A0A0A0"
+                            {% else %} href="{% url template mylist attribute state numpages %}"
+                            {% endif %}>&raquo;</a>
+                        </li>
+                     </ul>
+                     {% endif %}
                  </p>
               </div>
             </div>

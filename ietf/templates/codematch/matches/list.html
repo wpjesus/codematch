@@ -131,16 +131,29 @@
                              	{% if state != ""%}
                  					<a class="btn btn-default" href="{% url 'ietf.codematch.views.back' %}">Back</a>
                 				{% endif %}
-				<ul class="pagination">
-  <li><a href="#">&laquo;</a></li>
-  <li><a href="#">1</a></li>
-  <li><a class="active" href="#">2</a></li>
-  <li><a href="#">3</a></li>
-  <li><a href="#">4</a></li>
-  <li><a href="#">5</a></li>
-  <li><a href="#">6</a></li>
-  <li><a href="#">&raquo;</a></li>
-</ul>
+                                {% if codings %}
+                                    <ul class="pagination">
+                                        <li><a
+                                            {% if page == 1 %} style="color: #A0A0A0"
+								            {% else %} href="{% url template mylist attribute state 1 %}"
+                                            {% endif %}>&laquo;</a>
+                                        </li>
+                                        {% for i in pages %}
+                                            <li><a
+                                                {% if i == page %}
+                                                class="active"
+                                                {% endif %}
+                                                {% if page == i %} style="color: #A0A0A0"
+								                {% else %} href="{% url template mylist attribute state i %}"
+                                                {%endif%}>{{i}}</a></li>
+                                        {% endfor %}
+                                         <li><a
+                                            {% if page == numpages %} style="color: #A0A0A0"
+								            {% else %} href="{% url template mylist attribute state numpages %}"
+                                            {% endif %}>&raquo;</a>
+                                        </li>
+                                    </ul>
+                                {% endif %}
                                 </p>
                             </div>
                         </div>
