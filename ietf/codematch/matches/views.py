@@ -22,7 +22,7 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
     """
 
     user = get_user(request)
-
+    user_id = int(user.id)
     if state == "True" and constants.ALL_PROJECTS in request.session:
         all_projects = request.session[constants.ALL_PROJECTS]
         request.session[constants.MAINTAIN_STATE] = True
@@ -44,15 +44,18 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
             if coding in project.codings.all() and (is_my_list == "False" or user.id == coding.coder):
 		coder_id = coding.coder
 		coder = 'None'
+		is_owner = False
 		for id, name in all_coders:
                     if coder_id == id:
 		        coder = name
+		    if coder_id == user_id:
+			is_owner = True
                 #if coder_id in all_coders:
 		#	coder = all_coders[coder_id]
 		#else:
 		#	coder = Person.objects.using('datatracker').get(id=coder_id)
 		#	all_coders[coder_id] = coder
-                selected_codings.append((coding, project, coder))
+                selected_codings.append((coding, project, coder, is_owner))
 
     keys = []
     for project_container in all_projects:
@@ -97,7 +100,6 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
 
     return render_page(request, constants.TEMPLATE_MATCHES_LIST, {
         'codings': selected_codings,
-        'owner': user,
         'docs': docs,
         'areas_list': areas_list,
         'workinggroups_list': working_groups_list,
