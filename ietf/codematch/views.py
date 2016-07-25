@@ -43,3 +43,5 @@ def sync(request):
                 us.save()
             except:
                 pass
+    return HttpResponseRedirect('/codematch/')
+	

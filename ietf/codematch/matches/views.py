@@ -14,7 +14,7 @@ from django.conf import settings
 from django.core.paginator import Paginator
 
 
-def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, state="", page=1):
+def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, state="False", page=1):
     """ List all Codematches type_list (all = All CodeRequests / mylist = CodeRequests I've Created /
         mentoring = CodeRequests i'm mentoring)
         :param page: 
@@ -26,7 +26,9 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
     """
 
     user = get_user(request)
-    user_id = int(user.id)
+    user_id = None
+    if user:
+        user_id = int(user.id)
     if state == "True" and constants.ALL_PROJECTS in request.session:
         all_projects = request.session[constants.ALL_PROJECTS]
         request.session[constants.MAINTAIN_STATE] = True
@@ -35,9 +37,22 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
 
     selected_codings = []
     if att == constants.STRING_CODER:
-        all_codings = sorted(CodingProject.objects.all(), key=lambda p: Person.objects.get(id=p.coder))
+        all_codings = []
+	codings = sorted(CodingProject.objects.all(), key=lambda p: Person.objects.get(id=p.coder))
+        for c in codings:
+                for proj in all_projects:
+                        for cod in proj.codings.all():
+                                if cod == c:
+                                        all_codings.append(cod)
+	# all_codings = sorted(CodingProject.objects.all(), key=lambda p: Person.objects.get(id=p.coder))
     else:
-        all_codings = CodingProject.objects.order_by(att)
+	all_codings = []
+        codings = CodingProject.objects.order_by(att)
+	for c in codings:
+		for proj in all_projects:
+			for cod in proj.codings.all():
+				if cod == c:
+					all_codings.append(cod)
     ids = []
     
     paginator = Paginator(all_codings, 5)
@@ -57,7 +72,7 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
                 for id, name in all_coders:
                     if coder_id == id:
                         coder = name
-                    if coder_id == user_id:
+                    if user_id != None and coder_id == user_id:
                         is_owner = True
                 # if coder_id in all_coders:
                 #	coder = all_coders[coder_id]
@@ -481,11 +496,12 @@ def edit(request, pk, ck):
         request.session[constants.ADD_TAGS] = list(tags)
 
     if constants.ADD_DOCS not in request.session:
-        keys = filter(None, project_container.docs.split(';'))
-        docs = []
-        for key in keys:
-            docs.append(DocAlias.objects.using('datatracker').get(name=key))
-        request.session[constants.ADD_DOCS] = list(docs)
+	docs = []
+	if project_container.docs:
+        	keys = filter(None, project_container.docs.split(';'))
+        	for key in keys:
+            		docs.append(DocAlias.objects.using('datatracker').get(name=key))
+      	request.session[constants.ADD_DOCS] = list(docs)
 
     # TODO: Review this        
     us = get_user(request)

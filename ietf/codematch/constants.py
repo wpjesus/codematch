@@ -11,6 +11,7 @@ RELEASE_DATE = "2016-06-23"
 
 USER = 'user'
 ALL_PROJECTS = 'all_projects'
+ALL_CODINGS = 'all_codings'
 PROJECT_INSTANCE = 'project_instance'
 REQUEST_INSTANCE = 'request_instance'
 MENTOR_INSTANCE = 'mentor_instance'

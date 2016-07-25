@@ -136,7 +136,7 @@
                  	{% if projectcontainers %}
                  		<a class="btn btn-default" href="{% url "ietf.codematch.requests.views.search" typelist %}">Search</a>
                  	{% endif %}
-                 	{% if state != ""%}
+                 	{% if state == "True"%}
                  		<a class="btn btn-default" href="{% url 'ietf.codematch.views.back' %}">Back</a>
                  	{% endif %}
                     {% if projectcontainers %}

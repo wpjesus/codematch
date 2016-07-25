@@ -67,7 +67,11 @@
 													<strong>Mentor: </strong><a href="#">{{ mentor.name }}</a>
 													<!--<strong>Mentor:</strong><a href="#">{{ projectcontainer.code_request.mentor.name }}</a>-->
 													<br />
-													<strong>CodeRequest: </strong><a href="{% url "ietf.codematch.requests.views.show" projectcontainer.id %}"> {{ projectcontainer.title }}</a>
+													{% if projectcontainer.code_request %}
+													<strong>CodeRequest: </strong><a href="{% url "ietf.codematch.requests.views.show" projectcontainer.id %}">{{projectcontainer.title}}</a>
+													{% else %}
+													<strong>CodeRequest: </strong><a>None</a>
+													{% endif %}
 													<br />
 													<strong>Protocol: </strong><a href="#">{{ projectcontainer.protocol }}</a>
 													<br />

@@ -48,7 +48,7 @@
 								{% endif %}>Title</a> |
 								<a
 								{% if attribute == "coder" %} style="color: #A0A0A0"
-								{% else %} href="{% url template mylist 'coder' state %}"
+								{% else %} href="{% url template mylist 'coder' state  %}"
 								{% endif %}>Coder</a> |
 								<a
 								{% if attribute == "-creation_date" %} style="color: #A0A0A0"
@@ -128,7 +128,7 @@
                                 {% if codings %}
                                 	<a class="btn btn-default" href="{% url "ietf.codematch.matches.views.search" mylist %}">Search</a>
                                 {% endif %}
-                             	{% if state != ""%}
+                             	{% if state == "True"%}
                  					<a class="btn btn-default" href="{% url 'ietf.codematch.views.back' %}">Back</a>
                 				{% endif %}
                                 {% if codings %}

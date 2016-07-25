@@ -14,7 +14,7 @@ from django.conf import settings
 
 from django.core.paginator import Paginator
 
-def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="", page=1):
+def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="False", page=1):
     """ List all CodeRequests
         :param state: string - if the state is true then the project_containers
                                has been previously loaded (eg. Loaded from the search)
