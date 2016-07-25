@@ -10,7 +10,6 @@ from ietf.codematch.requests.forms import TagForm, DocNameForm
 from ietf.codematch.matches.models import ProjectContainer, CodingProject, Implementation, ProjectTag
 from ietf.codematch.helpers.utils import (render_page, is_user_allowed, clear_session, get_user)
 from django.conf import settings
-
 from django.core.paginator import Paginator
 
 
@@ -29,8 +28,10 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
     user_id = None
     if user:
         user_id = int(user.id)
+    all_ids = None
     if state == "True" and constants.ALL_PROJECTS in request.session:
         all_projects = request.session[constants.ALL_PROJECTS]
+        all_ids = request.session[constants.ALL_CODINGS]
         request.session[constants.MAINTAIN_STATE] = True
     else:
         all_projects = ProjectContainer.objects.all()
@@ -38,27 +39,26 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
     selected_codings = []
     if att == constants.STRING_CODER:
         all_codings = []
-	codings = sorted(CodingProject.objects.all(), key=lambda p: Person.objects.get(id=p.coder))
+        codings = sorted(CodingProject.objects.all(), key=lambda p: Person.objects.get(id=p.coder))
         for c in codings:
-                for proj in all_projects:
-                        for cod in proj.codings.all():
-                                if cod == c:
-                                        all_codings.append(cod)
-	# all_codings = sorted(CodingProject.objects.all(), key=lambda p: Person.objects.get(id=p.coder))
+            for proj in all_projects:
+                for cod in proj.codings.all():
+                    if cod == c and (all_ids is None or cod.id in all_ids): 
+                        all_codings.append(cod)
     else:
-	all_codings = []
+        all_codings = []
         codings = CodingProject.objects.order_by(att)
-	for c in codings:
-		for proj in all_projects:
-			for cod in proj.codings.all():
-				if cod == c:
-					all_codings.append(cod)
+        for c in codings:
+            for proj in all_projects:
+                for cod in proj.codings.all():
+                    if cod == c and (all_ids is None or cod.id in all_ids):
+                        all_codings.append(cod)
     ids = []
-    
+
     paginator = Paginator(all_codings, 5)
     page = int(page)
     all_codings = paginator.page(page)
-    
+
     for coding in all_codings:
         ids.append(coding.coder)
     ids = list(set(ids))
@@ -207,7 +207,8 @@ def search(request, is_my_list="False"):
         if request.GET.get(search_type):
             query = request.GET.get(search_type)
 
-        ids = []
+        proj_ids = []
+        cod_ids = []
 
         valid_searches = [constants.STRING_TITLE, constants.STRING_DESCRIPTION, constants.STRING_PROTOCOL,
                           constants.STRING_CODER, constants.STRING_AREA, constants.STRING_WORKINGGROUP]
@@ -219,14 +220,22 @@ def search(request, is_my_list="False"):
                 break
 
         if search_in_all or request.GET.get(constants.STRING_TITLE):
-            ids += ProjectContainer.objects.filter(codings__title__icontains=query).values_list('id', flat=True)
+            codings = CodingProject.objects.all()
+            for cod in codings:
+                if query.lower() in cod.title.lower():
+                    cod_ids.append(cod.id)
+            # proj_ids += ProjectContainer.objects.filter(codings__title__icontains=query).values_list('id', flat=True)
 
         if search_in_all or request.GET.get(constants.STRING_DESCRIPTION):
-            projs = ProjectContainer.objects.filter(codings__additional_information__icontains=query)
-            ids += projs.values_list('id', flat=True)
+            codings = CodingProject.objects.all()
+            for cod in codings:
+                if query.lower() in cod.additional_information.lower():
+                    cod_ids.append(cod.id)
+            # projs = ProjectContainer.objects.filter(codings__additional_information__icontains=query)
+            # proj_ids += projs.values_list('id', flat=True)
 
         if request.GET.get(constants.STRING_PROTOCOL):
-            ids += ProjectContainer.objects.filter(protocol__icontains=query).values_list('id', flat=True)
+            proj_ids += ProjectContainer.objects.filter(protocol__icontains=query).values_list('id', flat=True)
 
         if search_in_all or request.GET.get(constants.STRING_CODER):
             for pr in ProjectContainer.objects.all():
@@ -234,7 +243,7 @@ def search(request, is_my_list="False"):
                     user = Person.objects.using('datatracker').get(id=cd.coder)
                     if query.lower() in user.name.lower():
                         # TODO: Review this
-                        ids.append(pr.id)
+                        proj_ids.append(pr.id)
                         break
                         # ids += ProjectContainer.objects.filter(codings__coder__name__icontains=query).values_list('id', flat=True)
 
@@ -248,7 +257,7 @@ def search(request, is_my_list="False"):
                     'document__group__parent__name')))
                 for doc in docs:
                     if query.lower() in doc[0].lower():
-                        ids.append(project_container.id)
+                        proj_ids.append(project_container.id)
                         break
                         # ids += ProjectContainer.objects.filter(docs__document__group__parent__name__icontains=query).values_list(
                         #    'id', flat=True)
@@ -263,11 +272,14 @@ def search(request, is_my_list="False"):
                     DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('document__group__name')))
                 for doc in docs:
                     if query.lower() in doc[0].lower():
-                        ids.append(project_container.id)
+                        proj_ids.append(project_container.id)
                         break
-
-        project_containers = ProjectContainer.objects.filter(id__in=list(set(ids)))
-
+        
+        if cod_ids:
+            proj_ids += ProjectContainer.objects.filter(codings__id__in=cod_ids).values_list('id', flat=True)
+        project_containers = ProjectContainer.objects.filter(id__in=list(set(proj_ids)))
+    
+        request.session[constants.ALL_CODINGS] = cod_ids
         request.session[constants.ALL_PROJECTS] = project_containers
 
         request.session[constants.MAINTAIN_STATE] = True
@@ -496,12 +508,12 @@ def edit(request, pk, ck):
         request.session[constants.ADD_TAGS] = list(tags)
 
     if constants.ADD_DOCS not in request.session:
-	docs = []
-	if project_container.docs:
-        	keys = filter(None, project_container.docs.split(';'))
-        	for key in keys:
-            		docs.append(DocAlias.objects.using('datatracker').get(name=key))
-      	request.session[constants.ADD_DOCS] = list(docs)
+        docs = []
+        if project_container.docs:
+            keys = filter(None, project_container.docs.split(';'))
+            for key in keys:
+                docs.append(DocAlias.objects.using('datatracker').get(name=key))
+        request.session[constants.ADD_DOCS] = list(docs)
 
     # TODO: Review this        
     us = get_user(request)

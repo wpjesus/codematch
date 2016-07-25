@@ -2,17 +2,24 @@ DATABASES = {
     'default': {
         'NAME': 'ietf_utf8',
         'ENGINE': 'django.db.backends.mysql',
-        'USER': 'ubuntu',
+        'USER': 'matheuspfitscher',
         'PASSWORD': 'ietf',  # Contact henrik@levkowetz.com to get the password
         'HOST': '127.0.0.1'
     },
-     'datatracker': {
-       'NAME': 'ietf_utf8',
+    'datatracker': {
+        'NAME': 'ietf_utf8',
         'ENGINE': 'django.db.backends.mysql',
-        'USER': 'codematch',
-        'PASSWORD': 'codematcher',
-        'HOST': 'ietf.org',
-     }
+        'USER': 'django_readonly',
+        'PASSWORD': 'f$xdv#vzwi',
+        'HOST': 'zinfandel.tools.ietf.org',
+    }
+     # 'datatracker': {
+     #   'NAME': 'ietf_utf8',
+     #    'ENGINE': 'django.db.backends.mysql',
+     #    'USER': 'codematch',
+     #    'PASSWORD': 'codematcher',
+     #    'HOST': 'ietf.org',
+     # }
 }
 
 
@@ -101,7 +108,7 @@ DEBUG_TOOLBAR_PANELS = [
 # (eg. codematch-dev - CODEMATCH_PREFIX="/codematch-dev/")
 CODEMATCH_PREFIX = ""
 # (eg. codematch-dev - STATIC_URL="/static/") 
-STATIC_URL = CODEMATCH_PREFIX + "/static/"
+STATIC_URL = CODEMATCH_PREFIX + "/../"
 
 IS_CODEMATCH_APP = True
 
