@@ -571,6 +571,8 @@ def remove_link(request, ck, link_name):
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
 
     links = request.session[constants.ADD_LINKS]
+    if '://' not in link_name:
+        link_name = link_name.replace(':/', '://')
     link = next(el for el in links if el.link == link_name)
     if ck != "0":
         coding = get_object_or_404(CodingProject, id=ck)
