@@ -111,7 +111,7 @@
 									{% if canadddocuments %}
 										{{ docform }}
 										{% csrf_token %}
-										<input type="submit" value="Add related Document" />
+										<input type="submit" name="button_doc" value="Add related Document" />
 									{% endif %}
 
 									<br />
@@ -146,7 +146,7 @@
 										<label class="control-label col-xs-2">URL:</label>
 										{{ linkform.link }}
                                         {% csrf_token %}
-                                        <input type="submit" value="Add implementation" />
+                                        <input type="submit" name="button_link" value="Add implementation" />
                                     {% endif %}
 								</div>
 
@@ -170,7 +170,7 @@
 										<label class="control-label col-xs-2">Tag:</label>
 										{{ tagform.name }}
 										{% csrf_token %}
-										<input type="submit" name="tag" value="Add new Tag" />
+										<input type="submit" name="button_tag" value="Add new Tag" />
 									{% endif %}
 									</div>
 								</div>
@@ -182,7 +182,7 @@
 						   		<div class="widget-foot">
                                 <p class="buttonlist">
                                 	<div class="col-xs-offset-1" style="margin-left: 0px">
-								    	<input type="submit" name="save" class="btn btn-primary" value="Update" />
+								    	<input type="submit" name="button_save" class="btn btn-primary" value="Update" />
 											<a class="btn btn-default" href="{% url 'ietf.codematch.views.back' %}">Cancel</a>
                                 	</div>
                                 </p>

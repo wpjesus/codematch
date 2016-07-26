@@ -1,21 +1,22 @@
-from ietf.codematch import constants
 from django.shortcuts import get_object_or_404
 from django.forms.models import modelform_factory
 from django.db.models import Count
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.core.paginator import Paginator
 from ietf.person.models import Person
 from ietf.doc.models import DocAlias
+from ietf.codematch import constants
 from ietf.codematch.matches.forms import SearchForm, ProjectContainerForm, ContactForm
 from ietf.codematch.requests.forms import CodeRequestForm, DocNameForm, TagForm, MentorForm
 from ietf.codematch.matches.models import ProjectContainer, ProjectTag, ProjectContact
 from ietf.codematch.helpers.utils import (render_page, is_user_allowed, clear_session, get_user)
-from django.conf import settings
 
-from django.core.paginator import Paginator
 
 def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="False", page=1):
     """ List all CodeRequests
+        :param page: 
         :param state: string - if the state is true then the project_containers
                                has been previously loaded (eg. Loaded from the search)
         :param att: string - List will be sorted by this attribute (eg. if creation_date then ordered by date)
@@ -52,7 +53,7 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
         if att != constants.ATT_WORKING_GROUP and att != constants.ATT_AREA:
             project_containers = project_containers.order_by(att)
     list_of_lists = []
-    
+
     paginator = Paginator(project_containers, 5)
     page = int(page)
     all_codings = paginator.page(page)
@@ -61,8 +62,6 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
     map_attributes = {'protocol': constants.STRING_PROTOCOL,
                       'working_group': constants.STRING_WORKINGGROUP,
                       'area': constants.STRING_AREA}
-    # 'docs__document__group__name': constants.STRING_WORKINGGROUP,
-    # 'docs__document__group__parent__name': constants.STRING_AREA}
 
     # If the attribute is in the dictionary then should do the sorting and grouping for this attribute
     if att in map_attributes:
@@ -77,8 +76,9 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
                     keys += filter(None, project_container.docs.split(';'))
             keys = list(set(keys))
             all_documents = list(
-                DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('name', 'document__group__name',
-                                                                                        'document__group__parent__name'))
+                DocAlias.objects.using('datatracker').filter(name__in=keys)
+                                                     .values_list('name', 'document__group__name',
+                                                                  'document__group__parent__name'))
             for p in project_containers:
                 keys = []
                 if p.docs:
@@ -90,9 +90,6 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
                                 docs.append(gname)
                             else:
                                 docs.append(gparentname)
-                            # docs.extend(list(DocAlias.objects.using('datatracker').filter(name__in=keys).
-                            # values_list('document__group__name')))
-                            # values_list('document__group__parent__name')))
             select = list(set(docs))
 
         for s in select:
@@ -162,7 +159,7 @@ def search(request, type_list="all"):
 
         valid_searches = [constants.STRING_TITLE, constants.STRING_DESCRIPTION, constants.STRING_PROTOCOL,
                           constants.STRING_MENTOR, constants.STRING_AREA, constants.STRING_WORKINGGROUP,
-                          constants.STRING_DOCS]
+                          constants.STRING_DOC]
 
         search_in_all = True
         for v in valid_searches:
@@ -193,7 +190,7 @@ def search(request, type_list="all"):
                 if user and query.lower() in user.name.lower():
                     ids.append(pr.id)
 
-        if search_in_all or request.GET.get(constants.STRING_DOCS):
+        if search_in_all or request.GET.get(constants.STRING_DOC):
             docs = []
             for project_container in ProjectContainer.objects.exclude(code_request__isnull=True).all():
                 if not project_container.docs or project_container.docs == '':
@@ -239,7 +236,8 @@ def search(request, type_list="all"):
         request.session[constants.MAINTAIN_STATE] = True
 
         return HttpResponseRedirect(
-            settings.CODEMATCH_PREFIX + '/codematch/requests/show_list/' + type_list + '/creation_date/' + 'True')
+            settings.CODEMATCH_PREFIX + '/codematch/requests/show_list/' + 
+            type_list + '/{0}/'.format(constants.ATT_CREATION_DATE) + 'True')
     else:
         return render_page(request, constants.TEMPLATE_REQUESTS_SEARCH, {
             "form": SearchForm()
@@ -270,10 +268,6 @@ def show(request, pk):
     docs = list(DocAlias.objects.using('datatracker').filter(name__in=keys).values_list('name', 'document__group__name',
                                                                                         'document__group__parent__name'))
     for name, gname, gparentname in docs:
-        # group = doc.document.group
-        # doc = DocAlias.objects.using('datatracker').get(name=key)
-        # docs.append(doc)
-        # group = doc.document.group
         if gname not in working_groups:
             working_groups.append(gname)
         if gparentname:
@@ -365,27 +359,27 @@ def save_project(request, template, project_container=None):
             new_req = CodeRequestForm(request.POST)
 
         # Adding document to the documents list to be saved in the project
-        if doc_name:
+        if request.POST.get(constants.STRING_DOC) and doc_name:
             selected_document = DocAlias.objects.using('datatracker').filter(name=doc_name)
             if selected_document:
                 new_doc = selected_document[0]
                 docs.append(new_doc)  # Updating documents to appear after rendering
 
         # Adding new tag to the tags list to be saved in the project
-        elif tag.is_valid():
+        elif request.POST.get(constants.STRING_TAG) and tag.is_valid():
             new_tag = tag.save(commit=False)
             new_tag.name = "#" + new_tag.name
             tags.append(new_tag)  # Updating tags to appear after rendering
 
         # Adding new contact to the mailing list to be saved in the project
-        elif new_contact.is_valid():
+        elif request.POST.get(constants.STRING_CONTACT) and new_contact.is_valid():
             m = new_contact.save(commit=False)
             if m.type.lower() == constants.STRING_TWITTER:  # TODO: Standardize for all
                 m.contact = '@' + m.contact
             contacts.append(m)
 
         # Saving project (new or not) in the database
-        elif request.POST.get('save') and new_proj.is_valid() and new_req.is_valid():
+        elif request.POST.get(constants.STRING_SAVE) and new_proj.is_valid() and new_req.is_valid():
             # Creating new (or update) instance of the code request in the database
             code_request = new_req.save(commit=False)
             if mentor_id:

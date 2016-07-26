@@ -2,8 +2,8 @@
 # Version Constants
 # ----------------------------------------------------------------
 
-VERSION = "1.2.0"
-RELEASE_DATE = "2016-06-23"
+VERSION = "1.2.1"
+RELEASE_DATE = "2016-07-26"
 
 # ----------------------------------------------------------------
 # Session Constants
@@ -62,13 +62,14 @@ STRING_TITLE = 'title'
 STRING_DESCRIPTION = 'description'
 STRING_PROTOCOL = 'protocol'
 STRING_MENTOR = 'mentor'
-STRING_DOCS = 'docs'
-STRING_AREA = 'area'
+STRING_DOC = 'button_doc'
+STRING_AREA = 'button_area'
 STRING_WORKINGGROUP = 'workinggroup'
 STRING_CODER = 'coder'
-STRING_TAG = 'tag'
-STRING_LINK = 'link'
-STRING_SAVE = 'save'
+STRING_CONTACT = 'button_contact'
+STRING_TAG = 'button_tag'
+STRING_LINK = 'button_link'
+STRING_SAVE = 'button_save'
 STRING_POPULARITY = 'popularity'
 STRING_TWITTER = 'twitter'
 STRING_NONE = 'None'

@@ -23,14 +23,13 @@ def back(request):
 
 def handler500(request):
     # TODO: Review this to filter only the specific error
-    sync(request)
     print 'updated local database'
-    #  return render_page(request, constants.TEMPLATE_ERROR_500)
-    return render_page(request, constants.TEMPLATE_INDEX)
+    return sync(request)
 
 
 def handler404(request):
     return render_page(request, constants.TEMPLATE_ERROR_404)
+
 
 def sync(request):
     """ :param request: """
@@ -43,5 +42,4 @@ def sync(request):
                 us.save()
             except:
                 pass
-    return HttpResponseRedirect('/codematch/')
-	
+    return render_page(request, constants.TEMPLATE_ERROR_500)

@@ -3,12 +3,13 @@ from django.forms import ModelForm
 from ietf.codematch.requests.models import CodeRequest
 from ietf.codematch.matches.models import ProjectTag
 from ietf.person.fields import SearchablePersonField
-from ietf.doc.fields import SearchableDocumentField
+from ietf.doc.fields import SearchableDocAliasField
 
 
 class DocNameForm(forms.Form):
     # doc = forms.CharField(label="Document", max_length=128, required=True)
-    doc = SearchableDocumentField(label="Drafts", required=False)
+    doc = SearchableDocAliasField(label="I-D name/RFC number", required=True, doc_type="draft")
+
 
 class MentorForm(forms.Form):    
     mentor = SearchablePersonField(label="Must be present", required=False)

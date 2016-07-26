@@ -93,8 +93,13 @@ def render_page(request, template, keys=None):
     # if the template has changed then update actual and previous templates
     if constants.ACTUAL_TEMPLATE in request.session:
         actual_template = request.session[constants.ACTUAL_TEMPLATE]
+        previous_template = ''
+        if constants.PREVIOUS_TEMPLATE in request.session:
+            previous_template = request.session[constants.PREVIOUS_TEMPLATE]
         if actual_template != request.path:
-            request.session[constants.PREVIOUS_TEMPLATE] = actual_template
+            # TODO: Melhorar isto, mas no search existe referencia circular
+            if not ('search' in previous_template and 'show_list' in actual_template):
+                request.session[constants.PREVIOUS_TEMPLATE] = actual_template
 
     request.session[constants.ACTUAL_TEMPLATE] = request.path
 

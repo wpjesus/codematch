@@ -10,11 +10,14 @@ from django.conf import settings
 def index(request):
     return render_page(request, 'codematch/index.html')
 
+
 def register(request):
     return HttpResponseRedirect(settings.CODEMATCH_PREFIX + '/accounts/create/')
 
+
 def profile(request):
     return HttpResponseRedirect(settings.CODEMATCH_PREFIX + '/accounts/profile/')
+
 
 def top_coders(request):
     codings = CodingProject.objects.annotate(count=Count('coder'))

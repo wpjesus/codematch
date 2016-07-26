@@ -43,7 +43,7 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
         for c in codings:
             for proj in all_projects:
                 for cod in proj.codings.all():
-                    if cod == c and (all_ids is None or cod.id in all_ids): 
+                    if cod == c and (not all_ids or cod.id in all_ids): 
                         all_codings.append(cod)
     else:
         all_codings = []
@@ -51,7 +51,7 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
         for c in codings:
             for proj in all_projects:
                 for cod in proj.codings.all():
-                    if cod == c and (all_ids is None or cod.id in all_ids):
+                    if cod == c and (not all_ids or cod.id in all_ids):
                         all_codings.append(cod)
     ids = []
 
@@ -72,13 +72,8 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
                 for id, name in all_coders:
                     if coder_id == id:
                         coder = name
-                    if user_id != None and coder_id == user_id:
+                    if user_id is not None and coder_id == user_id:
                         is_owner = True
-                # if coder_id in all_coders:
-                #	coder = all_coders[coder_id]
-                # else:
-                #	coder = Person.objects.using('datatracker').get(id=coder_id)
-                #	all_coders[coder_id] = coder
                 selected_codings.append((coding, project, coder, is_owner))
 
     keys = []
@@ -150,10 +145,6 @@ def show(request, pk, ck):
     project_container = get_object_or_404(ProjectContainer, id=pk)
     coding = get_object_or_404(CodingProject, id=ck)
 
-    areas = []
-    tags = []
-    docs = []
-
     user = get_user(request)
     coder = Person.objects.using('datatracker').get(id=coding.coder)
     if project_container.code_request is None:
@@ -162,6 +153,7 @@ def show(request, pk, ck):
         mentor = Person.objects.using('datatracker').get(id=project_container.code_request.mentor)
 
     # According to model areas and working groups should come from documents
+    tags = []
     keys = []
     areas = []
     if project_container.docs:
@@ -224,15 +216,12 @@ def search(request, is_my_list="False"):
             for cod in codings:
                 if query.lower() in cod.title.lower():
                     cod_ids.append(cod.id)
-            # proj_ids += ProjectContainer.objects.filter(codings__title__icontains=query).values_list('id', flat=True)
 
         if search_in_all or request.GET.get(constants.STRING_DESCRIPTION):
             codings = CodingProject.objects.all()
             for cod in codings:
                 if query.lower() in cod.additional_information.lower():
                     cod_ids.append(cod.id)
-            # projs = ProjectContainer.objects.filter(codings__additional_information__icontains=query)
-            # proj_ids += projs.values_list('id', flat=True)
 
         if request.GET.get(constants.STRING_PROTOCOL):
             proj_ids += ProjectContainer.objects.filter(protocol__icontains=query).values_list('id', flat=True)
@@ -242,10 +231,8 @@ def search(request, is_my_list="False"):
                 for cd in pr.codings.all():
                     user = Person.objects.using('datatracker').get(id=cd.coder)
                     if query.lower() in user.name.lower():
-                        # TODO: Review this
                         proj_ids.append(pr.id)
                         break
-                        # ids += ProjectContainer.objects.filter(codings__coder__name__icontains=query).values_list('id', flat=True)
 
         if search_in_all or request.GET.get(constants.STRING_AREA):
             for project_container in ProjectContainer.objects.all():
@@ -274,8 +261,9 @@ def search(request, is_my_list="False"):
                     if query.lower() in doc[0].lower():
                         proj_ids.append(project_container.id)
                         break
-        
+                
         if cod_ids:
+            cod_ids = list(set(cod_ids))
             proj_ids += ProjectContainer.objects.filter(codings__id__in=cod_ids).values_list('id', flat=True)
         project_containers = ProjectContainer.objects.filter(id__in=list(set(proj_ids)))
     
@@ -285,7 +273,8 @@ def search(request, is_my_list="False"):
         request.session[constants.MAINTAIN_STATE] = True
 
         return HttpResponseRedirect(
-            settings.CODEMATCH_PREFIX + '/codematch/matches/show_list/' + is_my_list + '/creation_date/' + 'True')
+            settings.CODEMATCH_PREFIX + '/codematch/matches/show_list/' + 
+            is_my_list + '/{0}/'.format(constants.ATT_CREATION_DATE) + 'True')
 
     else:
         return render_page(request, constants.TEMPLATE_MATCHES_SEARCH, {
@@ -346,6 +335,18 @@ def save_code(request, template, pk, ck="", coding=None):
 
         project = None
         new_project = None
+
+        if coding is not None:
+            new_code = CodingProjectForm(request.POST, instance=coding)
+        else:
+            new_code = CodingProjectForm(request.POST)
+
+        print request.POST
+        print request.POST.get(constants.STRING_LINK)
+        print request.POST.get(constants.STRING_DOC)
+        print request.POST.get(constants.STRING_TAG)
+        print request.POST.get(constants.STRING_SAVE)
+
         # If there wasn't associated Project Container, must create a new one. Functionality used to legacy RFC.
         if project_container is None or project_container.code_request is None:
             post = request.POST.copy()
@@ -357,18 +358,13 @@ def save_code(request, template, pk, ck="", coding=None):
         else:
             project = project_container  # Update only
 
-        if coding is not None:
-            new_code = CodingProjectForm(request.POST, instance=coding)
-        else:
-            new_code = CodingProjectForm(request.POST)
-
         # Adding document to the documents list to be saved in the project
         if request.POST.get(constants.STRING_LINK) and implementation.is_valid():
             new_link = implementation.save(commit=False)
             links.append(new_link)  # Updating tags to appear after rendering
 
         # Adding document to the documents list to be saved in the project
-        elif doc_name:
+        elif request.POST.get(constants.STRING_DOC) and doc_name:
             selected_document = DocAlias.objects.using('datatracker').filter(name=doc_name)
             if selected_document:
                 new_doc = selected_document[0]
@@ -381,7 +377,7 @@ def save_code(request, template, pk, ck="", coding=None):
             tags.append(new_tag)  # Updating tags to appear after rendering
 
         # Saving project (new or not) in the database
-        elif request.POST.get(constants.STRING_SAVE) and project is not None and new_code.is_valid():
+        elif request.POST.get(constants.STRING_SAVE) and project and new_code.is_valid():
 
             coding_project = new_code.save(commit=False)
             coding_project.coder = Person.objects.using('datatracker').get(user=request.user).id
@@ -575,7 +571,7 @@ def remove_link(request, ck, link_name):
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
 
     links = request.session[constants.ADD_LINKS]
-    link = next(el for el in links if el.link == link_name.replace(":/", '://'))
+    link = next(el for el in links if el.link == link_name)
     if ck != "0":
         coding = get_object_or_404(CodingProject, id=ck)
 
