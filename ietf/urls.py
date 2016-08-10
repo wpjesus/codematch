@@ -26,9 +26,9 @@ sitemaps = {
     'ipr': IPRMap,
 }
 
-if hasattr(settings, 'IS_CODEMATCH_APP'):
-    handler500 = 'ietf.codematch.views.handler500'
-    handler404 = 'ietf.codematch.views.handler404'
+if hasattr(settings, 'IS_CODESTANDS_APP'):
+    handler500 = 'ietf.codestands.views.handler500'
+    handler404 = 'ietf.codestands.views.handler404'
 
 urlpatterns = patterns('',
     (r'^$', 'ietf.doc.views_search.frontpage'),
@@ -69,17 +69,18 @@ urlpatterns = patterns('',
     (r'^googlea30ad1dacffb5e5b.html', TemplateView.as_view(template_name='googlea30ad1dacffb5e5b.html')),
 )
 
-if settings.IS_CODEMATCH_APP:
+if settings.IS_CODESTANDS_APP:
     urlpatterns += patterns('',
-    (r'^codematch/', include('ietf.codematch.urls')),
-    (r'^codematch/matches/', include('ietf.codematch.matches.urls')),
-    (r'^codematch/requests/', include('ietf.codematch.requests.urls')),
-    (r'^codematch/accounts/', include('ietf.codematch.accounts.urls')),
+    (r'^codestands/', include('ietf.codestands.urls')),
+    (r'^codestands/matches/', include('ietf.codestands.matches.urls')),
+    (r'^codestands/requests/', include('ietf.codestands.requests.urls')),
+    (r'^codestands/accounts/', include('ietf.codestands.accounts.urls')),
 )
 if settings.DEBUG:
     urlpatterns += patterns('',
-    (r'^codematch/__debug__/', include(debug_toolbar.urls)),
+    (r'^codestands/__debug__/', include(debug_toolbar.urls)),
 )
+
 
 # Endpoints for Tastypie's REST API
 urlpatterns += patterns('',
@@ -105,6 +106,7 @@ for n,a in api._api_list:
 if settings.SERVER_MODE in ('development', 'test'):
      urlpatterns += patterns('',
          (r'^(?P<path>(?:images|css|js|test|static|fonts|other)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
+         # (r'^(?P<path>autocomplete/(?:img|css|js)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
          (r'^(?P<path>admin/(?:img|css|js)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
          (r'^(?P<path>secretariat/(img|css|js)/.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
          (r'^(?P<path>robots\.txt)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT+"dev/"}),

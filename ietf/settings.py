@@ -586,7 +586,7 @@ from settings_local import *            # pyflakes:ignore
 
 # Add DEV_APPS to INSTALLED_APPS
 INSTALLED_APPS += DEV_APPS
-INSTALLED_APPS += CODEMATCH_APPS
+INSTALLED_APPS += CODESTANDS_APPS
 
 # We provide a secret key only for test and development modes.  It's
 # absolutely vital that django fails to start in production mode unless a

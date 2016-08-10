@@ -1,0 +1,133 @@
+#### TODO LIST ###
+- Melhorar performance (principalmente new e edit CodeRequest)
+- Definir padr�o para permiss�es
+- Pensar em unir o template de update e new
+- Estudar outras aplica��es do DataTracker para padronizar c�digo
+- Pensar em separar as fun��es dentro de POST dos m�todos
+- Criar Script de migra��o de base se necess�rio
+- Fazer esquema para permitir novos cadastros de usu�rios
+- Atualizar interface para mockups v5
+- Revisar onde est�o permiss�es, ou centralizar tudo em utils ou entao descentralizar total (canadddocuments por exemplo)
+- Padronizar c�digo de Matches e Requests
+- Rever Owner em Show (Ser� que n�o � melhor trocar para um bool j� em c�digo)
+- Back quando acabou de atualizar ou criar algum item
+- Ver como commitar settings_local.py sem dar conflitos ao dar pull
+- Rever base.html da vers�o 6.6.1 (reaproveitei o da vers�o que eu tinha modificado)
+- Tive que alterar os scripts generate na pasta bin
+
+### DONE LIST ###
+- Adicionar documentos e tags dentro do formul�rio de novo coderequest
+- Mesma tela para All CodeRequests, Code requests i've created and CodeRequest i'm mentoring
+- Coment�rio e centraliza��o da fun��o new e update
+- Todas as prefer�ncias relacionadas ao CodeStands postas em settings_local
+- Codestands muito lento (!) (Melhorar, ainda tem um erro estranho acontencendo no servidor)
+- Separar tags por virgula 
+- Back voltar sens�vel ao contexto 
+- Update e Archive no show 
+- Colocar Associate my project antes de Edit 
+- Colocar mensagem quando n�o existem itens na lista 
+- Retirar a mensagem superior aos CodeRequests 
+- Permitir remo��o de documentos e tags
+
+### BUGS ###
+- Login repetidas vezes
+- Quando a tela est� reduzida o menu desaparece
+- Search codestands vem todos do mesmo projeto
+
+### QUESTION LIST ###
+- Existem diversos testes sendo feitos nos templates, deveriam ser passados para o c�digo?
+- Sera que deveria ser definido Mentor para o Codestands StandAlone
+- Bug da tela deve ser falado com Wanderson pq provavelmente n�o � minha culpa :D
+
+### VERSION 1.1.0 ###
+* Ordenar por Coder
+* My CodeStands est� errado
+* Criando multiplas vezes o mesmo CodeStands
+* Falta mem�ria as vezes na m�quina virtual (!)
+* Search pesquisa em ProjectContainers que n�o deveria
+* Search est� sem a parte da Query :(
+* Register in est� redirecionando errado 
+
+### VERSION 1.1.2 ###
+* Corrigido o bug de login multiplas vezes
+
+### VERSION 1.2.0 ##
+* Corrigido search
+* Trocar texto Coders of hall of fame para Top Coders
+* Ordenar por protocolo deveria considerar iguais protocolos escritos de maneiras diferentes? (foi definido que sempre usar o upper()
+* Search sem nenhum marcado deve considerar todos
+* Corrigido search que envolve documentos (docs, areas e working groups)
+* Corrigido os icones
+* Utilização da base de dados local
+
+### NOTES ###
+- Quando der problema no mysql da maquina virtual provavelmente � falta de espa�o
+
+### DOCUMENTATION ###
+Estrutura composta no momento de 4 pastas al�m da ra�z (Accounts, Helpers, Matches e Requests).
+- Accounts � onde devem ser colocadas as fun��es referente ao Login e Logout entre outras prefer�ncias de conta
+- Helpers � onde devem ser postas as fun��es que s�o utilizadas por todas as outras aplica��es
+- Matches � a aplica��o que cuida dos Codings
+- Requests � a aplica��o que dos ProjectContainers e CodeRequests
+- A ra�z n�o deve ter grandes funcionalidades al�m de ativar as outras aplica��es, � apenas uma porta de entrada
+- Obs: A mesma estrutura � usada para o c�digo e para os templates
+
+Como � utilizado esquema de permiss�es, algumas permiss�es devem ser sempre adicionadas para toda p�gina que for ser renderizada, por isso foi centralizado em Helpers/Utils.py um m�todo que adiciona v�riaveis de contexto ao dicion�rio. � preciso que sempre seja chamado o m�todo render_page quando se quiser renderizar uma p�gina, N�O USAR o m�todo render pois algumas coisas poder�o ficar inconsistentes.
+
+Tamb�m em Helpers/Utils.py est� o m�todo is_user_allowed que deve cuidar das permiss�es do usu�rio atual.
+
+Todas as prefer�ncias que forem apenas do Codestands devem estar centradas em settings_local, acredito que o arquivo settings.py deva ser mexido o menos poss�vel para facilitar uma futura integra��o com DataTracker.
+
+M�todos que precisam que o usu�rio esteja logado devem possuir o decorator login_required desta forma:
+- @login_required(login_url = settings.CODESTANDS_PREFIX + '/codestands/accounts/login')', onde o prefixo CODESTANDS_PREFIX deve vir da pasta settings_local. 
+� poss�vel assim que tenhamos diversas aplica��es rodando no mesmo servidor apache, sendo separadas apenas pelo prefixo 'codestands-dev' ou 'codestands-master' por exemplo.
+
+Ao referenciar algum arquivo da pasta static � preciso colocar a tag 'static' tal qual est� em base_codestands.html ou base.html e lembrar de importar a defini��o {% load staticfiles %}.
+Medida tamb�m para que se possa rodar diversas aplica��es no mesmo servidor Apache.
+
+Usu�rio v�lidos est�o na tabela person_person (SELECT * FROM person_person) do Datatracker e a senha � sempre 'password'.
+
+Para o usu�rio ver CodeRequest i've created ou CodeRequest i'm mentoring na barra superior ele deve ter a permiss�o para tal ou j� ter criado/supervisionado algum CodeRequest antes.
+
+### TIPS PARA INSTALA��O ###
+Instalar Django con 
+        sudo pip install Django
+Instalar Homebrew:
+        ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+Instalar mysql y stunnel con brew install mysql
+        brew install mysql
+                brew install stunnel
+
+Para baixar o reposit�rio do datatracker:
+	'svn checkout http://svn.tools.ietf.org/svn/tools/ietfdb/tags/6.0.4'
+
+(1) Instrucciones para instalar Datatracker en:
+        http://trac.tools.ietf.org/tools/ietfdb/wiki/SprintCoderSetup
+
+Para crear la base de datos
+        http://trac.tools.ietf.org/tools/ietfdb/wiki/SprintDatabase
+
+Para crear el user & pass del root en el mysql:
+        Crear el archivo: /Users/chris/Desktop/ietf/6.0.2/sqlpass 
+        y poner adentro:
+        SET PASSWORD FOR 'root'@'localhost' = PASSWORD('ietf');
+
+        mysqld_safe --init-file=/Users/chris/Desktop/ietf/6.0.2/sqlpass &
+
+crear stunnel.pem (en el directorio que lo pida: Ej. /usr/local/etc/stunnel/stunnel.pem )
+        openssl req -new -x509 -days 365 -nodes  -out stunnel.pem -keyout stunnel.pem
+
+Agregar en ~/.bash_profile
+        export LC_ALL=en_US.UTF-8
+        export LANG=en_US.UTF-8
+
+Instalar libmagic
+        sudo pip install libmagic
+
+Uno de los include se queja por falta de __init__py
+        sudo touch /System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/mpl_toolkits/__init__.py
+
+Crear el shell script the arranque para mysql & stunnel (las instrucciones est�n en(1)
+
+Crear el superuser de django
+        python ietf/manage.py createsuperuser

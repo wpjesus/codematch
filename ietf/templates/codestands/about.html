@@ -1,0 +1,136 @@
+{% extends "base_codestands.html" %}
+
+{% block title %}About CodeStands
+
+{% endblock %}
+{% block content %}
+<div class="content" style="padding:0">
+
+	<!-- Main bar -->
+    <div class="mainbar">
+
+        <!-- Page heading -->
+        <div class="page-head">
+
+            <!-- Breadcrumb -->
+            <div class="bread-crumb pull-right">
+                <a href="#"><i class="fa fa-home"></i> Home</a>
+                <!-- Divider -->
+                <span class="divider">/</span>
+                <a href="#" class="bread-current">About</a>
+            </div>
+            <div class="clearfix"></div>
+
+        </div> <!-- Page heading ends -->
+
+    </div> <!-- Main bar ends -->
+
+        <!-- Matter -->
+
+        <div class="matter">
+            <div class="container">
+
+                <!-- Recent News -->
+                <div class="col-md-12">
+                    <div class="widget">
+                        <!-- Widget title -->
+                        <div class="widget-head">
+                            <div class="pull-left">
+                                About CodeStands
+                            </div>
+                            <div class="widget-icons pull-right">
+                                <a href="#" class="wminimize"><i class="fa fa-chevron-up"></i></a>
+                                <a href="#" class="wclose"><i class="fa fa-times"></i></a>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="widget-content referrer">
+                            <!-- Widget content -->
+                            <div class="padd">
+
+<h3>What it is</h3>
+
+<p>
+The IETF CodeStands marketplace brings together students, researchers, professors, open source development communities, vendors with proprietary implementations, and consumers of code bases. The objective is to both link existing implementations to standards and showcase opportunities to develop running code for IETF protocols. Each type of user benefits from increased collaboration that CodeStands enables.
+
+<p>
+CodeStands is a concept with an active team developing the site. If you are interested to help or to see our progress, we collaborate on the following mailing list: https://www.ietf.org/mailman/listinfo/codestands-develop
+
+<h3> How it works</h3>
+
+<p>
+For existing implementations, project owners can directly create links to the appropriate drafts or RFCs that they have implemented through the CodeStands interface. Opportunities to develop code for drafts or standards are listed as "CodeRequests" established by a sponsor or 'mentor' for that "CodeRequest". Developers can select "CodeRequests" and link their project to the appropriate standard(s) through the CodeStands site. The relationship will open up collaboration opportunities with the IETF standards editor and a designated IETF CodeStands project mentor along with other developers who may grapple with the same questions in the development of their code.
+
+<p>
+When developers have questions, they may suggest changes that could be used to update the standard to improve accuracy and interoperability for future implementations if the suggestions are agreed upon. Discussions to update a standard would occur on the appropriate IETF mailing list and provide a way for those new to the IETF to engage easily. Since multiple implementations may be linked to a single standard or CodeRequest, opportunities to collaborate might include plugfests or even simply having fast access to notifications when errors are reported on drafts or published standards.
+
+<p>
+Multiple development efforts can occur around a single draft or RFC, enabling collaboration between development efforts and opportunities for organizing plugfest events. Developers benefit from registering their code development efforts for collaboration as well as advertising. Any project linked directly to a standard or to a standard through a CodeRequest becomes a CodeStands. A CodeStands does not constitute an endorsement of the code by the IETF. Results of interoperability testing may posted after plugfests to show results, but also does not constitute an endorsement by the IETF.
+
+<p>
+Development projects will be maintained external to the IETF CodeStands site either in code repositories like GitHub, SourceForge, or using the tool of choice for an organization. The CodeStands will provide a link to the project descriptions for proprietary implementations or the code repository for open source projects. Licensing or any IPR related to the code would be provided by the project owner in their external code repository or description page. Contributions to potentially amend or provide feedback on a draft or standard will occur on IETF mailing lists and will be subject to the NoteWell.
+
+<p>
+
+<h3> Who can participate</h3>
+
+Open Source & Industry Developers - Why you should get involved
+
+<h4> Marketing for your implementation</h4>
+<p>
+Get involved in open standards work and the Internet Engineering Task Force
+Connect and partner with other developers interested in the same topics
+Automated notifications on updates to standards and drafts and plugfest events
+</p>
+Students - Why you should participate
+
+<h4>Help contribute to the evolution of the Internet</h4>
+Make valuable connections with industry influencers
+Learn software engineering best practices and build your resume
+Professors - Why you should get involved
+
+<p>
+<h4>Get involved in open standards work and the Internet Engineering Task Force</h4>
+Connect and partner with other researchers interested in the same topics
+Engage your students with practical, real-world projects
+Consumers of Code Bases - Why you should get involved
+</p>
+
+<h4>Easy access to open source implementations</h4>
+<p>
+Please note that licenses are issued by the developer and are independent of CodeStands and the IETF. We do encourage the use of open source friendly license terms such as MIT or BSD. License terms may be included in the actual code that would be stored in a code repository linked to the CodeStands site.
+Implementations may have a statement of interoperability if plugfest testing was performed
+</P>
+<h3>About the Internet Engineering Task Force (IETF) - <a href="http://www.ietf.org">www.ietf.org</a> </h4>
+
+<p>
+Formed in 1986, the mission of the IETF is to make the Internet work better by producing high quality, relevant technical documents that influence the way people design, use, and manage the Internet. Since its inception, the engineers who have been involved in the IETF have written more than 8500 Requests for Comments (RFCs) that impact how the billions of users on the Internet use connect, communicate, collaborate, and innovate across all facets of life.
+</p>
+
+<h3>About the Internet Research Task Force (IRTF) - <a href="http://www.irtf.org">www.irtf.org</a> </h4>
+
+<p>
+While the IETF focuses on shorter term issues such as engineering and standards development, the IRTF focuses on longer term research issues, such as Internet Congestion Control, Delay Tolerant Networking, and CryptoForum Research. Its mission is to promote research of importance to the evolution of the Internet by creating focused, long term research groups working on topics related to Internet protocols, applications, architecture, and technology.
+ </p>
+
+<a class="btn btn-info" href="http://codestands.ietf.org">codestands.ietf.org</a>
+
+</div>
+</div>
+                            <div class="widget-foot">
+                                <p class="buttonlist">
+                                	<a class="btn btn-default " href="{% url "ietf.codestands.views.index" %}">Back</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- Matter ends -->
+
+    <!-- Mainbar ends -->
+    <div class="clearfix"></div>
+
+</div> <!-- Content ends -->
+
+{% endblock %}

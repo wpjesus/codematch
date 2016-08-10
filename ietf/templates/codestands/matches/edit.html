@@ -1,0 +1,215 @@
+{% extends "base_codestands.html" %}
+
+{% load ietf_filters bootstrap3 widget_tweaks %}
+
+{% load future %}
+{% load staticfiles %}
+
+{% block title %} Create a new CodeStands Project{% endblock %}
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+{% block pagehead %}
+  <link rel="stylesheet" href="{% static 'css/lib/select2.css' %}">
+  <link rel="stylesheet" href="{% static 'css/lib/select2-bootstrap.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="content" style="padding:0">
+
+    <!-- Main bar -->
+    <div class="mainbar">
+
+        <!-- Page heading -->
+        <div class="page-head">
+            <h2 class="pull-left"><i class="icon ion-arrow-shrink" style="font-size: 20px;"></i> Projects</h2>
+
+            <!-- Breadcrumb -->
+            <div class="bread-crumb pull-right">
+                <a href="{% url "ietf.codestands.views.index" %}"><i class="fa fa-home"></i> Home</a>
+                <!-- Divider -->
+                <span class="divider">/</span>
+                <a href="{% url "ietf.codestands.matches.views.show_list" %}" class="bread-current">Projects</a>
+                <span class="divider">/</span>
+                <a href="#" class="bread-current">New</a>
+            </div>
+
+            <div class="clearfix"></div>
+
+        </div>
+        <!-- Page heading ends -->
+
+        <!-- Matter -->
+
+        <div class="matter">
+            <div class="container">
+
+                <!-- Recent News -->
+                <div class="col-md-12">
+                    <div class="widget">
+                        <!-- Widget title -->
+                        <div class="widget-head">
+                            <div class="pull-left">
+                                Creating a new CodeStands Project
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="widget-content referrer">
+                            <!-- Widget content -->
+                            <form class="form-horizontal" action="{% url 'ietf.codestands.matches.views.edit' pk ck %}" method="post">
+                            	{% csrf_token %}
+                            	<div class="padd">
+                            	{% if projectcontainer != None and projectcontainer.code_request != None %}
+								<div class="form-group">
+									<label class="control-label col-xs-2">Title:</label>
+									<div class="col-xs-4" style="margin-top: 5px">
+										{{ projectcontainer.title }}
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="control-label col-xs-2">Protocol:</label>
+									<div class="col-xs-4" style="margin-top: 5px">
+										{{ projectcontainer.protocol}}
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="control-label col-xs-2">Description:</label>
+									<div class="col-xs-4" style="margin-top: 5px">
+										{{ projectcontainer.description }}
+									</div>
+								</div>
+								{% else %}
+									<div class="form-group">
+										<label class="control-label col-xs-2">Project title:</label>
+										<div class="col-xs-4">
+											{{ projform.title }}
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-xs-2">Protocol:</label>
+										<div class="col-xs-4">
+											{{ projform.protocol}}
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-xs-2">Description:</label>
+										<div class="col-xs-4">
+											{{ projform.description }}
+										</div>
+									</div>
+									<div>
+										{% if docs %}
+				            				<h4><strong>Documents</strong></h4>
+											{% for doc in docs %}
+												{{ doc.document.title }}: <a  href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
+												<a class="label label-info" href="{% url 'ietf.codestands.requests.views.remove_document' projectcontainer.id doc.name %}" >delete</a>
+												<br />
+											{% endfor %}
+										{% endif %}
+										<br />
+									</div>
+									{% if canadddocuments %}
+										{{ docform }}
+										{% csrf_token %}
+										<input type="submit" name="button_doc" value="Add related Document" />
+									{% endif %}
+
+									<br />
+									<br />
+								{% endif %}
+								<hr />
+								<div class="form-group">
+									<label class="control-label col-xs-2">Coding title:</label>
+									<div class="col-xs-4">
+										{{ codeform.title }}
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="control-label col-xs-2">Coding info:</label>
+									<div class="col-xs-4">
+										{{ codeform.additional_information }}
+									</div>
+								</div>
+								{% if user.is_authenticated %}
+								<form action="{% url 'ietf.codestands.matches.views.edit' pk ck %}" method="post">
+								<div>
+									{% if links %}
+										<h4><strong>Implementations</strong></h4>
+										{% for implementation in links %}
+											<a href="{{ implementation }}">{{ implementation }}</a>
+											<a class="label label-info" href="{% url 'ietf.codestands.matches.views.remove_link' ck implementation.link %}" >delete</a>
+										<br />
+										{% endfor %}
+									{% endif %}
+									<br />
+									{% if user.is_authenticated and canaddlinks %}
+										<label class="control-label col-xs-2">URL:</label>
+										{{ linkform.link }}
+                                        {% csrf_token %}
+                                        <input type="submit" name="button_link" value="Add implementation" />
+                                    {% endif %}
+								</div>
+
+								<br />
+
+								<div>
+									{% if tags %}
+		            					<h4><strong>Tags</strong></h4>
+		            					{% for tag in tags %}
+				            				{% if not forloop.first %}
+		            						,
+		            						{% endif %}
+		            						<a >{{ tag }}</a>
+		            					{% endfor %}
+		            					<br />
+		            				{% endif %}
+		            				<div>
+									<br />
+									{% if user.is_authenticated and canaddtags %}
+										<label >*tags may be related to events, dates, protocols or other relative subject.</label><br />
+										<label class="control-label col-xs-2">Tag:</label>
+										{{ tagform.name }}
+										{% csrf_token %}
+										<input type="submit" name="button_tag" value="Add new Tag" />
+									{% endif %}
+									</div>
+								</div>
+								</form>
+								{% endif %}
+
+								<br />
+
+						   		<div class="widget-foot">
+                                <p class="buttonlist">
+                                	<div class="col-xs-offset-1" style="margin-left: 0px">
+								    	<input type="submit" name="button_save" class="btn btn-primary" value="Update" />
+											<a class="btn btn-default" href="{% url 'ietf.codestands.views.back' %}">Cancel</a>
+                                	</div>
+                                </p>
+                            	</div>
+								</div>
+							</form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Matter ends -->
+
+    </div>
+
+    <!-- Mainbar ends -->
+    <div class="clearfix"></div>
+
+</div>
+<!-- Content ends -->
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/select2.min.js' %}"></script>
+<script src="{% static 'js/select2-field.js' %}"></script>
+<script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+<script src="{% static 'js/ipr-edit.js' %}"></script>
+{% endblock %}

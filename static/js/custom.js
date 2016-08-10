@@ -281,9 +281,9 @@ $(function(){
 /*
 $(document).ready(function(){
 
-  setTimeout(function() {noty({text: '<strong>Hi! Welcome to IETF CodeMatch!</strong>',layout:'topRight',type:'information',timeout:15000});}, 7000);
+  setTimeout(function() {noty({text: '<strong>Hi! Welcome to IETF CodeStands!</strong>',layout:'topRight',type:'information',timeout:15000});}, 7000);
 
-  setTimeout(function() {noty({text: 'Here comes the short description of IETF CodeMatch, informing its goals, results so fac, etc.',layout:'topRight',type:'alert',timeout:13000});}, 9000);
+  setTimeout(function() {noty({text: 'Here comes the short description of IETF CodeStands, informing its goals, results so fac, etc.',layout:'topRight',type:'alert',timeout:13000});}, 9000);
 
 });
 
