@@ -9,7 +9,7 @@ from ietf.liaisons.sitemaps import LiaisonMap
 from ietf.ipr.sitemaps import IPRMap
 from ietf import api
 
-import debug_toolbar
+# import debug_toolbar
 
 admin.autodiscover()
 api.autodiscover()
@@ -76,10 +76,10 @@ if settings.IS_CODESTANDS_APP:
     (r'^codestands/requests/', include('ietf.codestands.requests.urls')),
     (r'^codestands/accounts/', include('ietf.codestands.accounts.urls')),
 )
-if settings.DEBUG:
-    urlpatterns += patterns('',
-    (r'^codestands/__debug__/', include(debug_toolbar.urls)),
-)
+# if settings.DEBUG:
+#     urlpatterns += patterns('',
+#     (r'^codestands/__debug__/', include(debug_toolbar.urls)),
+# )
 
 
 # Endpoints for Tastypie's REST API
