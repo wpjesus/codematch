@@ -1,0 +1,56 @@
+{% extends "base_codestand.html" %}
+
+{% block title %}List of CodeStand Projects{% endblock %}
+
+{% block content %}
+<!-- Main content starts -->
+
+<div class="content">
+
+  	  	<!-- Main bar -->
+  	<div class="mainbar">
+     <div>
+		<!-- Widget title -->
+		<div>
+		  <h2>Hi! Welcome to IETF CodeStand!</h2>
+		  <div class="clearfix"></div>
+		</div>
+
+		<div >
+			 <div class="padd">
+		  <!-- Widget content -->
+		  <p>Here comes the short description of IETF CodeStand, informing its goals, results so fac, etc.</p>
+
+		  <div style="margin: 20px 0">
+			<i class="icon ion-arrow-shrink" style="font-size: 30px; float: left; padding-top:5px"></i>
+			<p style="padding-left: 44px">
+			<a href="{% url "ietf.codestand.matches.views.show_list" %}">Projects</a><br />
+			Who's Implementing what?</p>
+		  </div>
+
+		   <div>
+			<i class="fa fa-microphone" style="font-size: 30px; float: left; padding-top:5px"></i>
+			<p style="padding-left: 44px">
+			<a href="{% url "ietf.codestand.requests.views.show_list" %}"> CodeRequests</a><br />
+			Which coding opportunities are offered by the IETF?</p>
+		  </div>
+
+		   <div style="margin: 20px 0 ">
+			<i class="fa fa-star" style="font-size: 30px; float: left; padding-top:5px"></i>
+			<p style="padding-left: 44px">
+			<a href="{% url "ietf.codestand.accounts.views.top_coders" %}"> Top Coders</a><br />
+			The stars of IETF CodeStand!</p>
+		  </div>
+		  </div>
+		  <div class="widget-foot" ></div>
+		</div>
+	  </div>
+    </div>
+
+   <!-- Mainbar ends -->
+   <div class="clearfix"></div>
+
+</div>
+<!-- Content ends -->
+
+{% endblock %}

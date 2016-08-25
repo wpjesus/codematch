@@ -7,19 +7,12 @@ DATABASES = {
         'HOST': '127.0.0.1'
     },
     'datatracker': {
-        'NAME': 'ietf_utf8',
-        'ENGINE': 'django.db.backends.mysql',
-        'USER': 'matheuspfitscher',
-        'PASSWORD': 'ietf',  # Contact henrik@levkowetz.com to get the password
-        'HOST': '127.0.0.1'
-    },
-    #  'datatracker': {
-    #    'NAME': 'ietf_utf8',
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'USER': 'codestands',
-    #     'PASSWORD': 'codestandser',
-    #     'HOST': 'ietf.org',
-    #  }
+     'NAME': 'ietf_utf8',
+     'ENGINE': 'django.db.backends.mysql',
+     'USER': 'codematch',
+     'PASSWORD': 'codematcher',
+     'HOST': 'ietf.org',
+    }
 }
 
 
@@ -31,8 +24,8 @@ DATABASE_ROUTERS = ["ietf.new_router.DatatrackerRouter"]
 # NOTE: you should omit this if you are using a local database
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
-DEBUG_TOOLBAR_PATCH_SETTINGS = False
-INTERNAL_IPS = ('143.54.12.118',)
+# DEBUG_TOOLBAR_PATCH_SETTINGS = False
+# INTERNAL_IPS = ('143.54.12.118',)
 
 # Since the grenache database above is remote, you probably also should
 # use a fast local cache (this requires you to set up memcached.  Alternatively,
@@ -87,7 +80,7 @@ CONFLICT_REVIEW_PATH = '%s/devsync/ietf-ftp/conflict-reviews' % ARCHIVE_PATH
 NOMCOM_PUBLIC_KEYS_DIR = '%s/nomcom_keys/public_keys' % ARCHIVE_PATH
 IDSUBMIT_IDNITS_BINARY = '<path to a local copy of idnits>'
 
-""" Codestands Settings """
+""" Codestand Settings """
 
 # DEBUG_TOOLBAR_PANELS = [
 #     'debug_toolbar.panels.versions.VersionsPanel',
@@ -105,20 +98,20 @@ IDSUBMIT_IDNITS_BINARY = '<path to a local copy of idnits>'
 # ]
 
 # If any folder structure on Apache 
-# (eg. codestands-dev - CODESTANDS_PREFIX="/codestands-dev/")
-CODESTANDS_PREFIX = ""
-# (eg. codestands-dev - STATIC_URL="/static/") 
-STATIC_URL = CODESTANDS_PREFIX + "/../"
+# (eg. codestand-dev - CODESTAND_PREFIX="/codestand-dev/")
+CODESTAND_PREFIX = ""
+# (eg. codestand-dev - STATIC_URL="/static/") 
+STATIC_URL = CODESTAND_PREFIX + "/../"
 
-IS_CODESTANDS_APP = True
+IS_CODESTAND_APP = True
 
-# Application that must be installed by Codestands
-CODESTANDS_APPS = (
-    'ietf.codestands',
-    'ietf.codestands.accounts',
-    'ietf.codestands.matches',
-    'ietf.codestands.requests'
+# Application that must be installed by Codestand
+CODESTAND_APPS = (
+    'ietf.codestand',
+    'ietf.codestand.accounts',
+    'ietf.codestand.matches',
+    'ietf.codestand.requests'
 )
 
 # if DEBUG:
-#     CODESTANDS_APPS += ('debug_toolbar',)
+#     CODESTAND_APPS += ('debug_toolbar',)

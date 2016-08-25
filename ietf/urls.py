@@ -26,9 +26,9 @@ sitemaps = {
     'ipr': IPRMap,
 }
 
-if hasattr(settings, 'IS_CODESTANDS_APP'):
-    handler500 = 'ietf.codestands.views.handler500'
-    handler404 = 'ietf.codestands.views.handler404'
+if hasattr(settings, 'IS_CODESTAND_APP'):
+    handler500 = 'ietf.codestand.views.handler500'
+    handler404 = 'ietf.codestand.views.handler404'
 
 urlpatterns = patterns('',
     (r'^$', 'ietf.doc.views_search.frontpage'),
@@ -69,16 +69,16 @@ urlpatterns = patterns('',
     (r'^googlea30ad1dacffb5e5b.html', TemplateView.as_view(template_name='googlea30ad1dacffb5e5b.html')),
 )
 
-if settings.IS_CODESTANDS_APP:
+if settings.IS_CODESTAND_APP:
     urlpatterns += patterns('',
-    (r'^codestands/', include('ietf.codestands.urls')),
-    (r'^codestands/matches/', include('ietf.codestands.matches.urls')),
-    (r'^codestands/requests/', include('ietf.codestands.requests.urls')),
-    (r'^codestands/accounts/', include('ietf.codestands.accounts.urls')),
+    (r'^codestand/', include('ietf.codestand.urls')),
+    (r'^codestand/matches/', include('ietf.codestand.matches.urls')),
+    (r'^codestand/requests/', include('ietf.codestand.requests.urls')),
+    (r'^codestand/accounts/', include('ietf.codestand.accounts.urls')),
 )
 # if settings.DEBUG:
 #     urlpatterns += patterns('',
-#     (r'^codestands/__debug__/', include(debug_toolbar.urls)),
+#     (r'^codestand/__debug__/', include(debug_toolbar.urls)),
 # )
 
 

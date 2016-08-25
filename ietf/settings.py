@@ -199,7 +199,7 @@ MIDDLEWARE_CLASSES = (
     'ietf.middleware.RedirectTrailingPeriod',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'ietf.middleware.UnicodeNfkcNormalization',
-    'debug_toolbar.middleware.DebugToolbarMiddleware', # TODO: Remover isto
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware', #
 )
 
 ROOT_URLCONF = 'ietf.urls'
@@ -586,7 +586,7 @@ from settings_local import *            # pyflakes:ignore
 
 # Add DEV_APPS to INSTALLED_APPS
 INSTALLED_APPS += DEV_APPS
-INSTALLED_APPS += CODESTANDS_APPS
+INSTALLED_APPS += CODESTAND_APPS
 
 # We provide a secret key only for test and development modes.  It's
 # absolutely vital that django fails to start in production mode unless a

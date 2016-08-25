@@ -1,0 +1,182 @@
+{% extends "base_codestand.html" %}
+
+{% load future %}
+
+{% block title %}Details for Project - {{ projectcontainer.title }}{% endblock %}
+
+<p>
+	{% block pagehead %}
+	<meta name="description" content="CodeStand #{{projectcontainer.id}}: {{ projectcontainer.title }} ({{ projectcontainer.protocol }})" />
+	{% endblock %}
+
+{% block content %}
+
+<!-- Main content starts -->
+
+<div class="content" style="padding:0">
+
+  	  	<!-- Main bar -->
+  	<div class="mainbar">
+
+	    <!-- Page heading -->
+	    <div class="page-head">
+	      <h2 class="pull-left"><i class="fa fa-microphone"></i> CodeRequests</h2>
+
+        <!-- Breadcrumb -->
+        <div class="bread-crumb pull-right">
+          <a href="{% url "ietf.codestand.views.index" %}"><i class="fa fa-home"></i> Home</a>
+          <!-- Divider -->
+          <span class="divider">/</span>
+          <a href="{% url "ietf.codestand.requests.views.show_list" %}" class="bread-current">Coding Requests</a>
+          <!-- Divider -->
+          <span class="divider">/</span>
+          <a href="#" class="bread-current">{{ projectcontainer.title }}</a>
+        </div>
+
+        <div class="clearfix"></div>
+
+	    </div>
+	    <!-- Page heading ends -->
+
+	    <!-- Matter -->
+
+	    <div class="matter">
+        <div class="container">
+
+		<div class="col-md-12">
+
+              <!-- User widget -->
+              <div class="widget">
+                <div class="widget-head">
+                  <div class="pull-left">
+					<i class="fa fa-chevron-circle-right"></i> {{ projectcontainer.title }}
+				  </div>
+                  <div class="clearfix"></div>
+                </div>
+
+                <div class="widget-content">
+                  <div class="padd">
+
+
+                    <div class="user">
+
+                      <div class="user-details" style="margin-left: 0px; margin-bottom:20px;">
+                      	<div style="margin-left: 15px">
+
+                      		<div class="row">
+		                      <div class="col-md-4">
+		                        <strong>Protocol:</strong> <a href="#">{{ projectcontainer.protocol }}</a><br />
+	                      		<strong>Area:</strong>
+	                      		{% for area in areas %}
+		            				{% if not forloop.first %}
+		            				-
+		            				{% endif %}
+		            				<a href="#">{{ area }}</a>
+	            				{% endfor %}
+	                      		<a href="#">{{ area }}</a><br />
+	                      		<strong>Working Group:</strong>
+	                      		{% for group in workinggroups %}
+		            				{% if not forloop.first %}
+		            				-
+		            				{% endif %}
+		            				<a href="#">{{ group }}</a><br />
+	            				{% endfor %}
+	            				<strong>Estimated Level of Effort: </strong>
+	            				<a href="#">{{ projectcontainer.code_request.estimated_lof }}</a> <a> months</a>
+		                      </div>
+
+		                      <div class="col-md-4">
+		                      	<div>
+			                      	{% if user.is_authenticated %}
+			                   			{% if projectcontainer.owner == owner.id %}
+				                   			<a class="label label-info" href="{% url 'ietf.codestand.requests.views.edit' projectcontainer.id %}" ><i class="fa fa-pencil"></i> Edit</a>
+						               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
+					               		{% endif %}
+				               			<a href="{% url 'ietf.codestand.matches.views.new' projectcontainer.id %}" class="label label-info" ><i class="fa fa-check"></i>Associate my project</a>
+									{% endif %}
+								</div>
+		                        <!-- Social Media strip -->
+		                        <div id="media-strip">
+		                        <a><i class="fa fa-facebook-square"></i></a>
+		                        <a><i class="fa fa-twitter-square"></i></a>
+		                        <a><i class="fa fa-google-plus-square"></i></a>
+		                        </div>
+	                          </div>
+
+		                    </div>
+
+                      		<br />
+
+							{% if docs %}
+								<h4><strong>Documents</strong></h4>
+								{% for docname, gname, gparentname in docs %}
+									{{ gname }}: <a href="https://datatracker.ietf.org/doc/{{docname}}"> {{ docname }} </a>
+									<br />
+								{% endfor %}
+								<br />
+							{% endif %}
+
+                      		<h4><strong>Description</strong></h4>
+		                    <p>{{ projectcontainer.description|linebreaks }}</p>
+
+		                    <br />
+
+		                    <h4><strong>Resources</strong></h4>
+		                    Mentor: <a href="#">{{ mentor.name }}</a><br />
+
+		                    {% for m in projectcontainer.contacts.all %}
+		                    	{{ m.type }}: <a href="#">
+		                    		{{ m.contact }}</a><br />
+		                    {% endfor %}
+
+		                    {% if projectcontainer.tags.all %}
+		            		Tags:
+		            			{% for tag in projectcontainer.tags.all %}
+		            				{% if not forloop.first %}
+		            				,
+		            				{% endif %}
+		            				<a href="#">{{ tag }}</a>
+		            			{% endfor %}
+						        <br />
+		            		{% endif %}
+	            			<br />
+
+		            		{% if projectcontainer.codings.all %}
+			            		<h4><strong>CodeStand</strong></h4>
+			            		<ul>
+			            			{% for coding in projectcontainer.codings.all  %}
+			            			<li><a href="{% url 'ietf.codestand.matches.views.show' projectcontainer.id coding.id %}">{{ coding.title }}</a></li>
+			            			{% endfor %}
+			            		</ul>
+		            		{% endif %}
+                        </div>
+
+                      </div>
+                      <div class="clearfix"></div>
+                    </div>
+
+                  </div>
+					<div class="widget-foot">
+						<div class="pull-right">
+							<a class="btn btn-default" href="{% url 'ietf.codestand.views.back' %}">Back</a>
+						</div>
+						<div class="clearfix"></div>
+					</div>
+                </div>
+              </div>
+
+            </div>
+
+		</div>
+ 	    </div>
+
+		<!-- Matter ends -->
+
+    </div>
+
+   <!-- Mainbar ends -->
+   <div class="clearfix"></div>
+
+</div>
+<!-- Content ends -->
+{% endblock content %}
