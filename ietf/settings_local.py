@@ -2,7 +2,7 @@ DATABASES = {
     'default': {
         'NAME': 'ietf_utf8',
         'ENGINE': 'django.db.backends.mysql',
-        'USER': 'matheuspfitscher',
+        'USER': 'ubuntu',
         'PASSWORD': 'ietf',  # Contact henrik@levkowetz.com to get the password
         'HOST': '127.0.0.1'
     },
