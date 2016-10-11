@@ -9,10 +9,17 @@ DATABASES = {
     'datatracker': {
         'NAME': 'ietf_utf8',
         'ENGINE': 'django.db.backends.mysql',
-        'USER': 'codematch',
-        'PASSWORD': 'codematcher',  # Contact henrik@levkowetz.com to get the password
-        'HOST': 'ietf.org'
+        'USER': 'matheuspfitscher',
+        'PASSWORD': 'ietf',  # Contact henrik@levkowetz.com to get the password
+        'HOST': '127.0.0.1'
     },
+    # 'datatracker': {
+    #     'NAME': 'ietf_utf8',
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'USER': 'codematch',
+    #     'PASSWORD': 'codematcher',  # Contact henrik@levkowetz.com to get the password
+    #     'HOST': 'ietf.org'
+    # },
 }
 
 
