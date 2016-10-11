@@ -18,6 +18,7 @@ MENTOR_INSTANCE = 'mentor_instance'
 CODE_INSTANCE = 'code_instance'
 CONTACT_INSTANCE = 'contact_instance'
 ACTUAL_PROJECT = 'actual_project'
+DASHBOARD_ITEMS = 'dashboard_items'
 IS_MENTOR = 'is_mentor'
 ADD_DOCS = 'add_docs'
 ADD_TAGS = 'add_tags'
@@ -38,6 +39,7 @@ PREVIOUS_TEMPLATE = 'previous_template'
 TEMPLATE_INDEX = "codestand/index.html"
 TEMPLATE_ABOUT = "codestand/about.html"
 TEMPLATE_LOGIN = '/codestand/accounts/login'
+TEMPLATE_DASHBOARD = "codestand/dashboard.html"
 TEMPLATE_ERROR_500 = "codestand/500.html"
 TEMPLATE_ERROR_404 = "codestand/404.html"
 # REQUESTS
@@ -54,6 +56,10 @@ TEMPLATE_MATCHES_SHOW = "codestand/matches/show.html"
 TEMPLATE_MATCHES_SEARCH = "codestand/matches/search.html"
 # ACCOUNTS
 TEMPLATE_TOPCODERS = "codestand/accounts/topcoders.html"
+# WIDGETS
+WIDGET_ALL_MATCHES = 'codestand/widgets/all_matches.html'
+WIDGET_MY_MATCHES = 'codestand/widgets/my_matches.html'
+WIDGET_MY_REQUESTS = 'codestand/widgets/my_requests.html'
 
 # ----------------------------------------------------------------
 # Localized String
