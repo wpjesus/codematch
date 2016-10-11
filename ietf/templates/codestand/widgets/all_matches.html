@@ -1,0 +1,38 @@
+{# Copyright The IETF Trust 2015, All Rights Reserved #}
+{% load origin %}{% origin %}
+{% load ietf_filters community_tags wg_menu streams_menu %}
+{% load staticfiles %}
+
+<!-- Recent News -->
+<div class="col-md-4">
+  <div class="widget">
+    <!-- Widget title -->
+    <div class="widget-head">
+      <div class="pull-left"><i class="fa fa-microphone"> </i> All Projects</div>
+      <div class="widget-icons pull-right">
+          <!--
+        <a href="#" class="wminimize"><i class="fa fa-chevron-up"></i></a> 
+        <a href="#" class="wclose"><i class="fa fa-times"></i></a>-->
+      </div>  
+      <div class="clearfix"></div>
+    </div>
+    <div class="widget-content referrer">
+      <!-- Widget content -->
+      <div class="padd">
+        <ul class="latest-news">
+            {% for coding, projectcontainer, coder in all_matches %}
+          <li>
+            <!-- Title and date -->
+            <h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coder.name }}</a></h6>
+            <p>{{ coding.additional_information|linebreaks }}<a href="{% url 'show' projectcontainer.id coding.id %}"> <i class="fa fa-plus-square"></i> More</a></p>
+          </li>
+            {% endfor %}
+        </ul> 
+      </div>
+      <div class="widget-foot" >
+        <button class="btn pull-right btn-xs btn-default" onclick="location.href = '{% url 'ietf.codestand.matches.views.show_list' %}'"><i class="fa fa-plus-square"></i> More</button>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+  </div>
+</div>

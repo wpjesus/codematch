@@ -21,38 +21,36 @@
     <!-- Analyse whether these stylesheets are used in base file, if not, add it through 'morecss' in the specific page -->
   <!-- Stylesheets -->
       
-  <link rel="stylesheet" href="{% static 'css/chosen.css'%}" />    
-      
-  <link href="{% static "css/bootstrap.css"%}" rel="stylesheet">
+  <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
   <!-- Font awesome icon -->
-  <link rel="stylesheet" href="{% static "css/font-awesome.min.css"%}">
+  <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
   <!-- Ionicons icon -->
-  <link rel="stylesheet" href="{% static "css/ionicons.min.css"%}">
+  <link rel="stylesheet" href="{% static 'css/ionicons.min.css' %}">
   <!-- jQuery UI -->
       
-  <link rel="stylesheet" href="{% static "css/jquery-ui.css"%}">
+  <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
   <!-- Calendar -->
-  <link rel="stylesheet" href="{% static "css/fullcalendar.css"%}">
+  <link rel="stylesheet" href="{% static 'css/fullcalendar.css' %}">
   <!-- prettyPhoto -->
-  <link rel="stylesheet" href="{% static "css/prettyPhoto.css"%}">
+  <link rel="stylesheet" href="{% static 'css/prettyPhoto.css' %}">
   <!-- Star rating -->
-  <link rel="stylesheet" href="{% static "css/rateit.css"%}">
+  <link rel="stylesheet" href="{% static 'css/rateit.css' %}">
   <!-- Date picker -->
-  <link rel="stylesheet" href="{% static "css/bootstrap-datetimepicker.min.css"%}">
+  <link rel="stylesheet" href="{% static 'css/bootstrap-datetimepicker.min.css' %}">
   <!-- CLEditor -->
-  <link rel="stylesheet" href="{% static "css/jquery.cleditor.css"%}">
+  <link rel="stylesheet" href="{% static 'css/jquery.cleditor.css' %}">
   <!-- Data tables -->
-  <link rel="stylesheet" href="{% static "css/jquery.dataTables.css"%}">
+  <link rel="stylesheet" href="{% static 'css/jquery.dataTables.css' %}">
   <!-- Bootstrap toggle -->
-  <link rel="stylesheet" href="{% static "css/jquery.onoff.css"%}">
+  <link rel="stylesheet" href="{% static 'css/jquery.onoff.css' %}">
   <!-- Main stylesheet -->
-  <link href="{% static "css/style.css"%}" rel="stylesheet">
+  <link href="{% static 'css/style.css' %}" rel="stylesheet">
   <!-- Widgets stylesheet -->
-  <link href="{% static "css/widgets.css"%}" rel="stylesheet">
+  <link href="{% static 'css/widgets.css' %}" rel="stylesheet">
     <style>
      {% block morecss %}{% endblock %}
     </style>
-	<script src="{% static "js/respond.min.js"%}"></script>
+	<script src="{% static 'js/respond.min.js' %}"></script>
     <!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
         <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -60,14 +58,14 @@
     {% block pagehead %}{% endblock %}
 
     {% if server_mode and server_mode == "production" %}
-    <link rel="shortcut icon" href="{% static "images/ietf-icon-blue3.png"%}">
+    <link rel="shortcut icon" href="{% static 'images/ietf-icon-blue3.png' %}">
     {% else %}
-    <link rel="shortcut icon" href="{% static "images/ietf-icon-red3.png"%}">
+    <link rel="shortcut icon" href="{% static 'images/ietf-icon-red3.png' %}">
     {% endif %}
-    <link rel="apple-touch-icon" href="{% static "images/apple-touch-icon.png"%}">
+    <link rel="apple-touch-icon" href="{% static 'images/apple-touch-icon.png' %}">
   </head>
 
-  <body {% block bodyAttrs %}{%endblock%} data-group-menu-data-url="{% url "group_menu_data" %}">
+  <body {% block bodyAttrs %}{%endblock%} data-group-menu-data-url="{% url 'group_menu_data' %}" id="body">
 
 
     {% include "base/menu_codestand.html" %}
@@ -94,7 +92,7 @@
 	    <div class="text-center">
 	      <p class="small text-muted">
 	        {% if version_num %}
-		  <a href="{% url "ietf.codestand.views.about" %}">About</a> |
+		  <a href="{% url 'ietf.codestand.views.about' %}">About</a> |
 	          IETF CodeStand |
 	          <a href="#">Version {{ codestand_version }}</a>
 	          | {{codestand_revision_date}} |
@@ -119,37 +117,37 @@
 	<!-- Certainly these js are not necessary to all pages, then, just like css, it must be filtered -->
   
 	<!-- JS -->
-	<script src="{% static "js/jquery.js"%}"></script> <!-- jQuery -->
-	<script src="{% static "js/bootstrap.min.js"%}"></script> <!-- Bootstrap -->
-	<script src="{% static "js/jquery-ui.min.js"%}"></script> <!-- jQuery UI -->
-	<script src="{% static "js/fullcalendar.min.js"%}"></script> <!-- Full Google Calendar - Calendar -->
+	<script src="{% static 'js/jquery.js' %}"></script> <!-- jQuery -->
+	<script src="{% static 'js/bootstrap.min.js' %}"></script> <!-- Bootstrap -->
+	<script src="{% static 'js/jquery-ui.min.js'%}"></script> <!-- jQuery UI -->
+	<script src="{% static 'js/fullcalendar.min.js' %}"></script> <!-- Full Google Calendar - Calendar -->
 	<!--TODO<script src="{% static "js/jquery.rateit.min.js"%}"></script>--> <!-- RateIt - Star rating -->
-	<script src="{% static "js/jquery.prettyPhoto.js"%}"></script> <!-- prettyPhoto -->
-	<script src="{% static "js/jquery.slimscroll.min.js"%}"></script> <!-- jQuery Slim Scroll -->
-	<script src="{% static "js/jquery.dataTables.min.js"%}"></script> <!-- Data tables -->
+	<script src="{% static 'js/jquery.prettyPhoto.js' %}"></script> <!-- prettyPhoto -->
+	<script src="{% static 'js/jquery.slimscroll.min.js' %}"></script> <!-- jQuery Slim Scroll -->
+	<script src="{% static 'js/jquery.dataTables.min.js' %}"></script> <!-- Data tables -->
 	
 	<!-- jQuery Flot -->
-	<script src="{% static "js/excanvas.min.js"%}"></script>
-	<script src="{% static "js/jquery.flot.js"%}"></script>
-	<script src="{% static "js/jquery.flot.resize.js"%}"></script>
-	<script src="{% static "js/jquery.flot.pie.js"%}"></script>
-	<script src="{% static "js/jquery.flot.stack.js"%}"></script>
+	<script src="{% static 'js/excanvas.min.js' %}"></script>
+	<script src="{% static 'js/jquery.flot.js' %}"></script>
+	<script src="{% static 'js/jquery.flot.resize.js' %}"></script>
+	<script src="{% static 'js/jquery.flot.pie.js' %}"></script>
+	<script src="{% static 'js/jquery.flot.stack.js' %}"></script>
 
 	<!-- jQuery Notification - Noty -->
-	<script src="{% static "js/jquery.noty.js"%}"></script> <!-- jQuery Notify -->
-	<script src="{% static "js/themes/default.js"%}"></script> <!-- jQuery Notify -->
-	<script src="{% static "js/layouts/bottom.js"%}"></script> <!-- jQuery Notify -->
-	<script src="{% static "js/layouts/topRight.js"%}"></script> <!-- jQuery Notify -->
-	<script src="{% static "js/layouts/top.js"%}"></script> <!-- jQuery Notify -->
+	<script src="{% static 'js/jquery.noty.js' %}"></script> <!-- jQuery Notify -->
+	<script src="{% static 'js/themes/default.js' %}"></script> <!-- jQuery Notify -->
+	<script src="{% static 'js/layouts/bottom.js' %}"></script> <!-- jQuery Notify -->
+	<script src="{% static 'js/layouts/topRight.js' %}"></script> <!-- jQuery Notify -->
+	<script src="{% static 'js/layouts/top.js' %}"></script> <!-- jQuery Notify -->
 	<!-- jQuery Notification ends -->
 	
-	<script src="{% static "js/sparklines.js"%}"></script> <!-- Sparklines -->
-	<script src="{% static "js/jquery.cleditor.min.js"%}"></script> <!-- CLEditor -->
-	<script src="{% static "js/bootstrap-datetimepicker.min.js"%}"></script> <!-- Date picker -->
-	<script src="{% static "js/jquery.onoff.min.js"%}"></script> <!-- Bootstrap Toggle -->
-	<script src="{% static "js/filter.js"%}"></script> <!-- Filter for support page -->
-	<!--TODO <script src="{% static "js/custom.js"%}"></script>--> <!-- Custom codes -->
-	<script src="{% static "js/charts.js"%}"></script> <!-- Charts & Graphs -->
+	<script src="{% static 'js/sparklines.js' %}"></script> <!-- Sparklines -->
+	<script src="{% static 'js/jquery.cleditor.min.js' %}"></script> <!-- CLEditor -->
+	<script src="{% static 'js/bootstrap-datetimepicker.min.js' %}"></script> <!-- Date picker -->
+	<script src="{% static 'js/jquery.onoff.min.js' %}"></script> <!-- Bootstrap Toggle -->
+	<script src="{% static 'js/filter.js' %}"></script> <!-- Filter for support page -->
+	<!--TODO <script src="{% static 'js/custom.js' %}"></script>--> <!-- Custom codes -->
+	<script src="{% static 'js/charts.js' %}"></script> <!-- Charts & Graphs -->
 	<!-- end of codestand js prototype -->
       
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
@@ -160,9 +158,9 @@
 	{% endcomment %}
 	<script>$(".visible-nojs").removeClass("visible-nojs");</script>
 	<script>$(".hidden-nojs").removeClass("hidden-nojs");</script>
-	<script src="{% static "js/lib/jquery.cookie.min.js"%}"></script>
-	<script src="{% static "js/lib/bootstrap.min.js"%}"></script>
-	<script src="{% static "js/ietf.js"%}"></script>
+	<script src="{% static 'js/lib/jquery.cookie.min.js' %}"></script>
+	<script src="{% static 'js/lib/bootstrap.min.js' %}"></script>
+	<script src="{% static 'js/ietf.js' %}"></script>
 	{% block js %}{% endblock %}
 	
 	</body>

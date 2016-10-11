@@ -14,25 +14,22 @@
 			<span>Menu</span>
 		  </button>
 		  <!-- Site name for smallar screens -->
-		  <a href="#" class="navbar-brand" ><img src="{% static "images/ietflogo-small-transparent.png" %}" /></a>
+		  <a href="#" class="navbar-brand" ><img src="{% static 'images/ietflogo-small-transparent.png' %}" /></a>
 		</div>
       <ul class="nav navbar-nav">
 	  	<li class="dropdown">
-			<a href="{% url "ietf.codestand.views.index" %}" role="button" > Code<b>Stand</b></a>
-		</li>
-      	<li class="dropdown">
-			<a href="#" role="button" > <i class="fa fa-home"></i> </a>
+			<a href="{% url 'ietf.codestand.views.index' %}" role="button" > Code<b>Stand</b></a>
 		</li>
 
 		<li class="dropdown">
 			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="icon ion-arrow-shrink" ></i> Projects </a>
 			<ul class="dropdown-menu" role="menu">
 				<li>
-					<a href="{% url "ietf.codestand.matches.views.show_list" %}">All Projects</a>
+					<a href="{% url 'ietf.codestand.matches.views.show_list' %}">All Projects</a>
 				</li>
 				{% if mycodings or canaddcoding %}
 				<li>
-					<a href="{% url "ietf.codestand.matches.views.show_list" 'True' %}">My Projects</a>
+					<a href="{% url 'ietf.codestand.matches.views.show_list' 'True' %}">My Projects</a>
 				</li>
 				{% endif %}
 			</ul>
@@ -42,23 +39,23 @@
 			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-microphone" ></i> CodeRequests </a>
 			<ul class="dropdown-menu" role="menu">
 				<li>
-					<a href="{% url "ietf.codestand.requests.views.show_list" %}">All CodeRequests</a>
+					<a href="{% url 'ietf.codestand.requests.views.show_list' %}">All CodeRequests</a>
 				</li>
 				{% if projectsowner or canaddrequest %}
 				<li>
-					<a href="{% url "ietf.codestand.requests.views.show_list" 'mylist' %}">CodeRequests I've Created</a>
+					<a href="{% url 'ietf.codestand.requests.views.show_list' 'mylist' %}">CodeRequests I've Created</a>
 				</li>
 				{% endif %}
 				{% if projectsmentoring or ismentor %}
 				<li>
-					<a href="{% url "ietf.codestand.requests.views.show_list" 'mentoring' %}">CodeRequests I'm Mentoring</a>
+					<a href="{% url 'ietf.codestand.requests.views.show_list' 'mentoring' %}">CodeRequests I'm Mentoring</a>
 				</li>
 				{% endif %}
 			</ul>
 		</li>
 
 		<li class="dropdown">
-			<a href="{% url "ietf.codestand.accounts.views.top_coders" %}">  <i class="fa fa-star" ></i>Top Coders</a>
+			<a href="{% url 'ietf.codestand.accounts.views.top_coders' %}">  <i class="fa fa-star" ></i>Top Coders</a>
 		</li>
 	  </ul>
 
