@@ -87,7 +87,7 @@ def dashboard_dev(request):
     for option in all_options:
         matching = [s for s in items if option[0] in s]
         if matching:
-            options.append((option[1], "request_access('{}')".format(option[0]), 'color:black'))
+            options.append((option[1], "request_access('{}')".format(option[0]), 'color:red'))
         else:
             options.append((option[1], "request_access('{}')".format(option[0]), None))
         
@@ -97,6 +97,7 @@ def dashboard_dev(request):
     request.session[constants.MAINTAIN_STATE] = True
     
     return render_page(request, constants.TEMPLATE_DASHBOARD, keys)
+
 
 def handler500(request):
     # TODO: Review this to filter only the specific error
