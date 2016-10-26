@@ -37,7 +37,7 @@ class CodingProject(models.Model):
     """ repositories or by different groups or persons """
 
     # This is the name that the student choose for his coding project
-    title = models.CharField(max_length=80)
+    title = models.CharField(max_length=200)
     # URL to github or other repository:
     # link_to_implementation = models.URLField(blank=True)
     links = models.ManyToManyField(Implementation, blank=True, null=True)

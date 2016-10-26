@@ -11,6 +11,17 @@
 {% block pagehead %}
   <link rel="stylesheet" href="{% static 'css/lib/select2.css' %}">
   <link rel="stylesheet" href="{% static 'css/lib/select2-bootstrap.css' %}">
+  <style>
+	#id_title { width: 300px; }
+	#id_description { width: 300px; }
+	#id_protocol { width: 300px; }
+	#id_estimated_lof { width: 200px; }
+	#id_additional_information { width: 300px; }
+	#s2id_id_doc { width: 400px; margin-bottom: 10px; }
+	#id_contact { width: 200px; margin-left: 10px; margin-right: 10px; }
+	#id_type { margin-left: 10px; margin-right: 10px; }
+	#id_name { width: 200px; margin-left: 10px; margin-right: 10px; }
+  </style>
 {% endblock %}
 
 {% block content %}
@@ -58,19 +69,19 @@
                            	{% csrf_token %}
                             <div class="padd">
 								<div class="form-group">
-									<label class="control-label col-xs-2">Title:</label>
+									<label class="control-label col-xs-2">Title*:</label>
 									<div class="col-xs-4">
 										{{ projform.title }}
 									</div>
 								</div>
 								<div class="form-group">
-									<label class="control-label col-xs-2">Protocol:</label>
+									<label class="control-label col-xs-2">Protocol*:</label>
 									<div class="col-xs-4">
 										{{ projform.protocol }}
 									</div>
 								</div>
 								<div class="form-group">
-									<label class="control-label col-xs-2">Description:</label>
+									<label class="control-label col-xs-2">Description*:</label>
 									<div class="col-xs-4">
 										{{ projform.description }}
 									</div>
@@ -103,6 +114,7 @@
 									</div>
 								</div>                                 
 								<br />
+								<div class="padd">
 								<div>
 									{% if user.is_authenticated  %}
 									<form action="{% url 'ietf.codestand.requests.views.new' %}" method="post">
@@ -117,16 +129,17 @@
 											<br />
 										{% endif %}
 										</div>
-										{{ docform }}
-										{% csrf_token %}
-										<input type="submit" name="button_doc" value="Add related Document" />
-
+										<div>
+											{{ docform }}
+											{% csrf_token %}
+											<input type="submit" name="button_doc" value="Add related Document" />
+										</div>
 										<br />
 										<br />
 
 										<div>
 										{% if contacts %}
-				            				<h4><strong>Contacts</strong></h4>
+					            				<h4><strong>Contacts</strong></h4>
 											{% for c in contacts %}
 												{{ c.type }}: <a  href="#"> {{ c.contact }} </a>
 												<a class="label label-info" href="{% url 'ietf.codestand.requests.views.remove_contact' 0 c.contact %}" >delete</a>
@@ -136,6 +149,7 @@
 										<br />
 
 										</div>
+										<div>
 										{% if canaddcontact %}
 											{{ contactform }}
 											{% csrf_token %}
@@ -144,7 +158,7 @@
 
 										<br />
 										<br />
-
+										</div>
 										<div>
 										{% if user.is_authenticated and tags and canaddtags %}
 			            				<h4><strong>Tags</strong></h4>
@@ -158,7 +172,7 @@
 			            				{% endif %}
 			            				<div>
 										<br />
-										<label >*tags may be related to events, dates, protocols or other relative subject.</label><br />
+										<label >tags may be related to events, dates, protocols or other relative subject.</label><br />
 										<label>Tag:</label>
 										{{ tagform.name }}
 										{% csrf_token %}
@@ -169,7 +183,12 @@
 								</div>
 								<br />
 
-						   		<div class="widget-foot">
+			<div>
+				<p>(*) Denotes a required field.</p>
+				<div class="clearfix"/>
+			</div>
+
+			<div class="widget-foot">
 	                                <p class="buttonlist">
 	                                	<div class="col-xs-offset-1" style="margin-left: 0px">
 								    		<input type="submit" name="button_save" class="btn btn-primary" value="Submit" />
@@ -177,13 +196,13 @@
 	                                	</div>
 	                                </p>
                             	</div>
+				</div>
                             </div>
 							</form>
 
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -195,7 +214,6 @@
     <div class="clearfix"></div>
 
 </div>
-
 
 <!-- Content ends -->
 {% endblock %}

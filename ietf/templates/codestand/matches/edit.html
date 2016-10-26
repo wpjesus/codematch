@@ -12,6 +12,15 @@
 {% block pagehead %}
   <link rel="stylesheet" href="{% static 'css/lib/select2.css' %}">
   <link rel="stylesheet" href="{% static 'css/lib/select2-bootstrap.css' %}">
+  <style>
+	#id_title { width: 300px; }
+	#id_description { width: 300px; }
+	#id_protocol { width: 300px; }
+	#s2id_id_doc { width: 400px; margin-bottom: 10px; }
+	#id_additional_information { width: 300px; }
+	#id_link { width: 300px; margin-right: 10px; margin-left: 5px; }
+	#id_name { width: 200px; margin-right: 10px; margin-left: 5px; }
+  </style>
 {% endblock %}
 
 {% block content %}
@@ -80,23 +89,24 @@
 								</div>
 								{% else %}
 									<div class="form-group">
-										<label class="control-label col-xs-2">Project title:</label>
+										<label class="control-label col-xs-2">Project title*:</label>
 										<div class="col-xs-4">
 											{{ projform.title }}
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="control-label col-xs-2">Protocol:</label>
+										<label class="control-label col-xs-2">Protocol*:</label>
 										<div class="col-xs-4">
 											{{ projform.protocol}}
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="control-label col-xs-2">Description:</label>
+										<label class="control-label col-xs-2">Description*:</label>
 										<div class="col-xs-4">
 											{{ projform.description }}
 										</div>
 									</div>
+									<div style="margin-left: 100px">
 									<div>
 										{% if docs %}
 				            				<h4><strong>Documents</strong></h4>
@@ -116,16 +126,17 @@
 
 									<br />
 									<br />
+									</div>
 								{% endif %}
 								<hr />
 								<div class="form-group">
-									<label class="control-label col-xs-2">Coding title:</label>
+									<label class="control-label col-xs-2">Coding title*:</label>
 									<div class="col-xs-4">
 										{{ codeform.title }}
 									</div>
 								</div>
 								<div class="form-group">
-									<label class="control-label col-xs-2">Coding info:</label>
+									<label class="control-label col-xs-2">Coding info*:</label>
 									<div class="col-xs-4">
 										{{ codeform.additional_information }}
 									</div>
@@ -143,7 +154,7 @@
 									{% endif %}
 									<br />
 									{% if user.is_authenticated and canaddlinks %}
-										<label class="control-label col-xs-2">URL:</label>
+										<label class="control-label col-xs-2">URL*:</label>
 										{{ linkform.link }}
                                         {% csrf_token %}
                                         <input type="submit" name="button_link" value="Add implementation" />
@@ -164,9 +175,8 @@
 		            					<br />
 		            				{% endif %}
 		            				<div>
-									<br />
 									{% if user.is_authenticated and canaddtags %}
-										<label >*tags may be related to events, dates, protocols or other relative subject.</label><br />
+										<label style="margin-left: 160px">tags may be related to events, dates, protocols or other relative subject.</label><br />
 										<label class="control-label col-xs-2">Tag:</label>
 										{{ tagform.name }}
 										{% csrf_token %}
@@ -178,8 +188,10 @@
 								{% endif %}
 
 								<br />
-
-						   		<div class="widget-foot">
+        	<div class="padd">
+			<p>(*) Denotes a required field.</p>
+			<div class="clearfix"/>
+		</div>						   		<div class="widget-foot">
                                 <p class="buttonlist">
                                 	<div class="col-xs-offset-1" style="margin-left: 0px">
 								    	<input type="submit" name="button_save" class="btn btn-primary" value="Update" />

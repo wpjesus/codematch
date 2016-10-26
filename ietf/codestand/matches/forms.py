@@ -24,7 +24,6 @@ class ProjectContainerForm(ModelForm):
         model = ProjectContainer
         fields = ["title", "protocol", "description"]
 
-
 class CodingProjectForm(ModelForm):
     class Meta:
         model = CodingProject
