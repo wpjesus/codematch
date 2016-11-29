@@ -64,6 +64,8 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
     ids = list(set(ids))
     all_coders = list(Person.objects.using('datatracker').filter(id__in=ids).values_list('id', 'name'))
     for coding in all_codings:
+        if coding.is_archived and coding.coder != user_id:
+            continue
         for project in all_projects:
             if coding in project.codings.all() and (is_my_list == "False" or user.id == coding.coder):
                 coder_id = coding.coder
@@ -341,12 +343,6 @@ def save_code(request, template, pk, ck="", coding=None):
         else:
             new_code = CodingProjectForm(request.POST)
 
-        print request.POST
-        print request.POST.get(constants.STRING_LINK)
-        print request.POST.get(constants.STRING_DOC)
-        print request.POST.get(constants.STRING_TAG)
-        print request.POST.get(constants.STRING_SAVE)
-
         # If there wasn't associated Project Container, must create a new one. Functionality used to legacy RFC.
         if project_container is None or project_container.code_request is None:
             post = request.POST.copy()
@@ -472,6 +468,17 @@ def save_code(request, template, pk, ck="", coding=None):
         'canaddlinks': can_add_links,
         'canaddtags': can_add_tags
     })
+
+
+@login_required(login_url=settings.CODESTAND_PREFIX + constants.TEMPLATE_LOGIN)
+def archive(request, ck):
+    
+    coding_project = get_object_or_404(CodingProject, id=ck)
+    coding_project.is_archived = not coding_project.is_archived
+    coding_project.save()
+    
+    refresh_template = request.session[constants.ACTUAL_TEMPLATE]
+    return HttpResponseRedirect(refresh_template)
 
 
 @login_required(login_url=settings.CODESTAND_PREFIX + constants.TEMPLATE_LOGIN)

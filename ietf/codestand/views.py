@@ -2,7 +2,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
 from ietf.codestand.helpers.utils import (render_page)
 from ietf.codestand import constants
-from ietf.person.models import Person
+
 
 def index(request):
     sync(request)
@@ -20,6 +20,7 @@ def back(request):
         template = request.session["previous_template"]
 
     return HttpResponseRedirect(template)
+
 
 def handler500(request):
     # TODO: Review this to filter only the specific error

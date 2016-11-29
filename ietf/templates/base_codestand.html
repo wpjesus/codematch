@@ -8,10 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{% block title %}No title{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!--<link href="{% static "fonts/PTMono/stylesheet.css"%}" rel='stylesheet' type='text/css'>
-    <link href="{% static "fonts/PTSans/stylesheet.css"%}" rel='stylesheet' type='text/css'>
-    <link href="{% static "fonts/PTSerif/stylesheet.css"%}" rel='stylesheet' type='text/css'>-->
+      
     {% comment %}
     <!-- Halloween
     <link href='https://fonts.googleapis.com/css?family=IM+Fell+English+SC|IM+Fell+DW+Pica:400,400italic|Nova+Mono|IM+Fell+English:400,400italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
@@ -27,7 +24,6 @@
   <!-- Ionicons icon -->
   <link rel="stylesheet" href="{% static 'css/ionicons.min.css' %}">
   <!-- jQuery UI -->
-      
   <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
   <!-- Calendar -->
   <link rel="stylesheet" href="{% static 'css/fullcalendar.css' %}">
@@ -66,9 +62,76 @@
   </head>
 
   <body {% block bodyAttrs %}{%endblock%} data-group-menu-data-url="{% url 'group_menu_data' %}" id="body">
+  
+      <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container-fluid">
+	  <div class="navbar-header">
+	    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse">
+	      <span class="sr-only">Toggle navigation</span>
+	      <span class="icon-bar"></span>
+	      <span class="icon-bar"></span>
+	      <span class="icon-bar"></span>
+	    </button>
+	    <a class="navbar-brand" href="{% url 'ietf.codestand.views.index' %}" role="button" style="color: white">
+	       <img alt="IETF Logo" src="{% static 'images/ietflogo-small-transparent.png'%}">
+		  Code<b>Stand</b>
+	    </a>
+	  </div>
 
+	  <noscript>
+	    <p class="navbar-text"><small>Enable Javascript for full functionality.</small></p>
+	  </noscript>
 
-    {% include "base/menu_codestand.html" %}
+	  <div class="collapse navbar-collapse" id="navbar-collapse">
+	    <ul class="hidden-nojs nav navbar-nav">
+            {% include "base/menu_codestand.html" %}
+        </ul>
+          
+        {% if user.is_authenticated %}
+        <!-- Links -->
+        <ul class="nav navbar-nav pull-right" >
+          <li class="dropdown pull-right">
+            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+              <i class="fa fa-user"></i><b class="caret"></b>
+            </a>
+
+            <!-- Dropdown menu -->
+            <ul class="dropdown-menu">
+              <li><a href="{% url 'ietf.codestand.accounts.views.profile' %}"><i class="fa fa-user"></i> {{ username }} </a></li>
+              <!--<li><a href="#"><i class="fa fa-cogs"></i> Settings</a></li>-->
+              <li><a rel="nofollow" href="{% url 'django.contrib.auth.views.logout' %}" >Logout</a></li>
+            </ul>
+          </li>
+
+        </ul>
+        {% else %}
+        <!-- Links -->
+        <ul class="nav navbar-nav pull-right">
+          <li class="dropdown pull-right">
+            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+              <i class="fa fa-user"></i> Enter<b class="caret"></b>
+            </a>
+
+            <!-- Dropdown menu -->
+            <ul class="dropdown-menu">
+              <li><a rel="nofollow" href="https://datatracker.ietf.org/accounts/create/">Register Here</a></li>
+              <li><a rel="nofollow" href="{% url 'django.contrib.auth.views.login' %}?next={% url 'ietf.codestand.views.index' %}">Sign in</a></li>
+            </ul>
+          </li>
+
+        </ul>
+        {% endif %}
+
+    <!-- Search form -->
+    <form class="navbar-form navbar-right" role="search">
+        <div class="form-group" >
+            <input type="text" class="form-control" placeholder="Search">
+        </div>
+    </form>
+          
+	  </div>
+        </div>
+      </nav>
 
 	{% block content %}{% endblock %}
 
@@ -158,8 +221,6 @@
 	{% endcomment %}
 	<script>$(".visible-nojs").removeClass("visible-nojs");</script>
 	<script>$(".hidden-nojs").removeClass("hidden-nojs");</script>
-	<script src="{% static 'js/lib/jquery.cookie.min.js' %}"></script>
-	<script src="{% static 'js/lib/bootstrap.min.js' %}"></script>
 	<script src="{% static 'js/ietf.js' %}"></script>
 	{% block js %}{% endblock %}
 	

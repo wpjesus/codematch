@@ -26,7 +26,9 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
     """
 
     user = get_user(request)
-
+    user_id = None
+    if user:
+        user_id = user.id
     if state == "True" and constants.ALL_PROJECTS in request.session:
         project_containers = request.session[constants.ALL_PROJECTS]
         request.session[constants.MAINTAIN_STATE] = True
@@ -97,7 +99,9 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
             new_projs = []
             val = map_attributes[att]
             for p in project_containers:
-                if att == constants.STRING_PROTOCOL:
+                if p.is_archived and p.owner != user_id:
+                    continue
+                elif att == constants.STRING_PROTOCOL:
                     compare = s.upper()
                     prop = getattr(p, val).upper()  # Get Protocol name
                 else:
@@ -123,8 +127,9 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
                 list_of_lists.append((new_projs, compare))
     else:  # Just show all CodeRequests in order
         for p in project_containers:
-            new_projs = [p]
-            list_of_lists.append((new_projs, ""))
+            if not p.is_archived or p.owner == user_id:
+                new_projs = [p]
+                list_of_lists.append((new_projs, ""))
 
     return render_page(request, constants.TEMPLATE_REQUESTS_LIST, {
         'projectcontainers': list_of_lists,
@@ -476,6 +481,17 @@ def save_project(request, template, project_container=None):
 
 
 ''' TODO: UNIFICAR CODIGO MATCHES E REQUESTS '''
+
+
+@login_required(login_url=settings.CODESTAND_PREFIX + constants.TEMPLATE_LOGIN)
+def archive(request, pk):
+    
+    project_container = get_object_or_404(ProjectContainer, id=pk)
+    project_container.is_archived = not project_container.is_archived
+    project_container.save()
+    
+    refresh_template = request.session[constants.ACTUAL_TEMPLATE]
+    return HttpResponseRedirect(refresh_template)
 
 
 @login_required(login_url=settings.CODESTAND_PREFIX + constants.TEMPLATE_LOGIN)

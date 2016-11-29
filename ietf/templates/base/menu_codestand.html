@@ -1,109 +1,42 @@
 {# Copyright The IETF Trust 2015, All Rights Reserved #}{% load origin %}{% origin %}
-{% load ietf_filters community_tags wg_menu streams_menu %}
-{% load staticfiles %}
+{% load ietf_filters community_tags wg_menu streams_menu active_groups_menu %}
 
-<div class="navbar navbar-fixed-top bs-docs-nav" role="banner">
+    <li class="dropdown">
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="icon ion-arrow-shrink" ></i> Projects </a>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        <a href="{% url 'ietf.codestand.matches.views.show_list' %}">All Projects</a>
+                    </li>
+                    {% if mycodings or canaddcoding %}
+                    <li>
+                        <a href="{% url 'ietf.codestand.matches.views.show_list' 'True' %}">My Projects</a>
+                    </li>
+                    {% endif %}
+                </ul>
+    </li>
 
-      <!-- Navigation starts -->
-      <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
-
-      <div class="pull-left">
-      	<!-- Menu button for smallar screens -->
-      <div class="navbar-header">
-		  <button class="navbar-toggle btn-navbar" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
-			<span>Menu</span>
-		  </button>
-		  <!-- Site name for smallar screens -->
-		  <a href="#" class="navbar-brand" ><img src="{% static 'images/ietflogo-small-transparent.png' %}" /></a>
-		</div>
-      <ul class="nav navbar-nav">
-	  	<li class="dropdown">
-			<a href="{% url 'ietf.codestand.views.index' %}" role="button" > Code<b>Stand</b></a>
-		</li>
-
-		<li class="dropdown">
-			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="icon ion-arrow-shrink" ></i> Projects </a>
-			<ul class="dropdown-menu" role="menu">
-				<li>
-					<a href="{% url 'ietf.codestand.matches.views.show_list' %}">All Projects</a>
-				</li>
-				{% if mycodings or canaddcoding %}
-				<li>
-					<a href="{% url 'ietf.codestand.matches.views.show_list' 'True' %}">My Projects</a>
-				</li>
-				{% endif %}
-			</ul>
-		</li>
-
-		<li class="dropdown">
-			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-microphone" ></i> CodeRequests </a>
-			<ul class="dropdown-menu" role="menu">
-				<li>
-					<a href="{% url 'ietf.codestand.requests.views.show_list' %}">All CodeRequests</a>
-				</li>
-				{% if projectsowner or canaddrequest %}
-				<li>
-					<a href="{% url 'ietf.codestand.requests.views.show_list' 'mylist' %}">CodeRequests I've Created</a>
-				</li>
-				{% endif %}
-				{% if projectsmentoring or ismentor %}
-				<li>
-					<a href="{% url 'ietf.codestand.requests.views.show_list' 'mentoring' %}">CodeRequests I'm Mentoring</a>
-				</li>
-				{% endif %}
-			</ul>
-		</li>
-
-		<li class="dropdown">
-			<a href="{% url 'ietf.codestand.accounts.views.top_coders' %}">  <i class="fa fa-star" ></i>Top Coders</a>
-		</li>
-	  </ul>
-
-    </div>
-
-    	{% if user.is_authenticated %}
-
-        <!-- Links -->
-        <ul class="nav navbar-nav pull-right">
-          <li class="dropdown pull-right">
-            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-              <i class="fa fa-user"></i><b class="caret"></b>
-            </a>
-
-            <!-- Dropdown menu -->
-            <ul class="dropdown-menu">
-              <li><a href="{% url 'ietf.codestand.accounts.views.profile' %}"><i class="fa fa-user"></i> {{ username }} </a></li>
-              <!--<li><a href="#"><i class="fa fa-cogs"></i> Settings</a></li>-->
-              <li><a rel="nofollow" href="{% url 'django.contrib.auth.views.logout' %}" >Logout</a></li>
-            </ul>
-          </li>
-
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-microphone" ></i> CodeRequests </a>
+        <ul class="dropdown-menu" role="menu">
+            <li>
+                <a href="{% url 'ietf.codestand.requests.views.show_list' %}">All CodeRequests</a>
+            </li>
+            {% if projectsowner or canaddrequest %}
+            <li>
+                <a href="{% url 'ietf.codestand.requests.views.show_list' 'mylist' %}">CodeRequests I've Created</a>
+            </li>
+            {% endif %}
+            {% if projectsmentoring or ismentor %}
+            <li>
+                <a href="{% url 'ietf.codestand.requests.views.show_list' 'mentoring' %}">CodeRequests I'm Mentoring</a>
+            </li>
+            {% endif %}
         </ul>
-        {% else %}
-        <!-- Links -->
-        <ul class="nav navbar-nav pull-right">
-          <li class="dropdown pull-right">
-            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-              <i class="fa fa-user"></i> Enter <b class="caret"></b>
-            </a>
+    </li>
+    
+    <li class="dropdown">
+        <a href="{% url 'ietf.codestand.accounts.views.top_coders' %}">  <i class="fa fa-star" ></i>Top Coders</a>
+    </li>
 
-            <!-- Dropdown menu -->
-            <ul class="dropdown-menu">
-              <li><a rel="nofollow" href="https://datatracker.ietf.org/accounts/create/">Register Here</a></li>
-              <li><a rel="nofollow" href="{% url 'django.contrib.auth.views.login' %}?next={% url 'ietf.codestand.views.index' %}">Sign in</a></li>
-            </ul>
-          </li>
-
-        </ul>
-        {% endif %}
-
-        <!-- Search form -->
-        <form class="navbar-form navbar-right" role="search">
-			<div class="form-group">
-				<input type="text" class="form-control" placeholder="Search">
-			</div>
-		</form>
-
-      </nav>
-
-</div>
+<li class="divider hidden-xs"></li>   

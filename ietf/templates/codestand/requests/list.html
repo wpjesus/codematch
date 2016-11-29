@@ -104,7 +104,13 @@
 	                      	{% if user.is_authenticated %}
 	                   			{% if projectcontainer.owner == owner.id %}
 		                   			<a class="label label-info" href="{% url 'ietf.codestand.requests.views.edit' projectcontainer.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a>
-				               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
+				               		    <a class="label label-warning" href="{% url 'ietf.codestand.requests.views.archive' projectcontainer.id %}" ><i class="fa fa-folder"></i> 
+                                    {% if projectcontainer.is_archived %}                                            
+                                            Unarchive
+                                    {% else %}
+                                            Archive
+                                    {% endif %}
+                                            </a>
 			               		{% endif %}
 		               			<a href="{% url 'ietf.codestand.matches.views.new' projectcontainer.id %}" class="label label-info" ><i class="fa fa-check"></i>Associate my project</a>
 							{% endif %}

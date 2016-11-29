@@ -122,7 +122,7 @@
 												<br />
 												<h4><strong>Implementations</strong></h4>
 												{% for implementation in coding.links.all %}
-													<a href="{{ implementation.link }}">{{ implementation.link }}</a>
+													<a target="_blank" href="{{ implementation.link }}">{{ implementation.link }}</a>
 												<br />
 												{% endfor %}
 											{% endif %}
@@ -132,7 +132,7 @@
 											{% if docs and projectcontainer.code_request == None %}
 												<h4><strong>Documents</strong></h4>
 												{% for docname, gname, gparentname in docs %}
-													{{ gname }}: <a href="https://datatracker.ietf.org/doc/{{docname}}"> {{ docname }} </a>
+													{{ gname }}: <a target="_blank" href="https://datatracker.ietf.org/doc/{{docname}}"> {{ docname }} </a>
 													<br />
 												{% endfor %}
 												<br />

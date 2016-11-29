@@ -77,7 +77,13 @@
 	                                    	<h5><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coder }}</a>
             		                      	{% if user.is_authenticated and isOwner %}
 					                   			<a class="label label-info" href="{% url 'ietf.codestand.matches.views.edit' projectcontainer.id coding.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a>
-							               		<a class="label label-warning" href="#" ><i class="fa fa-folder"></i> Archive</a>
+							               		<a class="label label-warning" href="{% url 'ietf.codestand.matches.views.archive' coding.id %}" ><i class="fa fa-folder"></i>
+                                                {% if coding.is_archived %}                                            
+                                                    Unarchive
+                                                {% else %}
+                                                    Archive
+                                                {% endif %}
+                                            </a>
 											{% endif %}
 											</h5>
 	                                    	<!--<h6><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coder }}</a></h6>-->
