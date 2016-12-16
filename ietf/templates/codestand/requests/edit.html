@@ -124,7 +124,7 @@
 				            				<h4><strong>Documents</strong></h4>
 											{% for doc in docs %}
 												{{ doc.document.title }}: <a  href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
-												<a class="label label-info" href="{% url 'ietf.codestand.requests.views.remove_document' projectcontainer.id doc.name %}" >delete</a>
+												<a class="label label-info" href="{% url 'ietf.codestand.requests.views.remove_document' projectcontainer.id doc.name %}" onclick="return confirm('Are you sure you want to delete this document?');">delete</a>
 												<br />
 											{% endfor %}
 										{% endif %}
@@ -145,7 +145,7 @@
 				            				<h4><strong>Contacts</strong></h4>
 											{% for c in contacts %}
 												{{ c.type }}: <a  href="#"> {{ c.contact }} </a>
-												<a class="label label-info" href="{% url 'ietf.codestand.requests.views.remove_contact' projectcontainer.id c.contact %}" >delete</a>
+												<a class="label label-info" href="{% url 'ietf.codestand.requests.views.remove_contact' projectcontainer.id c.contact %}" onclick="return confirm('Are you sure you want to delete this contact?');">delete</a>
 												<br />
 											{% endfor %}
 										{% endif %}

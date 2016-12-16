@@ -54,6 +54,8 @@ class CodingProject(models.Model):
     # TODO: this field is integer?
     reputation = models.IntegerField(null=True, blank=True)
 
+    contacts = models.ManyToManyField(ProjectContact, blank=True, null=True)
+
     tags = models.ManyToManyField(ProjectTag, blank=True, null=True)
     
     is_archived = models.BooleanField(default=False)
@@ -93,6 +95,8 @@ class ProjectContainer(models.Model):
     contacts = models.ManyToManyField(ProjectContact, blank=True, null=True)
     
     is_archived = models.BooleanField(default=False)
-
+    
+    is_deleted = models.BooleanField(default=False)
+    
     def __unicode__(self):  # __unicode__ on Python 2
         return self.title

@@ -51,7 +51,11 @@
                                     {% for count, coder in topcoders %}
 	                               		<li>
 	                                    	<!-- Title and date -->
-	                                    	<h5><a href="#">{{ coder }}</a> - {{ count }} Codings</h5>
+                                            {% if count > 1 %}
+	                                    	<h5><a href="#">{{ coder }}</a> - {{ count }} Projects</h5>
+                                            {% else %}
+                                            <h5><a href="#">{{ coder }}</a> - {{ count }} Project</h5>
+                                            {% endif %}
 	                                	</li>
                                     {% endfor %}
                                 </ul>

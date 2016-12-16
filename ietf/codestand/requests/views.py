@@ -58,7 +58,7 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
 
     paginator = Paginator(project_containers, 5)
     page = int(page)
-    all_codings = paginator.page(page)
+    project_containers = paginator.page(page)
 
     # Attributes that should grouping
     map_attributes = {'protocol': constants.STRING_PROTOCOL,
@@ -99,7 +99,7 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
             new_projs = []
             val = map_attributes[att]
             for p in project_containers:
-                if p.is_archived and p.owner != user_id:
+                if (p.is_archived and p.owner != user_id) or p.is_deleted:
                     continue
                 elif att == constants.STRING_PROTOCOL:
                     compare = s.upper()
@@ -127,7 +127,7 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
                 list_of_lists.append((new_projs, compare))
     else:  # Just show all CodeRequests in order
         for p in project_containers:
-            if not p.is_archived or p.owner == user_id:
+            if (not p.is_archived or p.owner == user_id) and not p.is_deleted:
                 new_projs = [p]
                 list_of_lists.append((new_projs, ""))
 
@@ -136,8 +136,8 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
         'owner': user,
         'numpages': paginator.num_pages,
         'pages': range(1, paginator.num_pages + 1),
-        'hasnext': all_codings.has_next(),
-        'hasprevious': all_codings.has_previous(),
+        'hasnext': project_containers.has_next(),
+        'hasprevious': project_containers.has_previous(),
         'page': page,
         'attribute': att,
         'typelist': type_list,
@@ -292,7 +292,8 @@ def show(request, pk):
         'workinggroups': working_groups,
         'docs': docs,
         'owner': user,
-        'mentor': mentor
+        'mentor': mentor,
+        'list_template': constants.TEMPLATE_REQUESTS_LIST
     })
 
 
@@ -570,6 +571,17 @@ def new(request):
     request.session[constants.MAINTAIN_STATE] = True
 
     return save_project(request, constants.TEMPLATE_REQUESTS_NEW)
+
+
+@login_required(login_url=settings.CODESTAND_PREFIX + constants.TEMPLATE_LOGIN)
+def delete(request, pk, template=None):
+    project = get_object_or_404(ProjectContainer, id=pk)
+    project.is_deleted = True
+    project.save()
+    
+    if not template:
+        template = request.session[constants.ACTUAL_TEMPLATE]
+    return HttpResponseRedirect(template)
 
 
 @login_required(login_url=settings.CODESTAND_PREFIX + constants.TEMPLATE_LOGIN)

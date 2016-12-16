@@ -37,6 +37,7 @@ PREVIOUS_TEMPLATE = 'previous_template'
 
 TEMPLATE_INDEX = "codestand/index.html"
 TEMPLATE_ABOUT = "codestand/about.html"
+TEMPLATE_PROFILE = "codestand/profile.html"
 TEMPLATE_LOGIN = '/codestand/accounts/login'
 TEMPLATE_ERROR_500 = "codestand/500.html"
 TEMPLATE_ERROR_404 = "codestand/404.html"

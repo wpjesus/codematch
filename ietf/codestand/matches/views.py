@@ -5,7 +5,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from ietf.person.models import Person
 from ietf.doc.models import DocAlias
-from ietf.codestand.matches.forms import SearchForm, ProjectContainerForm, CodingProjectForm, LinkImplementationForm
+from ietf.codestand.matches.forms import SearchForm, ProjectContainerForm, CodingProjectForm, LinkImplementationForm, ContactForm
 from ietf.codestand.requests.forms import TagForm, DocNameForm
 from ietf.codestand.matches.models import ProjectContainer, CodingProject, Implementation, ProjectTag
 from ietf.codestand.helpers.utils import (render_page, is_user_allowed, clear_session, get_user)
@@ -76,7 +76,7 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
                         coder = name
                     if user_id is not None and coder_id == user_id:
                         is_owner = True
-                selected_codings.append((coding, project, coder, is_owner))
+                selected_codings.append((coding, project, coder, coder_id, is_owner))
 
     keys = []
     for project_container in all_projects:
@@ -101,8 +101,6 @@ def show_list(request, is_my_list="False", att=constants.ATT_CREATION_DATE, stat
             for name, gname, gparentname in all_documents:
                 if name == key:
                     documents.append((gname, gparentname))
-        # documents = list(DocAlias.objects.using('datatracker').filter(name__in=keys).
-        #                 values_list('document__group__name', 'document__group__parent__name'))
         for gname, gparentname in documents:
             if gname not in working_groups:
                 working_groups.append(gname)
@@ -183,7 +181,8 @@ def show(request, pk, ck):
         'docs': docs,
         'coder': coder,
         'mentor': mentor,
-        'owner': user
+        'owner': user,
+        'list_template': constants.TEMPLATE_MATCHES_LIST
     })
 
 
@@ -309,6 +308,7 @@ def save_code(request, template, pk, ck="", coding=None):
     can_add_documents = is_user_allowed(user, "canadddocuments")
     can_add_links = is_user_allowed(user, "canaddlinks")
     can_add_tags = is_user_allowed(user, "canaddtags")
+    can_add_contact = is_user_allowed(user, "canaddcontact")
 
     project_container = None
     if constants.ACTUAL_PROJECT in request.session:
@@ -319,10 +319,13 @@ def save_code(request, template, pk, ck="", coding=None):
         constants.PROJECT_INSTANCE] if constants.PROJECT_INSTANCE in request.session else ProjectContainerForm()
     code_form = request.session[
         constants.CODE_INSTANCE] if constants.CODE_INSTANCE in request.session else CodingProjectForm()
+    contact_form = request.session[
+        constants.CONTACT_INSTANCE] if constants.CONTACT_INSTANCE in request.session else ContactForm()
 
     docs = request.session[constants.ADD_DOCS]
     links = request.session[constants.ADD_LINKS]
     tags = request.session[constants.ADD_TAGS]
+    contacts = request.session[constants.ADD_CONTACTS]
 
     previous_template = "codestand/matches/show_list"  # Fix this
 
@@ -333,6 +336,7 @@ def save_code(request, template, pk, ck="", coding=None):
 
         implementation = LinkImplementationForm(request.POST)
         tag = TagForm(request.POST)
+        new_contact = ContactForm(request.POST)
         doc_name = request.POST.get("doc")
 
         project = None
@@ -371,6 +375,13 @@ def save_code(request, template, pk, ck="", coding=None):
             new_tag = tag.save(commit=False)
             new_tag.name = "#" + new_tag.name
             tags.append(new_tag)  # Updating tags to appear after rendering
+            
+        # Adding new contact to the mailing list to be saved in the project
+        elif request.POST.get(constants.STRING_CONTACT) and new_contact.is_valid():
+            m = new_contact.save(commit=False)
+            if m.type.lower() == constants.STRING_TWITTER:  # TODO: Standardize for all
+                m.contact = '@' + m.contact
+            contacts.append(m)
 
         # Saving project (new or not) in the database
         elif request.POST.get(constants.STRING_SAVE) and project and new_code.is_valid():
@@ -388,6 +399,7 @@ def save_code(request, template, pk, ck="", coding=None):
             rem_docs = request.session[constants.REM_DOCS]
             rem_links = request.session[constants.REM_LINKS]
             rem_tags = request.session[constants.REM_TAGS]
+            rem_contacts = request.session[constants.REM_CONTACTS]
 
             for link in rem_links:
                 coding_project.links.remove(link)
@@ -426,6 +438,18 @@ def save_code(request, template, pk, ck="", coding=None):
                 # Save the tag in the project (existing or new)
                 coding_project.tags.add(new_tag)
                 modified = True
+                
+            for m in contacts:
+                try:
+                    # Trying get an existing contact
+                    new_m = CodingProject.objects.get(contact=m.contact, type=m.type)
+                except:
+                    # Otherwise you need to create a new contact
+                    m.save()
+                    new_m = m
+
+                coding_project.contacts.add(new_m)
+                modified = True
 
             for doc in docs:
                 keys = project.docs
@@ -459,14 +483,17 @@ def save_code(request, template, pk, ck="", coding=None):
         'linkform': link_form,
         'tagform': tag_form,
         'docform': doc_form,
+        'contactform': contact_form,
         'pk': pk,
         'ck': ck,
         'links': links,
         'tags': tags,
         'docs': docs,
+        'contacts': contacts,
         'canadddocuments': can_add_documents,
         'canaddlinks': can_add_links,
-        'canaddtags': can_add_tags
+        'canaddtags': can_add_tags,
+        'canaddcontact': can_add_contact
     })
 
 
@@ -497,6 +524,7 @@ def edit(request, pk, ck):
         request.session[constants.REM_LINKS] = []
         request.session[constants.REM_TAGS] = []
         request.session[constants.REM_DOCS] = []
+        request.session[constants.REM_CONTACTS] = []
 
     request.session[constants.MAINTAIN_STATE] = True
 
@@ -509,6 +537,10 @@ def edit(request, pk, ck):
     if constants.ADD_TAGS not in request.session:
         tags = coding.tags.all()
         request.session[constants.ADD_TAGS] = list(tags)
+        
+    if constants.ADD_CONTACTS not in request.session:
+        contacts = project_container.contacts.all()
+        request.session[constants.ADD_CONTACTS] = list(contacts)
 
     if constants.ADD_DOCS not in request.session:
         docs = []
@@ -550,6 +582,8 @@ def new(request, pk=""):
         request.session[constants.REM_LINKS] = []
         request.session[constants.REM_TAGS] = []
         request.session[constants.REM_DOCS] = []
+        request.session[constants.REM_CONTACTS] = []
+        request.session[constants.ADD_CONTACTS] = []
         request.session[constants.ADD_LINKS] = []
         request.session[constants.ADD_TAGS] = []
         request.session[constants.ADD_DOCS] = []
@@ -598,6 +632,55 @@ def remove_link(request, ck, link_name):
 
     links.remove(link)
     request.session[constants.ADD_LINKS] = links
+
+    # TODO: Centralize this?
+    return HttpResponseRedirect(refresh_template)
+
+
+@login_required(login_url=settings.CODESTAND_PREFIX + constants.TEMPLATE_LOGIN)
+def delete(request, pk, ck, template=None):
+    project = get_object_or_404(ProjectContainer, id=pk)
+    if not project.code_request:
+        project.delete()
+    get_object_or_404(CodingProject, id=ck).delete()
+    
+    if not template:
+        template = request.session[constants.ACTUAL_TEMPLATE]
+    return HttpResponseRedirect(template)
+
+
+@login_required(login_url=settings.CODESTAND_PREFIX + constants.TEMPLATE_LOGIN)
+def remove_contact(request, ck, contact_name):
+    """ Adds the removal list, but will only be removed when saving changes
+        pk (pk = 0 - new ProjectContainer / pk > 0 - edit ProjectContainer
+        :param request: HttpResponse
+        :param ck: int - Indicates which project must be loaded
+        :param contact_name: string - Indicates which contact must be loaded
+    """
+
+    refresh_template = request.session[constants.ACTUAL_TEMPLATE]
+
+    contacts = request.session[constants.ADD_CONTACTS]
+    contact = next(el for el in contacts if el.contact == contact_name)
+
+    if ck != "0":
+        coding = get_object_or_404(CodingProject, id=ck)
+
+        # TODO: Review this        
+        us = get_user(request)
+        user = us
+
+        # Project must have been created by the current user and
+        # User must have permission to add new CodeRequest
+        if coding.coder != user.id:
+            raise Http404
+
+        if coding.contacts.filter(contact=contact_name):
+            cache_list = request.session[constants.REM_CONTACTS]
+            cache_list.append(contact)
+
+    contacts.remove(contact)
+    request.session[constants.ADD_CONTACTS] = contacts
 
     # TODO: Centralize this?
     return HttpResponseRedirect(refresh_template)

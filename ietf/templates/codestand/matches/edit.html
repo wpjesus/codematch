@@ -18,6 +18,9 @@
 	#id_protocol { width: 300px; }
 	#s2id_id_doc { width: 400px; margin-bottom: 10px; }
 	#id_additional_information { width: 300px; }
+    #div_contact { margin-left: 80px; margin-bottom: -40px" }  
+    #id_contact { width: 300px; margin-right: 10px; margin-left: 5px; }
+    #id_type { margin-left: 10px; margin-right: 10px; }  
 	#id_link { width: 300px; margin-right: 10px; margin-left: 5px; }
 	#id_name { width: 200px; margin-right: 10px; margin-left: 5px; }
   </style>
@@ -35,10 +38,10 @@
 
             <!-- Breadcrumb -->
             <div class="bread-crumb pull-right">
-                <a href="{% url "ietf.codestand.views.index" %}"><i class="fa fa-home"></i> Home</a>
+                <a href="{% url 'ietf.codestand.views.index' %}"><i class="fa fa-home"></i> Home</a>
                 <!-- Divider -->
                 <span class="divider">/</span>
-                <a href="{% url "ietf.codestand.matches.views.show_list" %}" class="bread-current">Projects</a>
+                <a href="{% url 'ietf.codestand.matches.views.show_list' %}" class="bread-current">Projects</a>
                 <span class="divider">/</span>
                 <a href="#" class="bread-current">New</a>
             </div>
@@ -112,7 +115,7 @@
 				            				<h4><strong>Documents</strong></h4>
 											{% for doc in docs %}
 												{{ doc.document.title }}: <a  href="https://datatracker.ietf.org/doc/{{doc.name}}"> {{ doc.name }} </a>
-												<a class="label label-info" href="{% url 'ietf.codestand.requests.views.remove_document' projectcontainer.id doc.name %}" >delete</a>
+												<a class="label label-info" href="{% url 'ietf.codestand.requests.views.remove_document' projectcontainer.id doc.name %}" onclick="return confirm('Are you sure you want to delete this item?');" >delete</a>
 												<br />
 											{% endfor %}
 										{% endif %}
@@ -148,7 +151,7 @@
 										<h4><strong>Implementations</strong></h4>
 										{% for implementation in links %}
 											<a href="{{ implementation }}">{{ implementation }}</a>
-											<a class="label label-info" href="{% url 'ietf.codestand.matches.views.remove_link' ck implementation.link %}" >delete</a>
+											<a class="label label-info" href="{% url 'ietf.codestand.matches.views.remove_link' ck implementation.link %}" onclick="return confirm('Are you sure you want to delete this item?');">delete</a>
 										<br />
 										{% endfor %}
 									{% endif %}
@@ -162,7 +165,32 @@
 								</div>
 
 								<br />
+                                    
+                                <div>
+                                {% if contacts %}
+                                    <h4><strong>Contacts</strong></h4>
+                                    {% for c in contacts %}
+                                        {{ c.type }}: <a  href="#"> {{ c.contact }} </a>
+                                        <a class="label label-info" href="{% url 'ietf.codestand.matches.views.remove_contact' ck c.contact %}" onclick="return confirm('Are you sure you want to delete this contact?');">delete</a>
+                                        <br />
+                                    {% endfor %}
+                                {% endif %}
+                                <br />
 
+                                </div>
+                                {% if canaddcontact %}
+                                    <div id='div_contact'>
+                                    {{ contactform }}
+                                    {% csrf_token %}
+                                    <input type="submit" name="button_contact" value="Add contact" />
+                                    </div>    
+                                {% endif %}
+
+                                <br />
+                                <br />
+
+                                <div>                                    
+                                    
 								<div>
 									{% if tags %}
 		            					<h4><strong>Tags</strong></h4>
@@ -224,4 +252,33 @@
 <script src="{% static 'js/select2-field.js' %}"></script>
 <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
 <script src="{% static 'js/ipr-edit.js' %}"></script>
+<script>
+    jQuery("#confirm").click(function(){
+        $("<div></div>").appendTo('body')
+           .html('<div><h3> write your message for confirm dialog</h3></div>')
+           .dialog({
+                title: "Confotm Dialog" ,
+                width:500, height:300,
+                modal:true,
+                resizable: false, 
+                show: { effect: 'drop', direction: "left" }, 
+                hide:{effect:'blind'}
+
+                buttons: {
+                    Yes: function() {
+                          jQuery.ajax({
+                              type:"POST", //post data
+                              data:{'key':key}, //if you want to send any data to view 
+                              url:'/get_viewerModal/' // your url that u write in action in form tag
+                          }).done(function(result){
+                               alert("am done") //this will executes after your view executed  
+                          })
+                     },
+                    Cancel: function() {
+                        $( this ).dialog( "close" );
+                    }
+               }
+           });
+    });
+<script> 
 {% endblock %}

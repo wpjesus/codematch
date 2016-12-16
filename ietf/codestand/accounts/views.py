@@ -1,8 +1,8 @@
 from ietf.codestand import constants
 from django.db.models import Count
-from django.http import HttpResponseRedirect
-from ietf.codestand.matches.models import CodingProject
-from ietf.codestand.helpers.utils import (render_page)
+from django.http import HttpResponseRedirect, Http404
+from ietf.codestand.matches.models import CodingProject, ProjectContainer
+from ietf.codestand.helpers.utils import (render_page, get_user)
 from ietf.person.models import Person
 from django.conf import settings
 
@@ -15,8 +15,21 @@ def register(request):
     return HttpResponseRedirect(settings.CODESTAND_PREFIX + '/accounts/create/')
 
 
-def profile(request):
-    return HttpResponseRedirect(settings.CODESTAND_PREFIX + '/accounts/profile/')
+def profile(request, user=None):
+    if user is None:
+        current_user = get_user(request)
+        if current_user is None:
+            raise Http404
+        else:
+            user = current_user.id
+    coder = Person.objects.using('datatracker').get(id=user)
+    projects = ProjectContainer.objects.filter(owner=user)
+    codings = CodingProject.objects.filter(coder=user)
+    return render_page(request, constants.TEMPLATE_PROFILE, {
+        'coder': coder,
+        'projects': projects,
+        'codings': codings,
+    })
 
 
 def top_coders(request):
