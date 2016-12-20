@@ -23,12 +23,19 @@ def profile(request, user=None):
         else:
             user = current_user.id
     coder = Person.objects.using('datatracker').get(id=user)
-    projects = ProjectContainer.objects.filter(owner=user)
+    projects = ProjectContainer.objects.exclude(code_request__isnull=True).exclude(is_deleted=True).filter(owner=user)
     codings = CodingProject.objects.filter(coder=user)
+    all_projects = ProjectContainer.objects.all()
+    selected_codings = []
+    for proj in all_projects:
+        all_codings = proj.codings.all()
+        for code in codings:
+            if code in all_codings:
+                selected_codings.append((proj, code))
     return render_page(request, constants.TEMPLATE_PROFILE, {
         'coder': coder,
         'projects': projects,
-        'codings': codings,
+        'codings': selected_codings,
     })
 
 
@@ -40,10 +47,13 @@ def top_coders(request):
     dict_code = {}
     ids = []
     for coding in codings:
-        ids.append(coding.coder)
+        if not coding.is_archived:
+            ids.append(coding.coder)
     ids = list(set(ids))
     all_coders = list(Person.objects.using('datatracker').filter(id__in=ids).values_list('id', 'name'))
     for code in codings:
+        if code.is_archived:
+            continue
         if code.coder not in coders:
             coders.append(code.coder)
             codes.append(code)

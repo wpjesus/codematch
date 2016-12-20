@@ -24,10 +24,10 @@
 
         <!-- Breadcrumb -->
         <div class="bread-crumb pull-right">
-          <a href="{% url "ietf.codestand.views.index" %}"><i class="fa fa-home"></i> Home</a>
+          <a href="{% url 'ietf.codestand.views.index' %}"><i class="fa fa-home"></i> Home</a>
           <!-- Divider -->
           <span class="divider">/</span>
-          <a href="{% url "ietf.codestand.requests.views.show_list" %}" class="bread-current">Coding Requests</a>
+          <a href="{% url 'ietf.codestand.requests.views.show_list' %}" class="bread-current">Coding Requests</a>
           <!-- Divider -->
           <span class="divider">/</span>
           <a href="#" class="bread-current">{{ projectcontainer.title }}</a>

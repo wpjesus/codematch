@@ -70,7 +70,8 @@
                                 	{% for coding, projectcontainer, coder, coder_id, isOwner in codings %}
 	                               		<li>
 	                                    	<!-- Title and date -->
-	                                    	<h5><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="{% url 'ietf.codestand.accounts.views.profile' coder_id %}">{{ coder }}</a>
+	                                    	<!--<h5><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="{% url 'ietf.codestand.accounts.views.profile' coder_id %}">{{ coder }}</a>-->
+                                            <h5><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coder }}</a>
             		                      	{% if user.is_authenticated and isOwner %}
 					                   			<a class="label label-info" href="{% url 'ietf.codestand.matches.views.edit' projectcontainer.id coding.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a>
 							               		<a class="label label-danger" href="{% url 'ietf.codestand.matches.views.delete' projectcontainer.id coding.id %}" onclick="return confirm('Are you sure you want to delete this document?');"><i class="fa fa-times"></i> Delete</a>

@@ -24,7 +24,7 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
                                     mentoring = CodeRequests i'm mentoring)
         :param request: HttpResponse
     """
-
+    
     user = get_user(request)
     user_id = None
     if user:
@@ -37,17 +37,17 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
             # Project must have been created by the current user and user must have permission mentor
             if not is_user_allowed(user, "iscreator"):
                 raise Http404
-            project_containers = ProjectContainer.objects.exclude(code_request__isnull=True).filter(
+            project_containers = ProjectContainer.objects.exclude(is_deleted=True).exclude(code_request__isnull=True).filter(
                 owner=user.id)
         elif type_list == "mentoring":
             # Project must have been mentored by the current user and user must have permission mentor
             if not is_user_allowed(user, "ismentor"):
                 raise Http404
-            project_containers = ProjectContainer.objects.exclude(code_request__isnull=True).filter(
+            project_containers = ProjectContainer.objects.exclude(is_deleted=True).exclude(code_request__isnull=True).filter(
                 code_request__mentor=user.id)
         else:
             # Exclude ProjectContainers that don't have an associated CodeRequest (TODO: Centralize this?)
-            project_containers = ProjectContainer.objects.exclude(code_request__isnull=True)
+            project_containers = ProjectContainer.objects.exclude(is_deleted=True).exclude(code_request__isnull=True)
 
     if att == constants.STRING_POPULARITY:
         project_containers = project_containers.annotate(count=Count('codings')).order_by('-count')[:20]
@@ -64,12 +64,16 @@ def show_list(request, type_list="all", att=constants.ATT_CREATION_DATE, state="
     map_attributes = {'protocol': constants.STRING_PROTOCOL,
                       'working_group': constants.STRING_WORKINGGROUP,
                       'area': constants.STRING_AREA}
-
+    
+    all_documents = []
     # If the attribute is in the dictionary then should do the sorting and grouping for this attribute
     if att in map_attributes:
         # Get all values for this attribute (eg. protocol: OSPF, RIP, NewProtocol)
         if att == 'protocol':
-            select = list(set(project_containers.values_list(att, flat=True)))
+            select = []
+            for proj in project_containers:
+                select.append(proj.protocol)
+            select = list(set(select))
         else:
             docs = []
             keys = []
@@ -173,19 +177,19 @@ def search(request, type_list="all"):
                 break
 
         if search_in_all or request.GET.get(constants.STRING_TITLE):
-            ids += ProjectContainer.objects.exclude(code_request__isnull=True).filter(
+            ids += ProjectContainer.objects.exclude(is_deleted=True).exclude(code_request__isnull=True).filter(
                 title__icontains=query).values_list('id', flat=True)
 
         if search_in_all or request.GET.get(constants.STRING_DESCRIPTION):
-            ids += ProjectContainer.objects.exclude(code_request__isnull=True).filter(
+            ids += ProjectContainer.objects.exclude(is_deleted=True).exclude(code_request__isnull=True).filter(
                 description__icontains=query).values_list('id', flat=True)
 
         if search_in_all or request.GET.get(constants.STRING_PROTOCOL):
-            ids += ProjectContainer.objects.exclude(code_request__isnull=True).filter(
+            ids += ProjectContainer.objects.exclude(is_deleted=True).exclude(code_request__isnull=True).filter(
                 protocol__icontains=query).values_list('id', flat=True)
 
         if search_in_all or request.GET.get(constants.STRING_MENTOR):
-            projects = ProjectContainer.objects.exclude(code_request__isnull=True)
+            projects = ProjectContainer.objects.exclude(is_deleted=True).exclude(code_request__isnull=True)
             for pr in projects:
                 # TODO: Review this
                 try:
@@ -197,7 +201,7 @@ def search(request, type_list="all"):
 
         if search_in_all or request.GET.get(constants.STRING_DOC):
             docs = []
-            for project_container in ProjectContainer.objects.exclude(code_request__isnull=True).all():
+            for project_container in ProjectContainer.objects.exclude(is_deleted=True).exclude(code_request__isnull=True).all():
                 if not project_container.docs or project_container.docs == '':
                     continue
                 keys = filter(None, project_container.docs.split(';'))
@@ -210,7 +214,7 @@ def search(request, type_list="all"):
 
         if search_in_all or request.GET.get(constants.STRING_AREA):
             docs = []
-            for project_container in ProjectContainer.objects.all():
+            for project_container in ProjectContainer.object.exclude(is_deleted=True).all():
                 if not project_container.docs or project_container.docs == '':
                     continue
                 keys = filter(None, project_container.docs.split(';'))
@@ -223,7 +227,7 @@ def search(request, type_list="all"):
 
         if search_in_all or request.GET.get(constants.STRING_WORKINGGROUP):
             docs = []
-            for project_container in ProjectContainer.objects.all():
+            for project_container in ProjectContainer.objects.exclude(is_deleted=True).all():
                 if not project_container.docs or project_container.docs == '':
                     continue
                 keys = filter(None, project_container.docs.split(';'))
@@ -234,7 +238,7 @@ def search(request, type_list="all"):
                         ids.append(project_container.id)
                         break
 
-        project_containers = ProjectContainer.objects.filter(id__in=list(set(ids)))
+        project_containers = ProjectContainer.objects.exclude(is_deleted=True).filter(id__in=list(set(ids)))
 
         request.session[constants.ALL_PROJECTS] = project_containers
 
@@ -488,6 +492,11 @@ def save_project(request, template, project_container=None):
 def archive(request, pk):
     
     project_container = get_object_or_404(ProjectContainer, id=pk)
+    
+    user = get_user(request)
+    if project_container.owner != user.id:
+        raise Http404
+    
     project_container.is_archived = not project_container.is_archived
     project_container.save()
     
@@ -575,13 +584,19 @@ def new(request):
 
 @login_required(login_url=settings.CODESTAND_PREFIX + constants.TEMPLATE_LOGIN)
 def delete(request, pk, template=None):
+    
     project = get_object_or_404(ProjectContainer, id=pk)
+    user = get_user(request)
+    if project.owner != user.id:
+        raise Http404
     project.is_deleted = True
     project.save()
     
     if not template:
         template = request.session[constants.ACTUAL_TEMPLATE]
-    return HttpResponseRedirect(template)
+        HttpResponseRedirect(template)
+    else:
+        return HttpResponseRedirect('/codestand/requests/show_list/')
 
 
 @login_required(login_url=settings.CODESTAND_PREFIX + constants.TEMPLATE_LOGIN)

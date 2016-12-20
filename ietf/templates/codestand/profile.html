@@ -46,7 +46,6 @@
                             <a href="mailto:matheusprola@hotmail.com">matheusprola@hotmail.com</a>
                         </li>
                         <li>Affiliation: {{ coder.affiliation }}</li>
-                        <li>Biography: {{ coder.biography }}</li>
                     </ul>
 
                     <!--<h3>Contacts</h3>-->
@@ -62,17 +61,17 @@
                     {% for proj in projects %}
                     <div>
                         <ul>
-                            <li><a href="#">{{ proj.title }}</a></li>
+                            <li><a href="{% url 'ietf.codestand.requests.views.show' proj.id %}">{{ proj.title }}</a></li>
                         </ul>
                     </div>
                     {% endfor %}
 
                     <h3>Code Requests ({{ codings|length }})</h3>
 
-                    {% for coding in codings %}
+                    {% for proj, coding in codings %}
                     <div>
                         <ul>
-                            <li><a href="#">{{ coding.title }}</a></li>
+                            <li><a href="{% url 'show' proj.id coding.id %}">{{ coding.title }}</a> </li>
                         </ul>
                     </div>
                     {% endfor %}

@@ -412,6 +412,10 @@ def save_code(request, template, pk, ck="", coding=None):
             for doc in rem_docs:
                 project.docs = project.docs.replace(doc.name, '', 1)
                 modified = True
+                
+            for m in rem_contacts:
+                coding.contacts.remove(m)
+                modified = True
 
             for link in links:
                 try:
@@ -499,11 +503,15 @@ def save_code(request, template, pk, ck="", coding=None):
 
 @login_required(login_url=settings.CODESTAND_PREFIX + constants.TEMPLATE_LOGIN)
 def archive(request, ck):
-    
+
+    user = get_user(request)
     coding_project = get_object_or_404(CodingProject, id=ck)
+    if coding_project.coder != user.id:
+        raise Http404
+
     coding_project.is_archived = not coding_project.is_archived
     coding_project.save()
-    
+
     refresh_template = request.session[constants.ACTUAL_TEMPLATE]
     return HttpResponseRedirect(refresh_template)
 
@@ -639,14 +647,23 @@ def remove_link(request, ck, link_name):
 
 @login_required(login_url=settings.CODESTAND_PREFIX + constants.TEMPLATE_LOGIN)
 def delete(request, pk, ck, template=None):
+    
     project = get_object_or_404(ProjectContainer, id=pk)
+    coding = get_object_or_404(CodingProject, id=ck)
+    user = get_user(request)
+    
+    if coding.coder != user.id:
+        raise Http404
+    
     if not project.code_request:
         project.delete()
-    get_object_or_404(CodingProject, id=ck).delete()
+    coding.delete()
     
     if not template:
         template = request.session[constants.ACTUAL_TEMPLATE]
-    return HttpResponseRedirect(template)
+        HttpResponseRedirect(template)
+    else:
+        return HttpResponseRedirect('/codestand/matches/show_list/')
 
 
 @login_required(login_url=settings.CODESTAND_PREFIX + constants.TEMPLATE_LOGIN)

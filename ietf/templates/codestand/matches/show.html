@@ -145,6 +145,11 @@
 												<br />
 											{% endif %}
 
+                                            {% for m in coding.contacts.all %}
+                                                {{ m.type }}: <a href="#">
+                                                    {{ m.contact }}</a><br />
+                                            {% endfor %}
+
 										</div>
 
 									</div>

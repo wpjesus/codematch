@@ -100,3 +100,11 @@ class ProjectContainer(models.Model):
     
     def __unicode__(self):  # __unicode__ on Python 2
         return self.title
+    
+# TODO: Thinks about change this to other model
+class DashboardConfig(models.Model):
+    """ The Dashboard config is the saved preferences to dashboard from user """
+    
+    user = models.IntegerField(null=True, blank=True)
+    
+    data = models.CharField(null=True, blank=True, max_length=255)

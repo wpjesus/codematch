@@ -97,8 +97,8 @@
 
             <!-- Dropdown menu -->
             <ul class="dropdown-menu">
-              <li><a href="{% url 'ietf.codestand.accounts.views.profile' %}"><i class="fa fa-user"></i> {{ username }} </a></li>
-              <!--<li><a href="#"><i class="fa fa-cogs"></i> Settings</a></li>-->
+              <!--<li><a href="{% url 'ietf.codestand.accounts.views.profile' %}"><i class="fa fa-user"></i> {{ username }} </a></li>-->
+                <li><a href="#"><i class="fa fa-user"></i> {{ username }} </a></li>
               <li><a rel="nofollow" href="{% url 'django.contrib.auth.views.logout' %}" >Logout</a></li>
             </ul>
           </li>
