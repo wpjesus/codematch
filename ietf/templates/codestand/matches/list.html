@@ -74,7 +74,7 @@
                                             <h5><a href="{% url 'show' projectcontainer.id coding.id %}">{{ coding.title }}</a> <span>by</span> <a href="#">{{ coder }}</a>
             		                      	{% if user.is_authenticated and isOwner %}
 					                   			<a class="label label-info" href="{% url 'ietf.codestand.matches.views.edit' projectcontainer.id coding.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a>
-							               		<a class="label label-danger" href="{% url 'ietf.codestand.matches.views.delete' projectcontainer.id coding.id %}" onclick="return confirm('Are you sure you want to delete this document?');"><i class="fa fa-times"></i> Delete</a>
+							               		<a class="label label-danger" href="{% url 'ietf.codestand.matches.views.delete' projectcontainer.id coding.id %}" onclick="return confirm('Are you sure you want to delete this Project?');"><i class="fa fa-times"></i> Delete</a>
                                                 <a class="label label-warning" href="{% url 'ietf.codestand.matches.views.archive' coding.id %}" ><i class="fa fa-folder"></i>
                                                 {% if coding.is_archived %}                                            
                                                     Unarchive

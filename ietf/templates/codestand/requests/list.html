@@ -104,7 +104,7 @@
 	                      	{% if user.is_authenticated %}
 	                   			{% if projectcontainer.owner == owner.id %}
 		                   			<a class="label label-info" href="{% url 'ietf.codestand.requests.views.edit' projectcontainer.id %}" style="margin-left: 30px"><i class="fa fa-pencil"></i> Edit</a>
-                                    <a class="label label-danger" href="{% url 'ietf.codestand.requests.views.delete' projectcontainer.id %}" onclick="return confirm('Are you sure you want to delete this document?');"><i class="fa fa-times"></i> Delete</a>
+                                    <a class="label label-danger" href="{% url 'ietf.codestand.requests.views.delete' projectcontainer.id %}" onclick="return confirm('Are you sure you want to delete this Code Request?');"><i class="fa fa-times"></i> Delete</a>
                                     <a class="label label-warning" href="{% url 'ietf.codestand.requests.views.archive' projectcontainer.id %}" ><i class="fa fa-folder"></i> 
                                     {% if projectcontainer.is_archived %}                                            
                                             Unarchive
